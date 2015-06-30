@@ -1,6 +1,7 @@
 """Cython interface to CUDD."""
-from libc.stdio cimport FILE, fdopen
+import pprint
 import sys
+from libc.stdio cimport FILE, fdopen
 from omega.symbolic.bdd import Nodes as _Nodes
 from omega.symbolic.bdd import Parser
 
@@ -216,6 +217,35 @@ def add_expr(e, bdd):
     return u
 
 
+def slugsin_parser(s):
+    sections = {
+        'INPUT', 'OUTPUT', 'ENV_INIT', 'SYS_INIT',
+        'ENV_TRANS', 'SYS_TRANS',
+        'ENV_LIVENESS', 'SYS_LIVENESS'}
+    sections = {'[{s}]'.format(s=s) for s in sections}
+    d = dict()
+    store = None
+    for line in s.splitlines():
+        if not line or line.startswith('#'):
+            continue
+        if line in sections:
+            store = list()
+            d[line] = store
+        else:
+            assert store is not None
+            print('storing in: ', store)
+            store.append(line)
+    return d
+
+
+def load_slugsin_file():
+    fname = 'slugs.txt'
+    with open(fname, 'r') as f:
+        s = f.read()
+    d = slugsin_parser(s)
+    pprint.pprint(d)
+
+
 def main():
     cdef DdManager *mgr
     cdef DdNode *u
@@ -291,4 +321,5 @@ cdef print_info(DdManager * mgr):
 
 
 print("hello world")
-main()
+# main()
+load_slugsin_file()
