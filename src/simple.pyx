@@ -232,6 +232,8 @@ def main():
     print('True: ', u.index)
     v = Cudd_ReadLogicZero(mgr)
     print('False: ', v.index)
+    # Cudd_RecursiveDeref(mgr, u)
+    # Cudd_RecursiveDeref(mgr, v)
 
     # add some variables, and store them in an array
 
@@ -248,6 +250,7 @@ def main():
     y[1] = x3
 
     u = Cudd_bddAnd(mgr, x0, x2)
+    Cudd_Ref(u)
     Cudd_bddSwapVariables(mgr, u, x, y, 2)
 
     # print_info(mgr)
@@ -258,17 +261,27 @@ def main():
     fv.init(mgr, v)
     f = _bdd_apply('and', fu, fv)
     print(f)
+    del f, fu, fv
+    Cudd_RecursiveDeref(mgr, u)
 
     bdd = BDD()
     bdd.manager = mgr
     bdd.var_to_index = dict(x=0, y=1)
     print(bdd.var_to_index)
 
-    s = '| 0 1'
+    s = '& | 0 1 x'
     f = add_expr(s, bdd)
     print(f)
     u = Cudd_ReadOne(mgr)
+    Cudd_Ref(u)
     print(u.index)
+    Cudd_RecursiveDeref(mgr, u)
+    del f
+
+    print_info(mgr)
+
+    n = Cudd_CheckZeroRef(mgr)
+    assert n == 0, n
 
 
 cdef print_info(DdManager * mgr):
