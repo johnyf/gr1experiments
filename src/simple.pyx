@@ -1,3 +1,4 @@
+"""Cython interface to CUDD."""
 from libc.stdio cimport FILE, fdopen
 import sys
 from omega.symbolic.bdd import Nodes as _Nodes
@@ -14,24 +15,28 @@ cdef extern from "cudd.h":
         pass
     ctypedef DdManager DdManager
     cdef DdManager * Cudd_Init (
-    	unsigned int numVars,
-    	unsigned int numVarsZ,
-    	unsigned int numSlots,
-    	unsigned int cacheSize,
-    	unsigned long maxMemory)
+        unsigned int numVars,
+        unsigned int numVarsZ,
+        unsigned int numSlots,
+        unsigned int cacheSize,
+        unsigned long maxMemory)
     cdef DdNode * Cudd_bddNewVar(DdManager *dd)
     cdef DdNode * Cudd_bddIthVar(DdManager *dd, int i)
     cdef DdNode * Cudd_ReadLogicZero(DdManager *dd)
     cdef DdNode * Cudd_ReadOne(DdManager *dd)
     cdef DdNode * Cudd_Not(DdNode *dd)
-    cdef DdNode * Cudd_bddIte(DdManager *dd,
-                              DdNode *f, DdNode *g, DdNode *h)
-    cdef DdNode * Cudd_bddAnd(DdManager *dd, DdNode *dd, DdNode *dd)
-    cdef DdNode * Cudd_bddOr(DdManager *dd, DdNode *dd, DdNode *dd)
-    cdef DdNode * Cudd_bddXor(DdManager *dd, DdNode *f, DdNode *g)
+    cdef DdNode * Cudd_bddIte(DdManager *dd, DdNode *f,
+                              DdNode *g, DdNode *h)
+    cdef DdNode * Cudd_bddAnd(DdManager *dd,
+                              DdNode *dd, DdNode *dd)
+    cdef DdNode * Cudd_bddOr(DdManager *dd,
+                             DdNode *dd, DdNode *dd)
+    cdef DdNode * Cudd_bddXor(DdManager *dd,
+                              DdNode *f, DdNode *g)
 
     cdef void Cudd_Ref(DdNode *n)
-    cdef void Cudd_RecursiveDeref(DdManager *table, DdNode *n)
+    cdef void Cudd_RecursiveDeref(DdManager *table,
+                                  DdNode *n)
     cdef void Cudd_Deref(DdNode *n)
     cdef int Cudd_CheckZeroRef(DdManager *manager)
     cdef void Cudd_Quit(DdManager *unique)
@@ -39,11 +44,12 @@ cdef extern from "cudd.h":
     cdef int Cudd_DagSize(DdNode *node)
 
     cdef DdNode * Cudd_bddExistAbstract(
-        	DdManager *manager, DdNode *f, DdNode *cube)
+        DdManager *manager, DdNode *f, DdNode *cube)
     cdef DdNode * Cudd_bddUnivAbstract(
-        	DdManager *manager, DdNode *f, DdNode *cube)
+        DdManager *manager, DdNode *f, DdNode *cube)
     cdef DdNode * Cudd_bddSwapVariables(
-        	DdManager *dd, DdNode *f, DdNode **x, DdNode **y, int n)
+        DdManager *dd,
+        DdNode *f, DdNode **x, DdNode **y, int n)
 
 
 CUDD_UNIQUE_SLOTS = 256
@@ -228,6 +234,7 @@ def main():
     print('False: ', v.index)
 
     # add some variables, and store them in an array
+
     x0 = Cudd_bddNewVar(mgr)
     x1 = Cudd_bddNewVar(mgr)
     x2 = Cudd_bddNewVar(mgr)
@@ -239,10 +246,11 @@ def main():
     x[1] = x1
     y[0] = x2
     y[1] = x3
+
     u = Cudd_bddAnd(mgr, x0, x2)
     Cudd_bddSwapVariables(mgr, u, x, y, 2)
-    # print_info(mgr)
 
+    # print_info(mgr)
     fu = Function()
     fu.init(mgr, u)
     mgr = fu.manager
