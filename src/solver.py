@@ -415,6 +415,28 @@ def solve_game(fname):
     del aut, z
 
 
+def test_binary_operators():
+    for n in xrange(1, 1500):
+        a = range(n)
+        f = plus
+        x0 = compute_as_binary_tree(f, list(a))
+        x1 = compute_as_binary_tree_simple(f, list(a))
+        x2 = linear_operator(f, list(a))
+        x3 = linear_operator_simple(f, list(a))
+        x4 = recurse_binary(f, list(a))
+        z = sum(a)
+        assert x0 == z, (x0, z)
+        assert x1 == z, (x1, z)
+        assert x2 == z, (x2, z)
+        assert x3 == z, (x3, z)
+        assert x4 == z, (x4, z)
+        print(z)
+
+
+def plus(x, y):
+    return x + y
+
+
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--file', type=str, help='slugsin input file')
