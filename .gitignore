@@ -1,5 +1,10 @@
 build/*
+src/build/*
 *.pyc
 *.out
 *.so
+*.o
+*.txt
+*.json
+*.swp
 
