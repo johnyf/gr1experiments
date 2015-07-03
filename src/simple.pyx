@@ -815,7 +815,7 @@ def recurse_binary(f, x):
     assert n > 0
     if n == 1:
         return x.pop()
-    k = math.floor(n % 2)
+    k = int(math.floor(n % 2))
     m = 2**k
     left = x[:m]
     right = x[m:]
@@ -835,8 +835,8 @@ def compute_as_binary_tree(f, x):
     # x = y
     while len(x) > 1:
         n = len(x)
-        k = math.floor(n / 2.0)
         logger.debug('Binary at: {n}'.format(n=n))
+        k = int(math.floor(n / 2.0))
         # consume the power of 2
         for i in xrange(k):
             j = 2 * i
@@ -864,7 +864,7 @@ def compute_as_binary_tree_simple(f, x):
     # x = y
     while len(x) > 1:
         n = len(x)
-        k = math.floor(n / 2.0)
+        k = int(math.floor(n / 2.0))
         # consume the power of 2
         r = [f(a, b) for a, b in zip(x[::2], x[1::2])]
         # has last element ?
