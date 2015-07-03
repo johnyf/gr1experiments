@@ -734,10 +734,10 @@ def compute_winning_set(aut):
             del y, yold, live_trans
         del zp
         # conjoin
-        # z = compute_as_binary_tree(lambda x, y: x & y, yj)
+        z = compute_as_binary_tree(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
-        linear_operator(lambda x, y: x & y, yj)
+        # linear_operator(lambda x, y: x & y, yj)
         z = yj[0]
         logger.debug('zold = {zold}'.format(zold=zold))
         logger.debug('z = {z}'.format(z=z))
