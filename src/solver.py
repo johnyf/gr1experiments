@@ -233,8 +233,7 @@ def compute_winning_set(aut):
         z = compute_as_binary_tree(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
-        # linear_operator(lambda x, y: x & y, yj)
-        z = yj[0]
+        # z = linear_operator(lambda x, y: x & y, yj)
         logger.debug('zold = {zold}'.format(zold=zold))
         logger.debug('z = {z}'.format(z=z))
         bdd.assert_consistent()
@@ -376,7 +375,7 @@ def compute_as_binary_tree_simple(f, x):
         assert len(x) == n - k, (len(x), n - k)
     assert len(x) == 1, len(x)
     logger.debug('-- done binary tree')
-    return x[0]
+    return x.pop()
 
 
 def linear_operator(f, x):
@@ -386,8 +385,9 @@ def linear_operator(f, x):
     n = len(x)
     for i in xrange(1, n):
         x[0] = f(x[0], x.pop())
-    assert len(x) == 1
+    assert len(x) == 1, len(x)
     logger.debug('-- done linear operator')
+    return x.pop()
 
 
 def linear_operator_simple(f, x):
