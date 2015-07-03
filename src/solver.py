@@ -187,6 +187,7 @@ def compute_winning_set(aut):
             live_trans = goal & zp
             y = bdd.False
             yold = None
+            print(bdd)
             while y != yold:
                 logger.debug('Start Y iteration')
                 yold = y
@@ -406,7 +407,7 @@ def solve_game(fname):
     d = load_slugsin_file(fname)
     bdd = cudd.BDD()
     aut = make_automaton(d, bdd)
-    print(aut)
+    # print(aut)
     print(bdd)
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
