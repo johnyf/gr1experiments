@@ -59,7 +59,11 @@ cdef extern from 'cudd.h':
     cdef int Cudd_ReadSize(DdManager *dd)
     cdef long Cudd_ReadNodeCount(DdManager *dd)
     cdef long Cudd_ReadPeakNodeCount(DdManager *dd)
+    cdef int Cudd_ReadPeakLiveNodeCount(DdManager * dd)
+    cdef unsigned long Cudd_ReadMemoryInUse(DdManager *dd)
+    cdef unsigned int Cudd_ReadReorderings(DdManager *dd)
     cdef long Cudd_ReadReorderingTime(DdManager * dd)
+    cdef int Cudd_ReadPerm(DdManager *dd, int i)
     cdef int Cudd_DagSize(DdNode *node)
 
     cdef void Cudd_SetMaxCacheHard(DdManager *dd, unsigned int mc)
@@ -126,15 +130,22 @@ cdef class BDD(object):
         Cudd_Quit(self.manager)
 
     def __str__(self):
-        peak = Cudd_ReadPeakNodeCount(self.manager)
-        n_vars = Cudd_ReadSize(self.manager)
         n = Cudd_ReadNodeCount(self.manager)
+        peak = Cudd_ReadPeakLiveNodeCount(self.manager)
+        n_vars = Cudd_ReadSize(self.manager)
+        reordering_time = Cudd_ReadReorderingTime(self.manager)
+        reordering_time = reordering_time / 1000.0
+        n_reorderings = Cudd_ReadReorderings(self.manager)
         s = (
             'Binary decision diagram (CUDD wrapper) with:\n'
-            '\t {n} nodes now\n'
-            '\t {peak} nodes at peak\n'
-            '\t {n_vars} BDD variables\n').format(
-                n=n, peak=peak, n_vars=n_vars)
+            '\t {n} live nodes now\n'
+            '\t {peak} live nodes at peak\n'
+            '\t {n_vars} BDD variables\n'
+            '\t {reorder_t} sec spent reordering\n'
+            '\t {n_reorder} reorderings\n').format(
+                n=n, peak=peak, n_vars=n_vars,
+                reorder_t=reordering_time,
+                n_reorder=n_reorderings)
         return s
 
     cdef incref(self, DdNode * u):
