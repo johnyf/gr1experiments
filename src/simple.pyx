@@ -123,7 +123,7 @@ cdef class BDD(object):
     def __cinit__(self):
         mgr = Cudd_Init(
             0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS,
-            2 * 1024UL * 1024UL * 1024UL)
+            16 * 1024UL * 1024UL * 1024UL)
         Cudd_SetMaxCacheHard(mgr, MAX_CACHE)
         Cudd_AutodynEnable(mgr, CUDD_REORDER_GROUP_SIFT)
         Cudd_SetMaxGrowth(mgr, 1.2)
