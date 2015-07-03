@@ -710,7 +710,7 @@ def compute_winning_set(aut):
                         # desired transitions
                         logger.debug('conjoin')
                         x = xp & ~ excuse
-                        del xp
+                        # del xp
                         logger.debug('disjoin')
                         x = x | live_trans
                         logger.debug('conjoin with sys_action')
@@ -912,9 +912,4 @@ def solve_game(fname):
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
     print(bdd)
-
-
-fname = 'slugs.txt'
-logger.addHandler(logging.StreamHandler())
-logger.setLevel('DEBUG')
-
+    del aut, z
