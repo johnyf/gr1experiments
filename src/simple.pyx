@@ -465,7 +465,7 @@ def slugsin_parser(s):
             d[line] = store
         else:
             assert store is not None
-            logger.debug('storing in: ', store)
+            logger.debug('storing in: ', str(store))
             store.append(line)
     return d
 
@@ -705,17 +705,24 @@ def compute_winning_set(aut):
                     while x != xold:
                         logger.debug('Start X iteration')
                         xold = x
+                        logger.debug('rename')
                         xp = _bdd_rename(x, bdd, aut.prime)
                         # desired transitions
+                        logger.debug('conjoin')
                         x = xp & ~ excuse
                         del xp
+                        logger.debug('disjoin')
                         x = x | live_trans
+                        logger.debug('conjoin with sys_action')
                         x = x & sys_action
-                        # logger.debug(
-                        #     "rho_s & (live_trans | (! J_i^e & X'))")
+                        logger.debug(
+                             "rho_s & (live_trans | (! J_i^e & X'))")
                         # cox
+                        logger.debug('exists')
                         x = bdd.quantify(x, aut.epvars, forall=False)
+                        logger.debug('implication')
                         x = x | ~ env_action
+                        logger.debug('forall')
                         x = bdd.quantify(x, aut.upvars, forall=True)
                     logger.debug('Disjoin X of this assumption')
                     good = good | x
@@ -735,6 +742,9 @@ def compute_winning_set(aut):
         logger.debug('zold = {zold}'.format(zold=zold))
         logger.debug('z = {z}'.format(z=z))
         bdd.assert_consistent()
+        current_time = time.time()
+        t = current_time - start_time
+        logger.info('Completed Z iteration in: {t} sec'.format(t=t))
     end_time = time.time()
     t = end_time - start_time
     print(
@@ -826,6 +836,7 @@ def compute_as_binary_tree(f, x):
     while len(x) > 1:
         n = len(x)
         k = math.floor(n / 2.0)
+        logger.debug('Binary at: {n}'.format(n=n))
         # consume the power of 2
         for i in xrange(k):
             j = 2 * i
