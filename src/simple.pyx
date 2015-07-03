@@ -843,11 +843,13 @@ def compute_as_binary_tree(f, x):
             a = x[j]
             b = x[j + 1]
             x[i] = f(a, b)
-        # has last element ?
         if len(x) % 2 == 1:
+            # has last element ?
             x[k] = x[2 * k]
-        # empty tail
-        del x[k + 1:]
+            # empty tail
+            del x[k + 1:]
+        else:
+            del x[k:]
         assert len(x) == n - k, (len(x), n - k)
     assert len(x) == 1, len(x)
     logger.debug('-- done binary tree')
