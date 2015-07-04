@@ -227,7 +227,7 @@ def compute_winning_set(aut):
             del y, yold, live_trans
         del zp
         # conjoin
-        z = compute_as_binary_tree(lambda x, y: x & y, yj)
+        z = recurse_binary(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
         # z = linear_operator(lambda x, y: x & y, yj)
@@ -302,7 +302,7 @@ def construct_streett_1_transducer(z, aut):
         # transducer = transducer & counter & (goal | ~ selector)
         transducers.append(transducer)
     # disjoin the strategies for the individual goals
-    transducer = compute_as_binary_tree(lambda x, y: x | y, transducers)
+    transducer = recurse_binary(lambda x, y: x | y, transducers)
     transducer = transducer & sys_action
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     return transducer
