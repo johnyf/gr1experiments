@@ -176,14 +176,16 @@ def compute_winning_set(aut):
     # todo: add counter variable
     z = bdd.True
     zold = None
-    logger.debug('before z fixpoint')
+    log.debug('before z fixpoint')
     while z != zold:
-        logger.debug('Start Z iteration')
+        log.debug('Start Z iteration')
         zold = z
         zp = cudd._bdd_rename(z, bdd, aut.prime)
         yj = list()
         for goal in aut.win['sys']:
             log.info('Guarantee: {goal}'.format(goal=goal))
+        for j, goal in enumerate(aut.win['sys']):
+            log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
             live_trans = goal & zp
             y = bdd.False
@@ -195,7 +197,7 @@ def compute_winning_set(aut):
                 live_trans = live_trans | yp
                 good = y
                 for excuse in aut.win['env']:
-                    # logger.debug(
+                    # log.debug(
                     #     'Assumption: {excuse}'.format(excuse=excuse))
                     x = bdd.True
                     xold = None
@@ -253,6 +255,7 @@ def memoize_iterates(z, aut):
 def construct_streett_1_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # Compute iterates, now that we know the outer fixpoint
+    log = logging.getLogger('solver')
     bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -261,15 +264,15 @@ def construct_streett_1_transducer(z, aut):
     # selector = aut.add_expr('strat_type')
     zp = cudd._bdd_rename(z, bdd, aut.prime)
     for j, goal in enumerate(aut.win['sys']):
-        logger.info('Goal: {j}'.format(j=j))
-        logger.info(bdd)
+        log.info('Goal: {j}'.format(j=j))
+        log.info(bdd)
         covered = bdd.False
         transducer = bdd.False
         live_trans = goal & zp
         y = bdd.False
         yold = None
         while y != yold:
-            logger.debug('Start Y iteration')
+            log.debug('Start Y iteration')
             yold = y
             yp = cudd._bdd_rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
@@ -278,28 +281,37 @@ def construct_streett_1_transducer(z, aut):
                 x = bdd.True
                 xold = None
                 while x != xold:
-                    logger.debug('Start X iteration')
+                    log.debug('Start X iteration')
                     xold = x
                     xp = cudd._bdd_rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
                     x = x | live_trans
+                    print('AND abstract')
                     x = cudd.and_abstract(x, sys_action, aut.epvars, bdd)
+                    print('OR abstract')
                     x = cudd.or_abstract(x, ~ env_action, aut.upvars, bdd)
                 # good
+                print('good')
                 good = good | x
                 # new - use x as temp
+                print('rename')
                 xp = cudd._bdd_rename(x, bdd, aut.prime)
                 x = xp & ~ excuse
                 x = x | live_trans
+                print('and abstract')
                 new = cudd.and_abstract(x, sys_action, aut.epvars, bdd)
+                print('and covered')
                 new = new & ~ covered
+                print('integrate covered')
                 covered = covered | new
+                print('integrate transducer')
                 transducer = transducer | (new & x)
             y = good
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
         # counter = aut.add_expr('c = {j}'.format(j=j))
         # transducer = transducer & counter & (goal | ~ selector)
+        log.info('appending transducer for this goal')
         transducers.append(transducer)
     # disjoin the strategies for the individual goals
     transducer = recurse_binary(lambda x, y: x | y, transducers)
@@ -444,7 +456,7 @@ if __name__ == '__main__':
     args = p.parse_args()
     fname = args.file
     # fname = 'slugs_small.txt'
-    logger = logging.getLogger('__main__')
+    logger = logging.getLogger('solver')
     logger.addHandler(logging.StreamHandler())
     logger.setLevel('INFO')
     solve_game(fname)
