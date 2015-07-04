@@ -168,7 +168,8 @@ def add_variables(d, bdd):
 
 def compute_winning_set(aut):
     """Compute winning region, w/o memoizing iterates."""
-    print('Compute winning region')
+    logger.info('++ Compute winning region')
+    log = logging.getLogger('solver')
     bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -183,13 +184,13 @@ def compute_winning_set(aut):
         zp = cudd._bdd_rename(z, bdd, aut.prime)
         yj = list()
         for goal in aut.win['sys']:
-            logger.debug('Guarantee: {goal}'.format(goal=goal))
+            log.info('Guarantee: {goal}'.format(goal=goal))
+            log.info(bdd)
             live_trans = goal & zp
             y = bdd.False
             yold = None
-            print(bdd)
             while y != yold:
-                logger.debug('Start Y iteration')
+                log.debug('Start Y iteration')
                 yold = y
                 yp = cudd._bdd_rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
@@ -200,33 +201,21 @@ def compute_winning_set(aut):
                     x = bdd.True
                     xold = None
                     while x != xold:
-                        logger.debug('Start X iteration')
+                        log.debug('Start X iteration')
                         xold = x
-                        logger.debug('rename')
                         xp = cudd._bdd_rename(x, bdd, aut.prime)
                         # desired transitions
-                        logger.debug('conjoin')
                         x = xp & ~ excuse
-                        # del xp
-                        logger.debug('disjoin')
                         x = x | live_trans
-                        logger.debug('conjoin with sys_action')
-                        x = x & sys_action
-                        logger.debug(
-                             "rho_s & (live_trans | (! J_i^e & X'))")
-                        # cox
-                        logger.debug('exists')
                         x = bdd.quantify(x, aut.epvars, forall=False)
-                        logger.debug('implication')
                         x = x | ~ env_action
-                        logger.debug('forall')
                         x = bdd.quantify(x, aut.upvars, forall=True)
-                    logger.debug('Disjoin X of this assumption')
+                    log.debug('Disjoin X of this assumption')
                     good = good | x
                     del x, xold
                 y = good
                 del good
-            logger.debug('Reached Y fixpoint')
+            log.debug('Reached Y fixpoint')
             yj.append(y)
             del y, yold, live_trans
         del zp
@@ -235,12 +224,10 @@ def compute_winning_set(aut):
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
         # z = linear_operator(lambda x, y: x & y, yj)
-        logger.debug('zold = {zold}'.format(zold=zold))
-        logger.debug('z = {z}'.format(z=z))
         bdd.assert_consistent()
         current_time = time.time()
         t = current_time - start_time
-        logger.info('Completed Z iteration at: {t} sec'.format(t=t))
+        log.info('Completed Z iteration at: {t} sec'.format(t=t))
     end_time = time.time()
     t = end_time - start_time
     print(
@@ -267,13 +254,15 @@ def construct_streett_1_transducer(z, aut):
     # selector = aut.add_expr('strat_type')
     zp = cudd._bdd_rename(z, bdd, aut.prime)
     for j, goal in enumerate(aut.win['sys']):
-        logger.debug('Goal: {j}'.format(j=j))
+        logger.info('Goal: {j}'.format(j=j))
+        logger.info(bdd)
         covered = bdd.False
         transducer = bdd.False
         live_trans = goal & zp
         y = bdd.False
         yold = None
         while y != yold:
+            logger.debug('Start Y iteration')
             yold = y
             yp = cudd._bdd_rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
@@ -282,6 +271,7 @@ def construct_streett_1_transducer(z, aut):
                 x = bdd.True
                 xold = None
                 while x != xold:
+                    logger.debug('Start X iteration')
                     xold = x
                     xp = cudd._bdd_rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
