@@ -76,6 +76,8 @@ cdef extern from 'cudd.h':
         DdManager *manager, DdNode *f, DdNode *cube)
     cdef DdNode * Cudd_bddUnivAbstract(
         DdManager *manager, DdNode *f, DdNode *cube)
+    cdef DdNode * Cudd_bddAndAbstract(
+        DdManager *manager, DdNode *f, DdNode *g, DdNode *cube)
     cdef DdNode * Cudd_bddSwapVariables(
         DdManager *dd,
         DdNode *f, DdNode **x, DdNode **y, int n)
@@ -248,6 +250,31 @@ cdef class BDD(object):
 
     cpdef assert_consistent(self):
         assert Cudd_DebugCheck(self.manager) == 0
+
+
+cpdef Function and_abstract(Function u, Function v, qvars, BDD bdd):
+    """Return `? qvars. u & v`"""
+    assert u.manager == v.manager
+    mgr = u.manager
+    cube = bdd.cube(mgr, qvars)
+    r = Cudd_bddAndAbstract(u.manager, u.node, v.node, cube.node)
+    f = Function()
+    f.init(mgr, r)
+    return f
+
+
+cpdef Function or_abstract(Function u, Function v, qvars, BDD bdd):
+    """Return `! qvars. u | v`"""
+    assert u.manager == v.manager
+    mgr = u.manager
+    cube = bdd.cube(mgr, qvars)
+    cdef DdNode * r
+    r = Cudd_bddAndAbstract(
+        u.manager, Cudd_Not(u.node), Cudd_Not(v.node), cube.node)
+    r = Cudd_Not(r)
+    f = Function()
+    f.init(mgr, r)
+    return f
 
 
 cdef class Function(object):

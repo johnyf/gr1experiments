@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 # plot events in annotated timeline
 # compare different histories of variable orders
 # check that `config.json` is the same
-# use relational product
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # try with multiple managers,
@@ -207,9 +206,17 @@ def compute_winning_set(aut):
                         # desired transitions
                         x = xp & ~ excuse
                         x = x | live_trans
-                        x = bdd.quantify(x, aut.epvars, forall=False)
-                        x = x | ~ env_action
-                        x = bdd.quantify(x, aut.upvars, forall=True)
+                        old = False
+                        if old:
+                            x = x & sys_action
+                            x = bdd.quantify(x, aut.epvars, forall=False)
+                            x = x | ~ env_action
+                            x = bdd.quantify(x, aut.upvars, forall=True)
+                        else:
+                            x = cudd.and_abstract(x, sys_action,
+                                                  aut.epvars, bdd)
+                            x = cudd.or_abstract(x, ~ env_action,
+                                                 aut.upvars, bdd)
                     log.debug('Disjoin X of this assumption')
                     good = good | x
                     del x, xold
@@ -276,16 +283,18 @@ def construct_streett_1_transducer(z, aut):
                     xp = cudd._bdd_rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
                     x = x | live_trans
-                    x = x & sys_action
-                    found_paths = x
-                    x = bdd.quantify(x, aut.epvars, forall=False)
-                    x = x | ~ env_action
-                    x = bdd.quantify(x, aut.upvars, forall=True)
+                    x = cudd.and_abstract(x, sys_action, aut.epvars, bdd)
+                    x = cudd.or_abstract(x, ~ env_action, aut.upvars, bdd)
+                # good
                 good = good | x
-                new = bdd.quantify(found_paths, aut.epvars, forall=False)
+                # new - use x as temp
+                xp = cudd._bdd_rename(x, bdd, aut.prime)
+                x = xp & ~ excuse
+                x = x | live_trans
+                new = cudd.and_abstract(x, sys_action, aut.epvars, bdd)
                 new = new & ~ covered
                 covered = covered | new
-                transducer = transducer | (new & found_paths)
+                transducer = transducer | (new & x)
             y = good
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
@@ -294,6 +303,7 @@ def construct_streett_1_transducer(z, aut):
         transducers.append(transducer)
     # disjoin the strategies for the individual goals
     transducer = compute_as_binary_tree(lambda x, y: x | y, transducers)
+    transducer = transducer & sys_action
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     return transducer
 
