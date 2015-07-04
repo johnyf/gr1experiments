@@ -180,13 +180,11 @@ def compute_winning_set(aut):
     while z != zold:
         log.debug('Start Z iteration')
         zold = z
-        zp = cudd._bdd_rename(z, bdd, aut.prime)
-        yj = list()
-        for goal in aut.win['sys']:
-            log.info('Guarantee: {goal}'.format(goal=goal))
+        # yj = list()
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
+            zp = cudd._bdd_rename(z, bdd, aut.prime)
             live_trans = goal & zp
             y = bdd.False
             yold = None
@@ -225,11 +223,12 @@ def compute_winning_set(aut):
                 y = good
                 del good
             log.debug('Reached Y fixpoint')
-            yj.append(y)
+            z = z & y
+            # yj.append(y)
             del y, yold, live_trans
         del zp
         # conjoin
-        z = recurse_binary(lambda x, y: x & y, yj)
+        # z = recurse_binary(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
         # z = linear_operator(lambda x, y: x & y, yj)
