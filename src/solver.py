@@ -165,7 +165,7 @@ def add_variables(d, bdd):
     return dvars, prime, partition
 
 
-def compute_winning_set(aut):
+def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     logger.info('++ Compute winning region')
     log = logging.getLogger('solver')
@@ -174,7 +174,8 @@ def compute_winning_set(aut):
     sys_action = aut.action['sys'][0]
     start_time = time.time()
     # todo: add counter variable
-    z = bdd.True
+    if z is None:
+        z = bdd.True
     zold = None
     log.debug('before z fixpoint')
     while z != zold:
@@ -423,7 +424,8 @@ def solve_game(fname):
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
     print(bdd)
-    construct_streett_1_transducer(z, aut)
+    z = compute_winning_set(aut, z)
+    # construct_streett_1_transducer(z, aut)
     del aut, z
 
 
