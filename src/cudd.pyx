@@ -81,6 +81,7 @@ cdef extern from 'cudd.h':
     cdef unsigned int Cudd_ReadReorderings(DdManager *dd)
     cdef long Cudd_ReadReorderingTime(DdManager * dd)
     cdef int Cudd_ReadPerm(DdManager *dd, int i)
+    cdef int Cudd_ReadInvPerm(DdManager *dd, int i)
     cdef int Cudd_DagSize(DdNode *node)
     # manager config
     cdef void Cudd_SetMaxCacheHard(DdManager *dd, unsigned int mc)
@@ -125,11 +126,13 @@ cdef class BDD(object):
     Variable names are strings.
     Attributes:
 
-    - `var_to_index`: maps each variable to a unique fixed integer
+      - `vars`
     """
 
     cdef DdManager * manager
+    cpdef public object vars
     cpdef public object _index_of_var
+    cpdef public object _var_with_index
 
     def __cinit__(self, memory=None):
         """Initialize BDD manager.
@@ -145,7 +148,9 @@ cdef class BDD(object):
         Cudd_SetMaxGrowth(mgr, 1.2)
         Cudd_SetMinHit(mgr, 1)
         self.manager = mgr
+        self.vars = set()
         self._index_of_var = dict()  # map: str -> unique fixed int
+        self._var_with_index = dict()
 
     def __dealloc__(self):
         n = Cudd_CheckZeroRef(self.manager)
@@ -215,7 +220,11 @@ cdef class BDD(object):
             return j
         # new var
         j = len(self._index_of_var)
+        self.vars.add(var)
         self._index_of_var[var] = j
+        self._var_with_index[j] = var
+        assert (len(self._index_of_var) ==
+            len(self._var_with_index))
         Cudd_bddIthVar(self.manager, j)
         return j
 
@@ -231,7 +240,22 @@ cdef class BDD(object):
         f.init(self.manager, r)
         return f
 
+    def var_at_level(self, level):
+        """Return name of variable at `level`."""
+        j = Cudd_ReadInvPerm(self.manager, level)
+        assert j in self._var_with_index, (j, self._var_with_index)
+        var = self._var_with_index[j]
+        return var
 
+    def level_of_var(self, var):
+        """Return level of variable named `var`."""
+        assert var in self._index_of_var, (
+            'undefined variable "{v}", '
+            'known variables are:\n {d}').format(
+                v=var, d=self._index_of_var)
+        j = self._index_of_var[var]
+        level = Cudd_ReadPerm(self.manager, j)
+        return level
 
     cpdef Function apply(self, op, Function u, Function v=None):
         """Return as `Function` the result of applying `op`."""
