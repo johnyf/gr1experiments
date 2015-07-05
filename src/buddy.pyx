@@ -324,6 +324,7 @@ cdef class Function(object):
     u = bdd_true()
     f = Function(u)
     h = g | ~ f
+    ```
     """
 
     cdef object __weakref__

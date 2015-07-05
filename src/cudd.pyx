@@ -437,6 +437,7 @@ cdef class Function(object):
     f = Function()
     f.init(bdd.manager, u)
     h = g | ~ f
+    ```
     """
 
     cdef object __weakref__
