@@ -185,14 +185,14 @@ def compute_winning_set(aut, z=None):
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
-            zp = cudd._bdd_rename(z, bdd, aut.prime)
+            zp = cudd.rename(z, bdd, aut.prime)
             live_trans = goal & zp
             y = bdd.False
             yold = None
             while y != yold:
                 log.debug('Start Y iteration')
                 yold = y
-                yp = cudd._bdd_rename(y, bdd, aut.prime)
+                yp = cudd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
                 good = y
                 for excuse in aut.win['env']:
@@ -203,7 +203,7 @@ def compute_winning_set(aut, z=None):
                     while x != xold:
                         log.debug('Start X iteration')
                         xold = x
-                        xp = cudd._bdd_rename(x, bdd, aut.prime)
+                        xp = cudd.rename(x, bdd, aut.prime)
                         # desired transitions
                         x = xp & ~ excuse
                         x = x | live_trans
@@ -262,7 +262,7 @@ def construct_streett_1_transducer(z, aut):
     transducers = list()
     # bdd.add_var('strat_type')
     # selector = aut.add_expr('strat_type')
-    zp = cudd._bdd_rename(z, bdd, aut.prime)
+    zp = cudd.rename(z, bdd, aut.prime)
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         log.info(bdd)
@@ -274,7 +274,7 @@ def construct_streett_1_transducer(z, aut):
         while y != yold:
             log.debug('Start Y iteration')
             yold = y
-            yp = cudd._bdd_rename(y, bdd, aut.prime)
+            yp = cudd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
             good = y
             for excuse in aut.win['env']:
@@ -283,7 +283,7 @@ def construct_streett_1_transducer(z, aut):
                 while x != xold:
                     log.debug('Start X iteration')
                     xold = x
-                    xp = cudd._bdd_rename(x, bdd, aut.prime)
+                    xp = cudd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
                     x = x | live_trans
                     print('AND abstract')
