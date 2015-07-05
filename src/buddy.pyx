@@ -52,7 +52,7 @@ cdef extern from 'bdd.h':
     cdef BDD bdd_satone(BDD r)  # cube
     cdef BDD bdd_fullsatone(BDD r)  # minterm
     cdef double bdd_satcount(BDD r)
-    cdef int bdd_BDDcount(BDD r)
+    cdef int bdd_nodecount(BDD r)
     # refs
     cdef BDD bdd_addref(BDD r)
     cdef BDD bdd_delref(BDD r)
@@ -78,6 +78,8 @@ cdef extern from 'bdd.h':
     cdef BDD bdd_appall(BDD u, BDD v, int op, BDD var)
     # renaming
     cdef BDD bdd_replace(BDD r, bddPair *pair)
+    cdef bddPair * bdd_newpair()
+    cdef void bdd_freepair(bddPair *p)
     cdef int bdd_setpair(bddPair *pair, int oldvar, int newvar)
     cdef int bdd_setpairs(bddPair *pair, int *oldvar,
                           int *newvar, int size)
@@ -87,15 +89,19 @@ cdef extern from 'bdd.h':
     cdef int bdd_setmaxBDDnum(int size)
     cdef int bdd_setmaxincrease(int size)
     cdef int bdd_setminfreeBDDs(int mf)
-    cdef int bdd_getBDDnum()
+    cdef int bdd_getnodenum()
     cdef int bdd_getallocnum()  # both dead and active
     # reordering
+    cdef int bdd_addvarblock(BDD b, int fixed)
+    cdef int bdd_intaddvarblock(int first, int last, int fixed)
+    cdef void bdd_varblockall()
     cdef void bdd_reorder(int method)
     cdef int bdd_autoreorder(int method)
     cdef int bdd_autoreorder_times(int method, int num)
     cdef void bdd_enable_reorder()
     cdef void bdd_disable_reorder()
     cdef int bdd_reorder_gain()
+    cdef void bdd_setcacheratio(int r)
     # I/O
     cdef int bdd_save(FILE *ofile, BDD r)
     cdef int bdd_load(FILE *ifile, BDD r)
@@ -131,18 +137,32 @@ cdef class BuddyBDD(object):
         self.var_to_index = dict()
         if bdd_isrunning():
             return
-        n = 10**6
+        n = 10**7
         cache = 10**4
-        n_vars = 250
+        n_vars = 150
         bdd_init(n, cache)
         bdd_setvarnum(n_vars)
+        bdd_autoreorder(BDD_REORDER_SIFT)
+        bdd_setcacheratio(64)
+        bdd_reorder_verbose(1)
 
     def __dealloc__(self):
         bdd_done()
 
     def __str__(self):
-        bdd_printstat()
-        return ''
+        n = bdd_getnodenum()
+        n_alloc = bdd_getallocnum()
+        n_vars = bdd_varnum()
+        s = (
+            'Binary decision diagram (BuDDy wrapper) with:\n'
+            '\t {n} live nodes now\n'
+            '\t {n_alloc} total nodes allocated\n'
+            '\t {n_vars} BDD variables\n').format(
+                n=n, n_alloc=n_alloc, n_vars=n_vars)
+        return s
+
+    def __len__(self):
+        return bdd_getnodenum()
 
     cdef incref(self, int u):
         bdd_addref(u)
@@ -167,12 +187,8 @@ cdef class BuddyBDD(object):
             r = bdd_false()
         return Function(r)
 
-    cpdef add_var(self, var):
-        """Return index for variable `var`.
-
-        @type var: `str`
-        @rtype: `int`
-        """
+    cpdef int add_var(self, str var):
+        """Return index for variable `var`."""
         j = self.var_to_index.get(var)
         if j is not None:
             return j
@@ -180,29 +196,22 @@ cdef class BuddyBDD(object):
         self.var_to_index[var] = j
         return j
 
-    cpdef var(self, var):
-        """Return BDD for variable `var`.
-
-        @type var: `str`
-        @rtype: `Function`
-        """
+    cpdef Function var(self, str var):
+        """Return BDD for variable `var`."""
         assert var in self.var_to_index, (
             var, self.var_to_index)
         j = self.var_to_index[var]
-        cdef int r = bdd_ithvar(j)
-        assert r != self.False, 'failed'
+        r = bdd_ithvar(j)
+        assert r != self.False.node, 'failed'
         return Function(r)
 
-    cpdef level(self, var):
-        """Return level of variable `var`.
-
-        @type var: `str`
-        """
+    cpdef int level(self, str var):
+        """Return level of variable `var`."""
         j = self.add_var(var)
         level = bdd_var2level(j)
         return level
 
-    cpdef at_level(self, level):
+    cpdef int at_level(self, int level):
         level = bdd_level2var(level)
         index_to_var = {
             v: k for k, v in self.var_to_index.iteritems()}
@@ -214,16 +223,16 @@ cdef class BuddyBDD(object):
         # unary
         if op in ('!', 'not'):
             assert v is None
-            r = bdd_not(u.BDD)
+            r = bdd_not(u.node)
         else:
             assert v is not None
         # binary
         if op in ('&', 'and'):
-            r = bdd_and(u.BDD, v.BDD)
+            r = bdd_and(u.node, v.node)
         elif op in ('|', 'or'):
-            r = bdd_or(u.BDD, v.BDD)
+            r = bdd_or(u.node, v.node)
         elif op in ('^', 'xor'):
-            r = bdd_xor(u.BDD, v.BDD)
+            r = bdd_xor(u.node, v.node)
         return Function(r)
 
     cpdef quantify(self, u, qvars, forall=False):
@@ -234,11 +243,11 @@ cdef class BuddyBDD(object):
             r = bdd_exist(u, cube)
         return Function(r)
 
-    cdef cube(self, dvars):
+    cpdef cube(self, dvars):
         """Return a positive unate cube for `dvars`."""
         n = len(dvars)
         cdef int *x
-        x = <int *> PyMem_Malloc(n * sizeof(int *))
+        x = <int *> PyMem_Malloc(n * sizeof(int))
         for i, var in enumerate(dvars):
             j = self.add_var(var)
             x[i] = j
@@ -248,37 +257,42 @@ cdef class BuddyBDD(object):
             PyMem_Free(x)
         return Function(r)
 
+    cpdef assert_consistent(self):
+        # TODO: implement this
+        pass
+
 
 cpdef and_abstract(u, v, qvars, bdd):
     cube = bdd.cube(qvars)
     op = APPLY_MAP['and']
-    r = bdd_appall(u, v, op, cube)
+    r = bdd_appall(u.node, v.node, op, cube.node)
     return Function(r)
 
 
 cpdef or_abstract(u, v, qvars, bdd):
     cube = bdd.cube(qvars)
     op = APPLY_MAP['or']
-    r = bdd_appex(u, v, op, bdd)
+    r = bdd_appex(u.node, v.node, op, cube.node)
     return Function(r)
 
 
-def rename(u, dvars, bdd):
+def rename(u, bdd, dvars):
     n = len(dvars)
     cdef int *oldvars
     cdef int *newvars
-    oldvars = <int *> PyMem_Malloc(n * sizeof(int *))
-    newvars = <int *> PyMem_Malloc(n * sizeof(int *))
+    oldvars = <int *> PyMem_Malloc(n * sizeof(int))
+    newvars = <int *> PyMem_Malloc(n * sizeof(int))
     for i, (a, b) in enumerate(dvars.iteritems()):
         ja = bdd.add_var(a)
         jb = bdd.add_var(b)
         oldvars[i] = ja
-        oldvars[i] = jb
-    cdef bddPair *pair = NULL
+        newvars[i] = jb
+    cdef bddPair *pair = bdd_newpair()
     try:
         bdd_setpairs(pair, oldvars, newvars, n)
-        r = bdd_replace(u, pair)
+        r = bdd_replace(u.node, pair)
     finally:
+        bdd_freepair(pair)
         PyMem_Free(oldvars)
         PyMem_Free(newvars)
     return Function(r)
@@ -297,7 +311,12 @@ cdef class Function(object):
         bdd_delref(self.node)
 
     def __str__(self):
-        return 'Function({u})'.format(u=self.node)
+        n = len(self)
+        return 'Function({u}, {n})'.format(
+            u=self.node, n=n)
+
+    def __len__(self):
+        return bdd_nodecount(self.node)
 
     def __richcmp__(self, other, op):
         if other is None:
