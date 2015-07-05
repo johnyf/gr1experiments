@@ -111,7 +111,7 @@ APPLY_MAP = {
     'and': 0, 'xor': 1, 'or': 2, 'nand': 3, 'nor': 4,
     'imp': 5, 'biimp': 6, 'diff': 7, 'less': 8, 'invimp': 9}
 BDD_REORDER_WIN2 = 1
-BDD_REORDER_SIFT = 13
+BDD_REORDER_SIFT = 3
 
 
 logger = logging.getLogger(__name__)
