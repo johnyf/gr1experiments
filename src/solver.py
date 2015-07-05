@@ -39,7 +39,7 @@ class BDDNodes(_Nodes):
 
     class Var(_Nodes.Var):
         def flatten(self, bdd, *arg, **kw):
-            u = bdd.add_ast(self)
+            u = bdd.add_var(self.value)
             return u
 
     class Num(_Nodes.Num):
