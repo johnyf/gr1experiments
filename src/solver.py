@@ -451,7 +451,7 @@ def solve_game(fname):
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
     print(bdd)
-    z = compute_winning_set(aut, z)
+    # TODO: remember that Buddy doesn't offer multiple managers
     # construct_streett_1_transducer(z, aut)
     del aut, z
 
