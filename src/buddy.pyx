@@ -194,6 +194,8 @@ cdef class BuddyBDD(object):
             return j
         j = len(self.var_to_index)
         self.var_to_index[var] = j
+        # new block for reordering
+        bdd_intaddvarblock(j, j, 0)
         return j
 
     cpdef Function var(self, str var):
@@ -203,6 +205,7 @@ cdef class BuddyBDD(object):
         j = self.var_to_index[var]
         r = bdd_ithvar(j)
         assert r != self.False.node, 'failed'
+        bdd_intaddvarblock(j, j, 0)
         return Function(r)
 
     cpdef int level(self, str var):
