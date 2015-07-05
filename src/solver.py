@@ -313,8 +313,10 @@ def construct_streett_1_transducer(z, aut):
                     xp = cudd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
                     paths = x | live_trans
-                    new = cudd.and_abstract(paths, sys_action, aut.epvars, bdd)
-                    x = cudd.or_abstract(new, ~ env_action, aut.upvars, bdd)
+                    new = cudd.and_abstract(paths, sys_action,
+                                            aut.epvars, bdd)
+                    x = cudd.or_abstract(new, ~ env_action,
+                                         aut.upvars, bdd)
                 good = good | x
                 print('transfer')
                 paths = cudd.transfer_bdd(paths, other_bdd)
