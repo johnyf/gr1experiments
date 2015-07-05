@@ -13,15 +13,16 @@ from omega.symbolic.symbolic import Automaton
 
 
 logger = logging.getLogger(__name__)
+REORDERING_LOG = 'reorder'
 
 
 # TODO:
 #
-# record variable order
 # record events (reordering, garbage collection)
 # plot events in annotated timeline
-# compare different histories of variable orders
+#
 # check that `config.json` is the same
+#
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # use a CUDD map for repeated renaming
@@ -102,6 +103,9 @@ def make_automaton(d, bdd):
     a = Automaton()
     a.bdd = bdd
     dvars, prime, partition = add_variables(d, bdd)
+    reordering_log = logging.getLogger(REORDERING_LOG)
+    s = var_order(bdd)
+    reordering_log.debug(repr(s))
     a.vars = dvars
     a.prime = prime
     a.evars = partition['evars']
@@ -171,6 +175,7 @@ def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     logger.info('++ Compute winning region')
     log = logging.getLogger('solver')
+    reordering_log = logging.getLogger(REORDERING_LOG)
     bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -182,6 +187,8 @@ def compute_winning_set(aut, z=None):
     log.debug('before z fixpoint')
     while z != zold:
         log.debug('Start Z iteration')
+        s = var_order(bdd)
+        reordering_log.debug(repr(s))
         zold = z
         # yj = list()
         for j, goal in enumerate(aut.win['sys']):
@@ -210,6 +217,8 @@ def compute_winning_set(aut, z=None):
                         x = xp & ~ excuse
                         x = x | live_trans
                         old = False
+                        s = var_order(bdd)
+                        reordering_log.debug(repr(s))
                         if old:
                             x = x & sys_action
                             x = bdd.quantify(x, aut.epvars, forall=False)
@@ -247,6 +256,14 @@ def compute_winning_set(aut, z=None):
         'in: {t:1.0f} sec'.format(
             u=z, t=t))
     return z
+
+
+def var_order(bdd):
+    """Return `dict` that maps each variable to a level.
+
+    @rtype: `dict(str: int)`
+    """
+    return {var: bdd.level_of_var(var) for var in bdd.vars}
 
 
 def memoize_iterates(z, aut):
@@ -481,13 +498,60 @@ def plus(x, y):
     return x + y
 
 
-if __name__ == '__main__':
+def load_order_history(fname):
+    with open(fname, 'r') as f:
+            s = f.read()
+    t = dict()
+    for line in s.splitlines():
+        d = eval(line)
+        for k, v in d.iteritems():
+            if k not in t:
+                t[k] = list()
+            t[k].append(v)
+    return t
+
+
+def main():
+    fname = 'reordering_slugs_31.txt'
+    other_fname = 'reordering_slugs_31_old.txt'
     p = argparse.ArgumentParser()
     p.add_argument('--file', type=str, help='slugsin input file')
+    p.add_argument('--plot-order', action='store_true',
+                   help='plot reordering of variales from log')
     args = p.parse_args()
-    fname = args.file
+    if args.plot_order:
+        from matplotlib import pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        t = load_order_history(fname)
+        other_t = load_order_history(other_fname)
+        plt.hold('on')
+        for i, k in enumerate(natsort.natsorted(t)):
+            v = t[k]
+            w = other_t.get(k)
+            if w is None:
+                print('Missing var "{var}"'.format(var=k))
+                continue
+            m = min(len(v), len(w))
+            # ax.plot(range(len(v)), v, i)
+            ax.plot(v[:m], w[:m], i)
+        plt.savefig('reordering.pdf')
+        plt.show()
+        return
+    input_fname = args.file
     # fname = 'slugs_small.txt'
     logger = logging.getLogger('solver')
     logger.addHandler(logging.StreamHandler())
     logger.setLevel('INFO')
-    solve_game(fname)
+    # reordering
+    reordering_fname = 'reordering_{f}'.format(f=input_fname)
+    log = logging.getLogger(REORDERING_LOG)
+    h = logging.FileHandler(reordering_fname, 'w')
+    log.addHandler(h)
+    log.setLevel('DEBUG')
+    solve_game(input_fname)
+
+
+if __name__ == '__main__':
+    main()
