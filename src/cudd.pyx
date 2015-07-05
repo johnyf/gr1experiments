@@ -122,13 +122,14 @@ cdef class BDD(object):
     """Wrapper of CUDD manager.
 
     Interface similar to `dd.bdd.BDD`.
+    Variable names are strings.
     Attributes:
 
     - `var_to_index`: maps each variable to a unique fixed integer
     """
 
     cdef DdManager * manager
-    cpdef public object var_to_index
+    cpdef public object _index_of_var
 
     def __cinit__(self, memory=None):
         """Initialize BDD manager.
@@ -144,7 +145,7 @@ cdef class BDD(object):
         Cudd_SetMaxGrowth(mgr, 1.2)
         Cudd_SetMinHit(mgr, 1)
         self.manager = mgr
-        self.var_to_index = dict()
+        self._index_of_var = dict()  # map: str -> unique fixed int
 
     def __dealloc__(self):
         n = Cudd_CheckZeroRef(self.manager)
@@ -209,22 +210,22 @@ cdef class BDD(object):
     def add_var(self, var):
         """Add a new variable named `var`."""
         # var already exists ?
-        j = self.var_to_index.get(var)
+        j = self._index_of_var.get(var)
         if j is not None:
             return j
         # new var
-        j = len(self.var_to_index)
-        self.var_to_index[var] = j
+        j = len(self._index_of_var)
+        self._index_of_var[var] = j
         Cudd_bddIthVar(self.manager, j)
         return j
 
     cpdef Function var(self, var):
-        """Return node for variable `var`."""
-        assert var in self.var_to_index, (
+        """Return node for variable named `var`."""
+        assert var in self._index_of_var, (
             'undefined variable "{v}", '
             'known variables are:\n {d}').format(
-                v=var, d=self.var_to_index)
-        j = self.var_to_index[var]
+                v=var, d=self._index_of_var)
+        j = self._index_of_var[var]
         r = Cudd_bddIthVar(self.manager, j)
         f = Function()
         f.init(self.manager, r)
@@ -364,7 +365,7 @@ def support(Function f, bdd, as_str=True):
     u = f.node
     supp = set()
     _support(mgr, u, supp)
-    id_to_var = {v: k for k, v in bdd.var_to_index.iteritems()}
+    id_to_var = {v: k for k, v in bdd._index_of_var.iteritems()}
     if as_str:
         supp = map(id_to_var.get, supp)
     return supp
@@ -405,13 +406,13 @@ cdef print_info(DdManager *mgr, f=None):
 
 cdef dump(Function u, BDD bdd, fname):
     """Dump BDD as DDDMP file `fname`."""
-    n = len(bdd.var_to_index)
+    n = len(bdd._index_of_var)
     cdef FILE * f
     cdef char **names
     cdef int *indices
     names = <char **> PyMem_Malloc(n * sizeof(char *))
     indices = <int *> PyMem_Malloc(n * sizeof(int))
-    for i, (var, idx) in enumerate(bdd.var_to_index.iteritems()):
+    for i, (var, idx) in enumerate(bdd._index_of_var.iteritems()):
         names[i] = var
         indices[i] = idx
     try:
@@ -549,8 +550,8 @@ def main():
 
     bdd = BDD()
     bdd.manager = mgr
-    bdd.var_to_index = dict(x=0, y=1)
-    print(bdd.var_to_index)
+    bdd._index_of_var = dict(x=0, y=1)
+    print(bdd._index_of_var)
     s = '& | 0 1 x'
     f = add_expr(s, bdd)
     print(f)

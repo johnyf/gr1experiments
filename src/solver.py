@@ -258,7 +258,7 @@ def construct_streett_1_transducer(z, aut):
     # copy vars
     bdd = aut.bdd
     other_bdd = BDD()
-    for var in bdd.var_to_index:
+    for var in bdd._index_of_var:
         other_bdd.add_var(var)
     # Compute iterates, now that we know the outer fixpoint
     log = logging.getLogger('solver')
