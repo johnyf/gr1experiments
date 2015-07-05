@@ -7,4 +7,6 @@ src/build/*
 *.txt
 *.json
 *.swp
+*.prof
+*.lprof
 
