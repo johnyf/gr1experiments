@@ -4,8 +4,9 @@ import logging
 import math
 import time
 # import cudd
-import buddy as cudd
-from buddy import BuddyBDD as BDD
+import cudd
+from cudd import BDD
+import natsort
 from omega.symbolic.bdd import Nodes as _Nodes
 from omega.symbolic.bdd import Parser
 from omega.symbolic.symbolic import Automaton
