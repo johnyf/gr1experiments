@@ -231,14 +231,7 @@ cdef class BDD(object):
         f.init(self.manager, r)
         return f
 
-    def add_ast(self, t):
-        if t.type == 'var':
-            f = self.var(t.value)
-        else:
-            raise NotImplemented('yet')
-        return f
 
-        return _bdd_apply(op, u, v)
 
     cpdef Function apply(self, op, Function u, Function v=None):
         """Return as `Function` the result of applying `op`."""
