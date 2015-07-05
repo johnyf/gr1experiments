@@ -252,14 +252,19 @@ def memoize_iterates(z, aut):
 
 def construct_streett_1_transducer(z, aut):
     """Return Street(1) I/O transducer."""
+    # copy vars
+    bdd = aut.bdd
+    other_bdd = cudd.BDD()
+    for var in bdd.var_to_index:
+        other_bdd.add_var(var)
     # Compute iterates, now that we know the outer fixpoint
     log = logging.getLogger('solver')
-    bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    transducers = list()
     # bdd.add_var('strat_type')
     # selector = aut.add_expr('strat_type')
+    store = list()
+    all_new = list()
     zp = cudd.rename(z, bdd, aut.prime)
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
@@ -278,43 +283,66 @@ def construct_streett_1_transducer(z, aut):
             for excuse in aut.win['env']:
                 x = bdd.True
                 xold = None
+                paths = None
+                new = None
                 while x != xold:
+                    del paths, new
                     log.debug('Start X iteration')
                     xold = x
                     xp = cudd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
-                    x = x | live_trans
-                    print('AND abstract')
-                    x = cudd.and_abstract(x, sys_action, aut.epvars, bdd)
-                    print('OR abstract')
-                    x = cudd.or_abstract(x, ~ env_action, aut.upvars, bdd)
-                # good
-                print('good')
+                    paths = x | live_trans
+                    new = cudd.and_abstract(paths, sys_action, aut.epvars, bdd)
+                    x = cudd.or_abstract(new, ~ env_action, aut.upvars, bdd)
                 good = good | x
-                # new - use x as temp
-                print('rename')
-                xp = cudd._bdd_rename(x, bdd, aut.prime)
-                x = xp & ~ excuse
-                x = x | live_trans
-                print('and abstract')
-                new = cudd.and_abstract(x, sys_action, aut.epvars, bdd)
-                print('and covered')
-                new = new & ~ covered
-                print('integrate covered')
-                covered = covered | new
-                print('integrate transducer')
-                transducer = transducer | (new & x)
+                print('transfer')
+                paths = cudd.transfer_bdd(paths, other_bdd)
+                new = cudd.transfer_bdd(new, other_bdd)
+                store.append((j, paths))
+                all_new.append((j, new))
+                print('the other bdd:')
+                print(other_bdd)
             y = good
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
+    print('done, lets construct strategies now')
+    transducers = list()
+    for j, goal in enumerate(aut.win['sys']):
+        log.info('Goal: {j}'.format(j=j))
+        log.info(other_bdd)
+        covered = other_bdd.False
+        transducer = other_bdd.False
+        for (k, paths), (k, new) in zip(store, all_new):
+            if k != j:
+                continue
+            print('covering...')
+            covered = covered | new
+            new = new & ~ covered
+            transducer = transducer | (new & paths)
+        del paths, new
+        log.info('appending transducer for this goal')
         # counter = aut.add_expr('c = {j}'.format(j=j))
         # transducer = transducer & counter & (goal | ~ selector)
-        log.info('appending transducer for this goal')
         transducers.append(transducer)
+        del covered
+    log.info(other_bdd)
+    log.info('clean intermediate results')
+    del store[:]
+    del all_new[:]
+    log.info(other_bdd)
     # disjoin the strategies for the individual goals
-    transducer = recurse_binary(lambda x, y: x | y, transducers)
-    transducer = transducer & sys_action
     # transducer = linear_operator(lambda x, y: x | y, transducers)
+    log.info('disjoin transducers')
+    transducer = recurse_binary(lambda x, y: x | y, transducers)
+    log.info(other_bdd)
+    log.info(other_bdd)
+    sys_action = cudd.transfer_bdd(sys_action, other_bdd)
+    log.info('conjoin with sys action')
+    transducer = transducer & sys_action
+    log.info(other_bdd)
+    log.info(transducer)
+    del sys_action
+    transducer = cudd.transfer_bdd(transducer, bdd)
     return transducer
 
 
