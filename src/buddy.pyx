@@ -116,8 +116,16 @@ cdef extern from 'bdd.h':
 APPLY_MAP = {
     'and': 0, 'xor': 1, 'or': 2, 'nand': 3, 'nor': 4,
     'imp': 5, 'biimp': 6, 'diff': 7, 'less': 8, 'invimp': 9}
+BDD_REORDER_NONE = 0
 BDD_REORDER_WIN2 = 1
+BDD_REORDER_WIN2ITE = 2  # "ite" = iteratively
 BDD_REORDER_SIFT = 3
+BDD_REORDER_SIFTITE = 4
+BDD_REORDER_WIN3 = 5
+BDD_REORDER_WIN3ITE = 6
+BDD_REORDER_RANDOM = 7
+BDD_REORDER_FREE = 0
+BDD_REORDER_FIXED = 1
 
 
 logger = logging.getLogger(__name__)
@@ -137,13 +145,13 @@ cdef class BuddyBDD(object):
         self.var_to_index = dict()
         if bdd_isrunning():
             return
-        n = 10**7
+        n_nodes = 10**2
         cache = 10**4
         n_vars = 150
-        bdd_init(n, cache)
+        bdd_init(n_nodes, cache)
         bdd_setvarnum(n_vars)
-        bdd_autoreorder(BDD_REORDER_SIFT)
         bdd_setcacheratio(64)
+        bdd_autoreorder(BDD_REORDER_SIFT)
         bdd_reorder_verbose(1)
 
     def __dealloc__(self):
@@ -266,16 +274,18 @@ cdef class BuddyBDD(object):
 
 
 cpdef and_abstract(u, v, qvars, bdd):
+    """Return `? qvars. u & v`."""
     cube = bdd.cube(qvars)
     op = APPLY_MAP['and']
-    r = bdd_appall(u.node, v.node, op, cube.node)
+    r = bdd_appex(u.node, v.node, op, cube.node)
     return Function(r)
 
 
 cpdef or_abstract(u, v, qvars, bdd):
+    """Return `! qvars. u | v`."""
     cube = bdd.cube(qvars)
     op = APPLY_MAP['or']
-    r = bdd_appex(u.node, v.node, op, cube.node)
+    r = bdd_appall(u.node, v.node, op, cube.node)
     return Function(r)
 
 
@@ -302,6 +312,19 @@ def rename(u, bdd, dvars):
 
 
 cdef class Function(object):
+    """Wrapper for nodes of `BDD`.
+
+    Takes care of reference counting,
+    using the `weakref`s.
+
+    Use as:
+
+    ```
+    bdd = BDD()
+    u = bdd_true()
+    f = Function(u)
+    h = g | ~ f
+    """
 
     cdef object __weakref__
     cpdef public int node
@@ -334,10 +357,13 @@ cdef class Function(object):
             raise Exception('Only `==` and `!=` defined.')
 
     def __invert__(self):
-        return Function(bdd_not(self.node))
+        r = bdd_not(self.node)
+        return Function(r)
 
     def __and__(self, other):
-        return Function(bdd_and(self.node, other.node))
+        r = bdd_and(self.node, other.node)
+        return Function(r)
 
     def __or__(self, other):
-        return Function(bdd_or(self.node, other.node))
+        r = bdd_or(self.node, other.node)
+        return Function(r)
