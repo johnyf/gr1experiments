@@ -3,7 +3,9 @@ import argparse
 import logging
 import math
 import time
-import cudd
+# import cudd
+import buddy as cudd
+from buddy import BuddyBDD as BDD
 from omega.symbolic.bdd import Nodes as _Nodes
 from omega.symbolic.bdd import Parser
 from omega.symbolic.symbolic import Automaton
@@ -255,7 +257,7 @@ def construct_streett_1_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
     bdd = aut.bdd
-    other_bdd = cudd.BDD()
+    other_bdd = BDD()
     for var in bdd.var_to_index:
         other_bdd.add_var(var)
     # Compute iterates, now that we know the outer fixpoint
@@ -444,7 +446,7 @@ def linear_operator_simple(f, x):
 def solve_game(fname):
     """Construct transducer for game in file `fname`."""
     d = load_slugsin_file(fname)
-    bdd = cudd.BDD()
+    bdd = BDD()
     aut = make_automaton(d, bdd)
     # print(aut)
     print(bdd)
