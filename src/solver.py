@@ -163,6 +163,7 @@ def add_variables(d, bdd):
     return dvars, prime, partition
 
 
+# @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     logger.info('++ Compute winning region')
