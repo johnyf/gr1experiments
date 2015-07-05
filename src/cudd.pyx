@@ -1,4 +1,15 @@
-"""Cython interface to CUDD."""
+# cython: profile=True
+"""Cython interface to CUDD.
+
+
+Reference
+=========
+    Fabio Somenzi
+    "CUDD: CU Decision Diagram Package"
+    University of Colorado at Boulder
+    v2.5.1, 2015
+    http://vlsi.colorado.edu/~fabio/
+"""
 import logging
 import pprint
 import sys
@@ -8,11 +19,13 @@ from cpython.mem cimport PyMem_Malloc, PyMem_Free
 
 
 cdef extern from 'cudd.h':
+    # node
     ctypedef unsigned int DdHalfWord
     cdef struct DdNode:
         DdHalfWord index
         DdHalfWord ref
     ctypedef DdNode DdNode
+    # manager
     cdef struct DdManager:
         pass
     ctypedef DdManager DdManager
@@ -24,10 +37,16 @@ cdef extern from 'cudd.h':
         unsigned long maxMemory)
     ctypedef enum Cudd_ReorderingType:
         pass
+    # node elements
     cdef DdNode * Cudd_bddNewVar(DdManager *dd)
     cdef DdNode * Cudd_bddIthVar(DdManager *dd, int i)
     cdef DdNode * Cudd_ReadLogicZero(DdManager *dd)
     cdef DdNode * Cudd_ReadOne(DdManager *dd)
+    cdef DdNode * Cudd_Regular(DdNode *u)
+    cdef bool Cudd_IsConstant(DdNode *u)
+    cdef DdNode * Cudd_T(DdNode *u)
+    cdef DdNode * Cudd_E(DdNode *u)
+    # basic Boolean operators
     cdef DdNode * Cudd_Not(DdNode *dd)
     cdef DdNode * Cudd_bddIte(DdManager *dd, DdNode *f,
                               DdNode *g, DdNode *h)
@@ -41,20 +60,18 @@ cdef extern from 'cudd.h':
     cdef DdNode * Cudd_bddComputeCube(
         DdManager *dd, DdNode **vars, int *phase, int n)
     cdef int Cudd_PrintMinterm(DdManager *dd, DdNode *f)
-
-    cdef DdNode * Cudd_Regular(DdNode *u)
-    cdef bool Cudd_IsConstant(DdNode *u)
-    cdef DdNode * Cudd_T(DdNode *u)
-    cdef DdNode * Cudd_E(DdNode *u)
-
+    # refs
     cdef void Cudd_Ref(DdNode *n)
     cdef void Cudd_RecursiveDeref(DdManager *table,
                                   DdNode *n)
     cdef void Cudd_Deref(DdNode *n)
+    # checks
     cdef int Cudd_CheckZeroRef(DdManager *manager)
     cdef int Cudd_DebugCheck(DdManager *table)
     cdef void Cudd_Quit(DdManager *unique)
-
+    cdef DdNode * Cudd_bddTransfer(
+        DdManager *ddSource, DdManager *ddDestination, DdNode *f)
+    # info
     cdef int Cudd_PrintInfo(DdManager *dd, FILE *fp)
     cdef int Cudd_ReadSize(DdManager *dd)
     cdef long Cudd_ReadNodeCount(DdManager *dd)
@@ -65,13 +82,13 @@ cdef extern from 'cudd.h':
     cdef long Cudd_ReadReorderingTime(DdManager * dd)
     cdef int Cudd_ReadPerm(DdManager *dd, int i)
     cdef int Cudd_DagSize(DdNode *node)
-
+    # manager config
     cdef void Cudd_SetMaxCacheHard(DdManager *dd, unsigned int mc)
     cdef void Cudd_AutodynEnable(DdManager *unique,
                                  Cudd_ReorderingType method)
     cdef void Cudd_SetMaxGrowth(DdManager *dd, double mg)
     cdef void Cudd_SetMinHit(DdManager *dd, unsigned int hr)
-
+    # quantification
     cdef DdNode * Cudd_bddExistAbstract(
         DdManager *manager, DdNode *f, DdNode *cube)
     cdef DdNode * Cudd_bddUnivAbstract(
@@ -113,10 +130,15 @@ cdef class BDD(object):
     cdef DdManager * manager
     cpdef public object var_to_index
 
-    def __cinit__(self):
-        mgr = Cudd_Init(
-            0, 0, CUDD_UNIQUE_SLOTS, CUDD_CACHE_SLOTS,
-            16 * 1024UL * 1024UL * 1024UL)
+    def __cinit__(self, memory=None):
+        """Initialize BDD manager.
+
+        @param memory: maximum allowed memory, in GB.
+        """
+        if memory is None:
+            memory = 2 * 1024**3
+        mgr = Cudd_Init(0, 0, CUDD_UNIQUE_SLOTS,
+                        CUDD_CACHE_SLOTS, memory)
         Cudd_SetMaxCacheHard(mgr, MAX_CACHE)
         Cudd_AutodynEnable(mgr, CUDD_REORDER_GROUP_SIFT)
         Cudd_SetMaxGrowth(mgr, 1.2)
@@ -138,16 +160,20 @@ cdef class BDD(object):
         reordering_time = Cudd_ReadReorderingTime(self.manager)
         reordering_time = reordering_time / 1000.0
         n_reorderings = Cudd_ReadReorderings(self.manager)
+        mem = Cudd_ReadMemoryInUse(self.manager)
+        mem = float(mem) / 10**6
         s = (
             'Binary decision diagram (CUDD wrapper) with:\n'
             '\t {n} live nodes now\n'
             '\t {peak} live nodes at peak\n'
             '\t {n_vars} BDD variables\n'
-            '\t {reorder_t} sec spent reordering\n'
+            '\t {mem:10.1f} MB in use\n'
+            '\t {reorder_t:10.1f} sec spent reordering\n'
             '\t {n_reorder} reorderings\n').format(
                 n=n, peak=peak, n_vars=n_vars,
                 reorder_t=reordering_time,
-                n_reorder=n_reorderings)
+                n_reorder=n_reorderings,
+                mem=mem)
         return s
 
     cdef incref(self, DdNode * u):
@@ -211,9 +237,36 @@ cdef class BDD(object):
             raise NotImplemented('yet')
         return f
 
-    def apply(self, op, Function u, Function v=None):
-        assert self.manager == u.manager
         return _bdd_apply(op, u, v)
+
+    cpdef Function apply(self, op, Function u, Function v=None):
+        """Return as `Function` the result of applying `op`."""
+        # TODO: add ite, also to slugsin syntax
+        assert self.manager == u.manager
+        cdef DdNode * r
+        cdef DdManager * mgr
+        mgr = u.manager
+        # unary
+        r = NULL
+        if op in ('!', 'not'):
+            assert v is None
+            r = Cudd_Not(u.node)
+        else:
+            assert v is not None
+            assert u.manager == v.manager
+        # binary
+        if op in ('&', 'and'):
+            r = Cudd_bddAnd(mgr, u.node, v.node)
+        elif op in ('|', 'or'):
+            r = Cudd_bddOr(mgr, u.node, v.node)
+        elif op in ('^', 'xor'):
+            r = Cudd_bddXor(mgr, u.node, v.node)
+        if r == NULL:
+            raise Exception(
+                'unknown operator: "{op}"'.format(op=op))
+        f = Function()
+        f.init(mgr, r)
+        return f
 
     cpdef Function quantify(self, Function u,
                             qvars, forall=False):
@@ -231,7 +284,10 @@ cdef class BDD(object):
         return f
 
     cdef Function cube(self, DdManager * manager, dvars):
-        """Return node for cube over `dvars`."""
+        """Return node for cube over `dvars`.
+
+        Only positive unate cubes implemented for now.
+        """
         n = len(dvars)
         # make cube
         cdef DdNode * cube
@@ -275,6 +331,98 @@ cpdef Function or_abstract(Function u, Function v, qvars, BDD bdd):
     f = Function()
     f.init(mgr, r)
     return f
+
+
+cpdef Function rename(Function u, bdd, dvars):
+    """Return node `u` after renaming variables in `dvars`."""
+    n = len(dvars)
+    cdef DdNode **x = <DdNode **> PyMem_Malloc(n * sizeof(DdNode *))
+    cdef DdNode **y = <DdNode **> PyMem_Malloc(n * sizeof(DdNode *))
+    cdef DdNode * r
+    cdef DdManager * mgr = u.manager
+    cdef Function f
+    for i, xvar in enumerate(dvars):
+        yvar = dvars[xvar]
+        f = bdd.var(xvar)
+        x[i] = f.node
+        f = bdd.var(yvar)
+        y[i] = f.node
+    try:
+        r = Cudd_bddSwapVariables(
+            mgr, u.node, x, y, n)
+    finally:
+        PyMem_Free(x)
+        PyMem_Free(y)
+    f = Function()
+    f.init(mgr, r)
+    return f
+
+
+def support(Function f, bdd, as_str=True):
+    """Return support of node `f`."""
+    mgr = f.manager
+    u = f.node
+    supp = set()
+    _support(mgr, u, supp)
+    id_to_var = {v: k for k, v in bdd.var_to_index.iteritems()}
+    if as_str:
+        supp = map(id_to_var.get, supp)
+    return supp
+
+
+cdef _support(DdManager * mgr, DdNode * u, set supp):
+    """Recurse to collect indices of support variables."""
+    # TODO: use cache
+    # terminal ?
+    if Cudd_IsConstant(u):
+        return
+    # add var
+    r = Cudd_Regular(u)
+    supp.add(r.index)
+    # recurse
+    v = Cudd_E(u)
+    w = Cudd_T(u)
+    _support(mgr, v, supp)
+    _support(mgr, w, supp)
+
+
+cpdef transfer_bdd(Function u, BDD bdd):
+    """Transfer the node `u` to `bdd`."""
+    assert u.manager != bdd.manager
+    r = Cudd_bddTransfer(u.manager, bdd.manager, u.node)
+    f = Function()
+    f.init(bdd.manager, r)
+    return f
+
+
+cdef print_info(DdManager *mgr, f=None):
+    cdef FILE *cf
+    if f is None:
+        f = sys.stdout
+    cf = fdopen(f.fileno(), 'w')
+    Cudd_PrintInfo(mgr, cf)
+
+
+cdef dump(Function u, BDD bdd, fname):
+    """Dump BDD as DDDMP file `fname`."""
+    n = len(bdd.var_to_index)
+    cdef FILE * f
+    cdef char **names
+    cdef int *indices
+    names = <char **> PyMem_Malloc(n * sizeof(char *))
+    indices = <int *> PyMem_Malloc(n * sizeof(int))
+    for i, (var, idx) in enumerate(bdd.var_to_index.iteritems()):
+        names[i] = var
+        indices[i] = idx
+    try:
+        f = fopen(fname, 'w')
+        Dddmp_cuddBddStore(
+            bdd.manager, NULL, u.node,
+            names, indices, DDDMP_MODE_TEXT,
+            DDDMP_VARIDS, NULL, f)
+    finally:
+        PyMem_Free(names)
+        PyMem_Free(indices)
 
 
 cdef class Function(object):
@@ -346,95 +494,6 @@ cdef class Function(object):
         f = Function()
         f.init(self.manager, r)
         return f
-
-
-cdef print_info(DdManager *mgr, f=None):
-    cdef FILE *cf
-    if f is None:
-        f = sys.stdout
-    cf = fdopen(f.fileno(), 'w')
-    Cudd_PrintInfo(mgr, cf)
-
-
-cpdef Function _bdd_apply(op, Function u, Function v=None):
-    """Return result of applying `op`, as `Function`."""
-    cdef DdNode * r
-    cdef DdManager * mgr
-    mgr = u.manager
-    # unary
-    r = NULL
-    if op in ('!', 'not'):
-        assert v is None
-        r = Cudd_Not(u.node)
-    else:
-        assert v is not None
-        assert u.manager == v.manager
-    # binary
-    if op in ('&', 'and'):
-        r = Cudd_bddAnd(mgr, u.node, v.node)
-    elif op in ('|', 'or'):
-        r = Cudd_bddOr(mgr, u.node, v.node)
-    elif op in ('^', 'xor'):
-        r = Cudd_bddXor(mgr, u.node, v.node)
-    if r == NULL:
-        raise Exception(
-            'unknown operator: "{op}"'.format(op=op))
-    f = Function()
-    f.init(mgr, r)
-    return f
-
-
-def support(Function f, bdd, as_str=True):
-    """Return support of node `f`."""
-    mgr = f.manager
-    u = f.node
-    supp = set()
-    _support(mgr, u, supp)
-    id_to_var = {v: k for k, v in bdd.var_to_index.iteritems()}
-    if as_str:
-        supp = map(id_to_var.get, supp)
-    return supp
-
-
-cdef _support(DdManager * mgr, DdNode * u, set supp):
-    """Recurse to collect indices of support variables."""
-    # TODO: use cache
-    # terminal ?
-    if Cudd_IsConstant(u):
-        return
-    # add var
-    r = Cudd_Regular(u)
-    supp.add(r.index)
-    # recurse
-    v = Cudd_E(u)
-    w = Cudd_T(u)
-    _support(mgr, v, supp)
-    _support(mgr, w, supp)
-
-
-cpdef Function _bdd_rename(Function u, bdd, dvars):
-    """Return node `u` after renaming variables in `dvars`."""
-    n = len(dvars)
-    cdef DdNode **x = <DdNode **> PyMem_Malloc(n * sizeof(DdNode *))
-    cdef DdNode **y = <DdNode **> PyMem_Malloc(n * sizeof(DdNode *))
-    cdef DdNode * r
-    cdef DdManager * mgr = u.manager
-    cdef Function f
-    for i, xvar in enumerate(dvars):
-        yvar = dvars[xvar]
-        f = bdd.var(xvar)
-        x[i] = f.node
-        f = bdd.var(yvar)
-        y[i] = f.node
-    try:
-        r = Cudd_bddSwapVariables(
-            mgr, u.node, x, y, n)
-    finally:
-        PyMem_Free(x)
-        PyMem_Free(y)
-    f = Function()
-    f.init(mgr, r)
-    return f
 
 
 '''
@@ -533,25 +592,3 @@ def test():
     # r = bdd.quantify(f, qvars, forall=False)
     # print(support(r, bdd))
 '''
-
-
-cdef dump(Function u, BDD bdd, fname):
-    """Dump BDD as DDDMP file `fname`."""
-    n = len(bdd.var_to_index)
-    cdef FILE * f
-    cdef char **names
-    cdef int *indices
-    names = <char **> PyMem_Malloc(n * sizeof(char *))
-    indices = <int *> PyMem_Malloc(n * sizeof(int))
-    for i, (var, idx) in enumerate(bdd.var_to_index.iteritems()):
-        names[i] = var
-        indices[i] = idx
-    try:
-        f = fopen(fname, 'w')
-        Dddmp_cuddBddStore(
-            bdd.manager, NULL, u.node,
-            names, indices, DDDMP_MODE_TEXT,
-            DDDMP_VARIDS, NULL, f)
-    finally:
-        PyMem_Free(names)
-        PyMem_Free(indices)
