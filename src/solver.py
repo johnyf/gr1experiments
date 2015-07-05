@@ -7,8 +7,7 @@ import time
 import cudd
 from cudd import BDD
 import natsort
-from omega.symbolic.bdd import Nodes as _Nodes
-from omega.symbolic.bdd import Parser
+from omega.symbolic.bdd import add_expr
 from omega.symbolic.symbolic import Automaton
 
 
@@ -26,43 +25,6 @@ REORDERING_LOG = 'reorder'
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # use a CUDD map for repeated renaming
-
-
-class BDDNodes(_Nodes):
-    """AST to flatten prefix syntax to CUDD."""
-
-    class Operator(_Nodes.Operator):
-        def flatten(self, bdd, *arg, **kw):
-            operands = [
-                u.flatten(bdd=bdd, *arg, **kw)
-                for u in self.operands]
-            u = bdd.apply(self.operator, *operands)
-            return u
-
-    class Var(_Nodes.Var):
-        def flatten(self, bdd, *arg, **kw):
-            u = bdd.var(self.value)
-            return u
-
-    class Num(_Nodes.Num):
-        def flatten(self, bdd, *arg, **kw):
-            assert self.value in ('0', '1'), self.value
-            u = int(self.value)
-            if u == 0:
-                r = bdd.False
-            else:
-                r = bdd.True
-            return r
-
-
-parser = Parser(nodes=BDDNodes())
-
-
-def add_expr(e, bdd):
-    """Return `Function` from `str` expression `e`."""
-    tree = parser.parse(e)
-    u = tree.flatten(bdd=bdd)
-    return u
 
 
 def slugsin_parser(s):
