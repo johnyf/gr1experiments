@@ -21,9 +21,7 @@ logger = logging.getLogger(__name__)
 # check that `config.json` is the same
 # group primed and unprimed vars
 # use efficient rename for neighbors
-# try with multiple managers,
-#   in a sequential program,
-#   to observe the effect of decoupling the variable order
+# use a CUDD map for repeated renaming
 
 
 class BDDNodes(_Nodes):
