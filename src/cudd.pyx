@@ -309,7 +309,7 @@ cdef class BDD(object):
 
 
 cpdef Function and_abstract(Function u, Function v, qvars, BDD bdd):
-    """Return `? qvars. u & v`"""
+    """Return `? qvars. u & v`."""
     assert u.manager == v.manager
     mgr = u.manager
     cube = bdd.cube(mgr, qvars)
@@ -320,7 +320,7 @@ cpdef Function and_abstract(Function u, Function v, qvars, BDD bdd):
 
 
 cpdef Function or_abstract(Function u, Function v, qvars, BDD bdd):
-    """Return `! qvars. u | v`"""
+    """Return `! qvars. u | v`."""
     assert u.manager == v.manager
     mgr = u.manager
     cube = bdd.cube(mgr, qvars)
@@ -432,10 +432,11 @@ cdef class Function(object):
 
     ```
     bdd = BDD()
-    u = bdd.True
+    cdef DdNode * u
+    u = Cudd_ReadOne(bdd.manager)
     f = Function()
-    f.init(bdd.manager, u.node)
-    f = f & ~ f
+    f.init(bdd.manager, u)
+    h = g | ~ f
     """
 
     cdef object __weakref__
