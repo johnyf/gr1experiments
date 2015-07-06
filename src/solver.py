@@ -27,12 +27,28 @@ REORDERING_LOG = 'reorder'
 # use a CUDD map for repeated renaming
 
 
-def slugsin_parser(s):
+def load_slugsin_file(fname):
+    """Return `dict` keyed by slugsin file section."""
+    with open(fname, 'r') as f:
+        s = f.read()
+    d = _parser_slugsin(s)
+    return d
+
+
+def _parser_slugsin(s):
+    """Return sections of slugsin file, as `dict`."""
+    sections = dict(
+        INPUT='input',
+        OUTPUT='output',
+        ENV_INIT='env_init',
+        SYS_INIT='sys_init',
+        ENV_TRANS='env_action',
+        SYS_TRANS='sys_action',
+        ENV_LIVENESS='env_win',
+        SYS_LIVENESS='sys_win')
     sections = {
-        'INPUT', 'OUTPUT', 'ENV_INIT', 'SYS_INIT',
-        'ENV_TRANS', 'SYS_TRANS',
-        'ENV_LIVENESS', 'SYS_LIVENESS'}
-    sections = {'[{s}]'.format(s=s) for s in sections}
+        '[{k}]'.format(k=k): v
+        for k, v in sections.iteritems()}
     d = dict()
     store = None
     for line in s.splitlines():
@@ -40,20 +56,11 @@ def slugsin_parser(s):
             continue
         if line in sections:
             store = list()
-            d[line] = store
+            key = sections[line]
+            d[key] = store
         else:
             assert store is not None
-            logger.debug('storing line: {line}'.format(line=line))
             store.append(line)
-    return d
-
-
-def load_slugsin_file(fname):
-    """Return a `dict` that keyed by slugsin file section."""
-    with open(fname, 'r') as f:
-        s = f.read()
-    d = slugsin_parser(s)
-    # pprint.pprint(d)
     return d
 
 
@@ -77,9 +84,9 @@ def make_automaton(d, bdd):
     # formulae
     # TODO: conjoin in prefix syntax
     sections = (
-        '[ENV_INIT]', '[SYS_INIT]',
-        '[ENV_TRANS]', '[SYS_TRANS]',
-        '[ENV_LIVENESS]', '[SYS_LIVENESS]')
+        'env_init', 'sys_init',
+        'env_action', 'sys_action',
+        'env_win', 'sys_win')
     dnodes = {k: list() for k in sections}
     for section, nodes in dnodes.iteritems():
         if section not in d:
@@ -88,19 +95,19 @@ def make_automaton(d, bdd):
             u = add_expr(s, bdd)
             nodes.append(u)
     # no liveness ?
-    c = dnodes['[ENV_LIVENESS]']
+    c = dnodes['env_win']
     if not c:
         c.append(bdd.True)
-    c = dnodes['[SYS_LIVENESS]']
+    c = dnodes['sys_win']
     if not c:
         c.append(bdd.True)
     # assign them
-    a.init['env'] = dnodes['[ENV_INIT]']
-    a.init['sys'] = dnodes['[SYS_INIT]']
-    a.action['env'] = dnodes['[ENV_TRANS]']
-    a.action['sys'] = dnodes['[SYS_TRANS]']
-    a.win['env'] = dnodes['[ENV_LIVENESS]']
-    a.win['sys'] = dnodes['[SYS_LIVENESS]']
+    a.init['env'] = dnodes['env_init']
+    a.init['sys'] = dnodes['sys_init']
+    a.action['env'] = dnodes['env_action']
+    a.action['sys'] = dnodes['sys_action']
+    a.win['env'] = dnodes['env_win']
+    a.win['sys'] = dnodes['sys_win']
     return a
 
 
@@ -110,7 +117,7 @@ def _add_variables(d, bdd):
     dvars = dict()
     prime = dict()
     for k, v in d.iteritems():
-        if k not in ('[INPUT]', '[OUTPUT]'):
+        if k not in ('input', 'output'):
             continue
         for var in v:
             # make primed var
@@ -123,9 +130,9 @@ def _add_variables(d, bdd):
             dvars[pvar] = j
             # print('added new variable "{var}", index: {j}'.format(
             #    var=var, j=j))
-    uvars = list(d['[INPUT]'])
+    uvars = list(d['input'])
     upvars = map(prime.__getitem__, uvars)
-    evars = list(d['[OUTPUT]'])
+    evars = list(d['output'])
     epvars = map(prime.__getitem__, evars)
     partition = dict(uvars=uvars, upvars=upvars,
                      evars=evars, epvars=epvars)
