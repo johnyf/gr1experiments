@@ -8,7 +8,7 @@ from cudd import BDD
 import natsort
 from omega.logic import syntax
 from omega.symbolic.bdd import add_expr
-from omega.symbolic.symbolic import Automaton
+from omega.symbolic import symbolic
 
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ def make_automaton(d, bdd):
 
     @type d: dict(str: list)
     """
-    a = Automaton()
+    a = symbolic.Automaton()
     a.bdd = bdd
     dvars, prime, partition = _add_variables(d, bdd)
     reordering_log = logging.getLogger(REORDERING_LOG)
@@ -98,13 +98,6 @@ def make_automaton(d, bdd):
         for s in d[section]:
             u = add_expr(s, bdd)
             dnodes[section].append(u)
-    # no liveness ?
-    c = dnodes['env_win']
-    if not c:
-        c.append(bdd.True)
-    c = dnodes['sys_win']
-    if not c:
-        c.append(bdd.True)
     # assign them
     a.init['env'] = dnodes['env_init']
     a.init['sys'] = dnodes['sys_init']
@@ -112,6 +105,7 @@ def make_automaton(d, bdd):
     a.action['sys'] = dnodes['sys_action']
     a.win['env'] = dnodes['env_win']
     a.win['sys'] = dnodes['sys_win']
+    symbolic.fill_blanks(a, as_bdd=True)
     return a
 
 
