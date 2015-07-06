@@ -75,6 +75,7 @@ def make_automaton(d, bdd):
     reordering_log = logging.getLogger(REORDERING_LOG)
     s = var_order(bdd)
     reordering_log.debug(repr(s))
+    # TODO: correct this
     a.vars = dvars
     a.prime = prime
     a.evars = partition['evars']
@@ -128,8 +129,6 @@ def _add_variables(d, bdd):
             dvars[var] = j
             j = bdd.add_var(pvar)
             dvars[pvar] = j
-            # print('added new variable "{var}", index: {j}'.format(
-            #    var=var, j=j))
     uvars = list(d['input'])
     upvars = map(prime.__getitem__, uvars)
     evars = list(d['output'])
@@ -437,13 +436,9 @@ def solve_game(fname):
     d = load_slugsin_file(fname)
     bdd = BDD()
     aut = make_automaton(d, bdd)
-    # print(aut)
-    print(bdd)
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
-    print(bdd)
-    # TODO: remember that Buddy doesn't offer multiple managers
-    # construct_streett_1_transducer(z, aut)
+    construct_streett_1_transducer(z, aut)
     del aut, z
 
 
