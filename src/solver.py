@@ -2,12 +2,10 @@
 import argparse
 import logging
 import time
-# import cudd
 import cudd
 from cudd import BDD
 import natsort
 from omega.logic import syntax
-from omega.symbolic.bdd import add_expr
 from omega.symbolic import symbolic
 
 
@@ -69,75 +67,33 @@ def make_automaton(d, bdd):
 
     @type d: dict(str: list)
     """
+    # bits -- shouldn't produce safety or init formulae
     a = symbolic.Automaton()
-    a.bdd = bdd
-    dvars, prime, partition = _add_variables(d, bdd)
-    reordering_log = logging.getLogger(REORDERING_LOG)
-    s = var_order(bdd)
-    reordering_log.debug(repr(s))
-    # TODO: correct this
-    a.vars = dvars
-    a.prime = prime
-    a.evars = partition['evars']
-    a.epvars = partition['epvars']
-    a.uvars = partition['uvars']
-    a.upvars = partition['upvars']
+    a.vars = _init_vars(d)
+    a = symbolic._bitblast(a)
     # formulae
-    # TODO: conjoin in prefix syntax
-    sections = (
-        'env_init', 'env_action', 'env_win',
-        'sys_init', 'sys_action', 'sys_win')
-    dnodes = {k: list() for k in sections}
-    # add in fixed order, to improve
-    # effectiveness of reordering
-    lengths = {k: section_len(d[k]) for k in sections}
-    for section in sorted(lengths, key=lengths.__getitem__,
-                          reverse=True):
-        if section not in d:
-            continue
-        for s in d[section]:
-            u = add_expr(s, bdd)
-            dnodes[section].append(u)
-    # assign them
-    a.init['env'] = dnodes['env_init']
-    a.init['sys'] = dnodes['sys_init']
-    a.action['env'] = dnodes['env_action']
-    a.action['sys'] = dnodes['sys_action']
-    a.win['env'] = dnodes['env_win']
-    a.win['sys'] = dnodes['sys_win']
+    sections = symbolic._make_section_map(a)
+    for section, target in sections.iteritems():
+        target.extend(d[section])
+    a.conjoin('prefix')
+    print(a)
+    # compile
+    a.bdd = bdd  # use `cudd.BDD`, but fill vars
+    a = symbolic._bitvector_to_bdd(a)
     symbolic.fill_blanks(a, as_bdd=True)
     return a
 
 
-def section_len(formulae):
-    """Return sum of `len` of `str` in `formulae`."""
-    return sum(len(s) for s in formulae)
-
-
-def _add_variables(d, bdd):
-    """Add unprimed and primed copies for bits from slugsin file."""
-    suffix = "'"
+def _init_vars(d):
     dvars = dict()
-    prime = dict()
-    for k, v in d.iteritems():
-        if k not in ('input', 'output'):
+    players = dict(input='env', output='sys')
+    for section in ('input', 'output'):
+        if section not in d:
             continue
-        for var in v:
-            # make primed var
-            pvar = var + suffix
-            prime[var] = pvar
-            # add unprimed and primed copies
-            j = bdd.add_var(var)
-            dvars[var] = j
-            j = bdd.add_var(pvar)
-            dvars[pvar] = j
-    uvars = list(d['input'])
-    upvars = map(prime.__getitem__, uvars)
-    evars = list(d['output'])
-    epvars = map(prime.__getitem__, evars)
-    partition = dict(uvars=uvars, upvars=upvars,
-                     evars=evars, epvars=epvars)
-    return dvars, prime, partition
+        owner = players[section]
+        for bit in d[section]:
+            dvars[bit] = dict(type='bool', owner=owner)
+    return dvars
 
 
 # @profile
@@ -363,6 +319,12 @@ def load_order_history(fname):
     return t
 
 
+def log_var_order(bdd):
+    reordering_log = logging.getLogger(REORDERING_LOG)
+    s = var_order(bdd)
+    reordering_log.debug(repr(s))
+
+
 def main():
     fname = 'reordering_slugs_31.txt'
     other_fname = 'reordering_slugs_31_old.txt'
@@ -403,6 +365,20 @@ def main():
     log.addHandler(h)
     log.setLevel('DEBUG')
     solve_game(input_fname)
+
+
+def test_indices_and_levels():
+    bdd = cudd.BDD()
+    ja = bdd.add_var('a', index=3)
+    jb = bdd.add_var('b', index=10)
+    jc = bdd.add_var('c', index=0)
+    print(ja, jb, jc)
+    print('a level', bdd.level_of_var('a'))
+    print('b level', bdd.level_of_var('b'))
+    print('c level', bdd.level_of_var('c'))
+    u = bdd.var('a') & bdd.var('b')
+    print str(u)
+    print bdd.var_at_level(10)
 
 
 if __name__ == '__main__':
