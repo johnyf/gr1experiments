@@ -166,7 +166,7 @@ def compute_winning_set(aut, z=None):
         s = var_order(bdd)
         reordering_log.debug(repr(s))
         zold = z
-        # yj = list()
+        yj = list()
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
@@ -211,12 +211,12 @@ def compute_winning_set(aut, z=None):
                 y = good
                 del good
             log.debug('Reached Y fixpoint')
-            z = z & y
-            # yj.append(y)
+            # z = z & y
+            yj.append(y)
             del y, yold, live_trans
         del zp
         # conjoin
-        # z = recurse_binary(lambda x, y: x & y, yj)
+        z = _recurse_binary(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
         # z = linear_operator(lambda x, y: x & y, yj)
