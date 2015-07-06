@@ -39,6 +39,7 @@ cdef extern from 'cudd.h':
         pass
     # node elements
     cdef DdNode * Cudd_bddNewVar(DdManager *dd)
+    cdef DdNode * Cudd_bddNewVarAtLevel(DdManager *dd, int level)
     cdef DdNode * Cudd_bddIthVar(DdManager *dd, int i)
     cdef DdNode * Cudd_ReadLogicZero(DdManager *dd)
     cdef DdNode * Cudd_ReadOne(DdManager *dd)
@@ -212,20 +213,36 @@ cdef class BDD(object):
         f.init(self.manager, r)
         return f
 
-    def add_var(self, var):
-        """Add a new variable named `var`."""
+    def add_var(self, var, index=None):
+        """Return index of variable named `var`.
+
+        If a variable named `var` exists,
+        the assert that it has `index`.
+        Otherwise, create a variable named `var`
+        with `index` (if given).
+
+        If no reordering has yet occurred,
+        then the returned index equals the level,
+        provided `add_var` has been used so far.
+        """
         # var already exists ?
         j = self._index_of_var.get(var)
         if j is not None:
+            assert j == index, (j, index)
             return j
         # new var
-        j = len(self._index_of_var)
+        if index is None:
+            j = len(self._index_of_var)
+        else:
+            j = index
+        u = Cudd_bddIthVar(self.manager, j)
+        if u == NULL:
+            raise Exception('Failed to add var')
         self.vars.add(var)
         self._index_of_var[var] = j
         self._var_with_index[j] = var
         assert (len(self._index_of_var) ==
             len(self._var_with_index))
-        Cudd_bddIthVar(self.manager, j)
         return j
 
     cpdef Function var(self, var):
@@ -243,6 +260,9 @@ cdef class BDD(object):
     def var_at_level(self, level):
         """Return name of variable at `level`."""
         j = Cudd_ReadInvPerm(self.manager, level)
+        # no var there yet ?
+        if j == -1:
+            return None
         assert j in self._var_with_index, (j, self._var_with_index)
         var = self._var_with_index[j]
         return var
@@ -463,9 +483,16 @@ cdef class Function(object):
     cpdef DdNode * node
 
     cdef init(self, DdManager * mgr, DdNode * u):
+        if u == NULL:
+            raise Exception('`DdNode *u` is `NULL` pointer.')
         self.manager = mgr
         self.node = u
         Cudd_Ref(u)
+
+    property index:
+
+        def __get__(self):
+            return self.node.index
 
     def __dealloc__(self):
         Cudd_RecursiveDeref(self.manager, self.node)
