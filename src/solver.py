@@ -85,16 +85,19 @@ def make_automaton(d, bdd):
     # formulae
     # TODO: conjoin in prefix syntax
     sections = (
-        'env_init', 'sys_init',
-        'env_action', 'sys_action',
-        'env_win', 'sys_win')
+        'env_init', 'env_action', 'env_win',
+        'sys_init', 'sys_action', 'sys_win')
     dnodes = {k: list() for k in sections}
-    for section, nodes in dnodes.iteritems():
+    # add in fixed order, to improve
+    # effectiveness of reordering
+    lengths = {k: section_len(d[k]) for k in sections}
+    for section in sorted(lengths, key=lengths.__getitem__,
+                          reverse=True):
         if section not in d:
             continue
         for s in d[section]:
             u = add_expr(s, bdd)
-            nodes.append(u)
+            dnodes[section].append(u)
     # no liveness ?
     c = dnodes['env_win']
     if not c:
@@ -110,6 +113,11 @@ def make_automaton(d, bdd):
     a.win['env'] = dnodes['env_win']
     a.win['sys'] = dnodes['sys_win']
     return a
+
+
+def section_len(formulae):
+    """Return sum of `len` of `str` in `formulae`."""
+    return sum(len(s) for s in formulae)
 
 
 def _add_variables(d, bdd):
