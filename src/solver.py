@@ -64,7 +64,7 @@ def make_automaton(d, bdd):
     """
     a = Automaton()
     a.bdd = bdd
-    dvars, prime, partition = add_variables(d, bdd)
+    dvars, prime, partition = _add_variables(d, bdd)
     reordering_log = logging.getLogger(REORDERING_LOG)
     s = var_order(bdd)
     reordering_log.debug(repr(s))
@@ -104,7 +104,7 @@ def make_automaton(d, bdd):
     return a
 
 
-def add_variables(d, bdd):
+def _add_variables(d, bdd):
     """Add unprimed and primed copies for bits from slugsin file."""
     suffix = "'"
     dvars = dict()
@@ -318,7 +318,7 @@ def construct_streett_1_transducer(z, aut):
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
-    transducer = recurse_binary(lambda x, y: x | y, transducers)
+    transducer = _recurse_binary(lambda x, y: x | y, transducers)
     log.info(other_bdd)
     log.info(other_bdd)
     sys_action = cudd.transfer_bdd(sys_action, other_bdd)
@@ -331,7 +331,7 @@ def construct_streett_1_transducer(z, aut):
     return transducer
 
 
-def recurse_binary(f, x):
+def _recurse_binary(f, x):
     """Recursively traverse binary tree of computation."""
     n = len(x)
     assert n > 0
@@ -342,12 +342,12 @@ def recurse_binary(f, x):
     left = x[:m]
     right = x[m:]
     del x[:]
-    a = recurse_binary(f, left)
-    b = recurse_binary(f, right)
+    a = _recurse_binary(f, left)
+    b = _recurse_binary(f, right)
     return f(a, b)
 
 
-def compute_as_binary_tree(f, x):
+def _compute_as_binary_tree(f, x):
     """Return result of applying operator `f`."""
     logger.debug('++ start binary tree')
     assert len(x) > 0
@@ -378,7 +378,7 @@ def compute_as_binary_tree(f, x):
     return x[0]
 
 
-def compute_as_binary_tree_simple(f, x):
+def _compute_as_binary_tree_simple(f, x):
     """Return result of applying operator `f`."""
     logger.debug('++ start binary tree')
     assert len(x) > 0
@@ -402,7 +402,7 @@ def compute_as_binary_tree_simple(f, x):
     return x.pop()
 
 
-def linear_operator(f, x):
+def _linear_operator(f, x):
     """Return result of applying linearly operator `f`."""
     logger.debug('++ start linear operator')
     assert len(x) > 0
@@ -414,7 +414,7 @@ def linear_operator(f, x):
     return x.pop()
 
 
-def linear_operator_simple(f, x):
+def _linear_operator_simple(f, x):
     """Return result of applying linearly operator `f`."""
     logger.debug('++ start simple linear operator')
     assert len(x) > 0
@@ -443,12 +443,12 @@ def solve_game(fname):
 def test_binary_operators():
     for n in xrange(1, 1500):
         a = range(n)
-        f = plus
-        x0 = compute_as_binary_tree(f, list(a))
-        x1 = compute_as_binary_tree_simple(f, list(a))
-        x2 = linear_operator(f, list(a))
-        x3 = linear_operator_simple(f, list(a))
-        x4 = recurse_binary(f, list(a))
+        f = _plus
+        x0 = _compute_as_binary_tree(f, list(a))
+        x1 = _compute_as_binary_tree_simple(f, list(a))
+        x2 = _linear_operator(f, list(a))
+        x3 = _linear_operator_simple(f, list(a))
+        x4 = _recurse_binary(f, list(a))
         z = sum(a)
         assert x0 == z, (x0, z)
         assert x1 == z, (x1, z)
@@ -458,7 +458,7 @@ def test_binary_operators():
         print(z)
 
 
-def plus(x, y):
+def _plus(x, y):
     return x + y
 
 
