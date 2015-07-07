@@ -275,10 +275,11 @@ def construct_streett_transducer(z, aut):
             if k != j:
                 continue
             print('covering...')
+            rim = new & ~ covered
             covered = covered | new
-            new = new & ~ covered
-            transducer = transducer | (new & paths)
-        del paths, new
+            del new
+            transducer = transducer | (rim & paths)
+            del rim, paths
         log.info('appending transducer for this goal')
         counter = t.add_expr('c = {j}'.format(j=j))
         goal = cudd.transfer_bdd(goal, other_bdd)
