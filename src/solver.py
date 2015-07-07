@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import copy
 import logging
 import time
 import cudd
