@@ -208,8 +208,6 @@ def construct_streett_transducer(z, aut):
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    # bdd.add_var('strat_type')
-    # selector = aut.add_expr('strat_type')
     store = list()
     all_new = list()
     zp = cudd.rename(z, bdd, aut.prime)
@@ -255,7 +253,19 @@ def construct_streett_transducer(z, aut):
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
     print('done, lets construct strategies now')
+    # transducer automaton
+    print('sys action has {n} nodes'.format(n=len(sys_action)))
+    sys_action = cudd.transfer_bdd(sys_action, other_bdd)
+    print('done transferring')
+    t = symbolic.Automaton()
+    t.vars = copy.deepcopy(aut.vars)
+    t.vars['strat_type'] = dict(type='bool', owner='sys')
+    n_goals = len(aut.win['sys'])
+    t.vars['c'] = dict(type='saturating', dom=(0, n_goals - 1), owner='sys')
+    t = t.build(other_bdd, add=True)
+    selector = t.add_expr('strat_type')
     transducers = list()
+    # construct strategies
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         log.info(other_bdd)
@@ -270,8 +280,9 @@ def construct_streett_transducer(z, aut):
             transducer = transducer | (new & paths)
         del paths, new
         log.info('appending transducer for this goal')
-        # counter = aut.add_expr('c = {j}'.format(j=j))
-        # transducer = transducer & counter & (goal | ~ selector)
+        counter = t.add_expr('c = {j}'.format(j=j))
+        goal = cudd.transfer_bdd(goal, other_bdd)
+        transducer = transducer & counter & (goal | ~ selector)
         transducers.append(transducer)
         del covered
     log.info(other_bdd)
@@ -291,8 +302,12 @@ def construct_streett_transducer(z, aut):
     log.info(other_bdd)
     log.info(transducer)
     del sys_action
-    transducer = cudd.transfer_bdd(transducer, bdd)
-    return transducer
+    # TODO: init of counter and strategy_type
+    # conjoin with counter limits
+    log.info('final conjunction')
+    transducer = transducer & t.action['sys'][0]
+    t.action['sys'] = [transducer]
+    return t
 
 
 def solve_game(fname):
