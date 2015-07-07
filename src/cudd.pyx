@@ -100,10 +100,10 @@ cdef extern from 'cudd.h':
     cdef DdNode * Cudd_bddSwapVariables(
         DdManager *dd,
         DdNode *f, DdNode **x, DdNode **y, int n)
-CUDD_UNIQUE_SLOTS = 256
-CUDD_CACHE_SLOTS = 262144
-CUDD_REORDER_GROUP_SIFT = 14
-MAX_CACHE = <unsigned int> -1
+cdef CUDD_UNIQUE_SLOTS = 256
+cdef CUDD_CACHE_SLOTS = 262144
+cdef CUDD_REORDER_GROUP_SIFT = 14
+cdef MAX_CACHE = <unsigned int> -1
 
 
 cdef extern from 'dddmp.h':
@@ -113,8 +113,8 @@ cdef extern from 'dddmp.h':
         DdManager *ddMgr, char *ddname, DdNode *f,
         char **varnames, int *auxids, int mode,
         Dddmp_VarInfoType varinfo, char *fname, FILE *fp)
-DDDMP_MODE_TEXT = <int>'A'
-DDDMP_VARIDS = 0
+cdef DDDMP_MODE_TEXT = <int>'A'
+cdef DDDMP_VARIDS = 0
 
 
 logger = logging.getLogger(__name__)
