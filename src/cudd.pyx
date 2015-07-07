@@ -236,14 +236,18 @@ cdef class BDD(object):
         else:
             j = index
         u = Cudd_bddIthVar(self.manager, j)
-        if u == NULL:
-            raise Exception('Failed to add var')
+        assert u != NULL, 'failed to add var "{v}"'.format(v=var)
+        self._add_var(var, j)
+        return j
+
+
+    cdef _add_var(self, var, index):
         self.vars.add(var)
-        self._index_of_var[var] = j
-        self._var_with_index[j] = var
+        self._index_of_var[var] = index
+        self._var_with_index[index] = var
         assert (len(self._index_of_var) ==
             len(self._var_with_index))
-        return j
+        return index
 
     cpdef Function var(self, var):
         """Return node for variable named `var`."""
