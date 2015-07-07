@@ -127,7 +127,7 @@ cdef class BDD(object):
     Variable names are strings.
     Attributes:
 
-      - `vars`
+      - `vars`: `set` of bit names as `str`ings
     """
 
     cdef DdManager * manager
@@ -253,13 +253,16 @@ cdef class BDD(object):
         self._add_var(var, j)
         return j
 
-    cdef _add_var(self, var, index):
+    cdef _add_var(self, str var, int index):
+        """Add to `self` a *new* variable named `var`."""
+        assert var not in self.vars
+        assert var not in self._index_of_var
+        assert index not in self._var_with_index
         self.vars.add(var)
         self._index_of_var[var] = index
         self._var_with_index[index] = var
         assert (len(self._index_of_var) ==
             len(self._var_with_index))
-        return index
 
     cpdef Function var(self, var):
         """Return node for variable named `var`."""
