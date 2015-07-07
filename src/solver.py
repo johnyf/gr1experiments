@@ -208,11 +208,13 @@ def construct_streett_transducer(z, aut):
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    store = list()
-    all_new = list()
+    store = dict()
+    all_new = dict()
     zp = cudd.rename(z, bdd, aut.prime)
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
+        store[j] = list()
+        all_new[j] = list()
         log.info(bdd)
         covered = bdd.False
         transducer = bdd.False
@@ -245,10 +247,8 @@ def construct_streett_transducer(z, aut):
                 print('transfer')
                 paths = cudd.transfer_bdd(paths, other_bdd)
                 new = cudd.transfer_bdd(new, other_bdd)
-                store.append((j, paths))
-                all_new.append((j, new))
-                print('the other bdd:')
-                print(other_bdd)
+                store[j].append(paths)
+                all_new[j].append(new)
             y = good
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
@@ -271,9 +271,12 @@ def construct_streett_transducer(z, aut):
         log.info(other_bdd)
         covered = other_bdd.False
         transducer = other_bdd.False
-        for (k, paths), (k, new) in zip(store, all_new):
-            if k != j:
-                continue
+        cur_store = store[j]
+        cur_new = all_new[j]
+        while cur_store:
+            assert cur_new, cur_new
+            paths = cur_store.pop(0)
+            new = cur_new.pop(0)
             print('covering...')
             rim = new & ~ covered
             covered = covered | new
@@ -288,8 +291,11 @@ def construct_streett_transducer(z, aut):
         del covered
     log.info(other_bdd)
     log.info('clean intermediate results')
-    del store[:]
-    del all_new[:]
+    for j in store:
+        assert not store[j], (j, store[j])
+        assert not all_new[j], (j, all_new[j])
+    # insert the counters at the top of the order
+    # semi-symbolic representation ?
     log.info(other_bdd)
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
