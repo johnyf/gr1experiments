@@ -300,10 +300,16 @@ def construct_streett_transducer(z, aut):
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
-    transducer = syntax.recurse_binary(lambda x, y: x | y, transducers)
-    log.info(other_bdd)
+    transducer = syntax.recurse_binary(lambda x, y: x | y,
+                                       transducers, other_bdd)
+    print(len(transducer))
+    print(other_bdd)
+    print(bdd)
+    n_remain = len(transducers)
+    assert n_remain == 0, n_remain
     log.info(other_bdd)
     sys_action = cudd.transfer_bdd(sys_action, other_bdd)
+    log.info('transfer bdd')
     log.info('conjoin with sys action')
     transducer = transducer & sys_action
     log.info(other_bdd)
