@@ -278,7 +278,7 @@ def construct_streett_transducer(z, aut):
         # init the transducer with these
         counter = t.add_expr('c = {j}'.format(j=j))
         selector = t.add_expr('strat_type')
-        transducer = transducer & counter & (goal | ~ selector)
+        transducer = transducer & counter & (goal | ~ selector) & sys_action_2
         # transducer = make_strategy(store, all_new, j, goal, t)
         transducers.append(transducer)
         del transducer
@@ -305,7 +305,7 @@ def construct_streett_transducer(z, aut):
     log.info('transfer bdd')
     log.info('conjoin with sys action')
     # TODO: try copying both to a fresh BDD
-    transducer = transducer & sys_action_2
+    # transducer = transducer & sys_action_2
     log.info(other_bdd)
     log.info(transducer)
     del sys_action_2
