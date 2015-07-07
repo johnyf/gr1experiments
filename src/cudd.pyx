@@ -507,6 +507,9 @@ cdef class Function(object):
                 idx=u.index,
                 ref=u.ref)
 
+    def __len__(self):
+        return Cudd_DagSize(self.node)
+
     def __richcmp__(Function self, Function other, op):
         if other is None:
             eq = False
