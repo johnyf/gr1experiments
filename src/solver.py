@@ -197,7 +197,7 @@ def memoize_iterates(z, aut):
     pass
 
 
-def construct_streett_1_transducer(z, aut):
+def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
     bdd = aut.bdd
@@ -302,8 +302,9 @@ def solve_game(fname):
     aut = make_automaton(d, bdd)
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
-    construct_streett_1_transducer(z, aut)
-    del aut, z
+    t = construct_streett_transducer(z, aut)
+    print(t)
+    del aut, z, t
 
 
 def load_order_history(fname):
