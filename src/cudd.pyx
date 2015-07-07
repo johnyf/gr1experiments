@@ -213,7 +213,7 @@ cdef class BDD(object):
         f.init(self.manager, r)
         return f
 
-    def add_var(self, var, index=None):
+    cpdef add_var(self, var, index=None):
         """Return index of variable named `var`.
 
         If a variable named `var` exists,
