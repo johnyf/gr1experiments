@@ -240,6 +240,14 @@ cdef class BDD(object):
         self._add_var(var, j)
         return j
 
+    cpdef insert_var(self, var, level):
+        """Create a new variable named `var`, at `level`."""
+        cdef DdNode * r
+        r = Cudd_bddNewVarAtLevel(self.manager, level)
+        assert r != NULL, 'failed to create var "{v}"'.format(v=var)
+        j = r.index
+        self._add_var(var, j)
+        return j
 
     cdef _add_var(self, var, index):
         self.vars.add(var)
