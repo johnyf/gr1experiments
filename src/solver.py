@@ -278,6 +278,7 @@ def construct_streett_transducer(z, aut):
         # init the transducer with these
         counter = t.add_expr('c = {j}'.format(j=j))
         selector = t.add_expr('strat_type')
+        # TODO: maybe store the transducers to yet a separate manager
         transducer = transducer & counter & (goal | ~ selector) & sys_action_2
         # transducer = make_strategy(store, all_new, j, goal, t)
         transducers.append(transducer)
