@@ -209,16 +209,23 @@ def construct_streett_transducer(z, aut):
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    store = dict()
-    all_new = dict()
+    store = list()
+    all_new = list()
     zp = cudd.rename(z, bdd, aut.prime)
+    # transducer automaton
+    print('sys action has {n} nodes'.format(n=len(sys_action)))
+    sys_action_2 = cudd.transfer_bdd(sys_action, other_bdd)
+    print('done transferring')
+    t = symbolic.Automaton()
+    t.vars = copy.deepcopy(aut.vars)
+    t.vars['strat_type'] = dict(type='bool', owner='sys')
+    n_goals = len(aut.win['sys'])
+    t.vars['c'] = dict(type='saturating', dom=(0, n_goals - 1), owner='sys')
+    t = t.build(other_bdd, add=True)
+    transducers = list()
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
-        store[j] = list()
-        all_new[j] = list()
         log.info(bdd)
-        covered = bdd.False
-        transducer = bdd.False
         live_trans = goal & zp
         y = bdd.False
         yold = None
@@ -248,53 +255,21 @@ def construct_streett_transducer(z, aut):
                 print('transfer')
                 paths = cudd.transfer_bdd(paths, other_bdd)
                 new = cudd.transfer_bdd(new, other_bdd)
-                store[j].append(paths)
-                all_new[j].append(new)
+                store.append(paths)
+                all_new.append(new)
             y = good
+        # make transducer
+        # TODO: maybe transfer the goals at the beginning
+        goal = cudd.transfer_bdd(goal, other_bdd)
+        transducer = make_strategy(store, all_new, j, goal, t)
+        transducers.append(transducer)
+        del transducer
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
-    print('done, lets construct strategies now')
-    # transducer automaton
-    print('sys action has {n} nodes'.format(n=len(sys_action)))
-    sys_action = cudd.transfer_bdd(sys_action, other_bdd)
-    print('done transferring')
-    t = symbolic.Automaton()
-    t.vars = copy.deepcopy(aut.vars)
-    t.vars['strat_type'] = dict(type='bool', owner='sys')
-    n_goals = len(aut.win['sys'])
-    t.vars['c'] = dict(type='saturating', dom=(0, n_goals - 1), owner='sys')
-    t = t.build(other_bdd, add=True)
-    selector = t.add_expr('strat_type')
-    transducers = list()
-    # construct strategies
-    for j, goal in enumerate(aut.win['sys']):
-        log.info('Goal: {j}'.format(j=j))
-        log.info(other_bdd)
-        covered = other_bdd.False
-        transducer = other_bdd.False
-        cur_store = store[j]
-        cur_new = all_new[j]
-        while cur_store:
-            assert cur_new, cur_new
-            paths = cur_store.pop(0)
-            new = cur_new.pop(0)
-            print('covering...')
-            rim = new & ~ covered
-            covered = covered | new
-            del new
-            transducer = transducer | (rim & paths)
-            del rim, paths
-        log.info('appending transducer for this goal')
-        counter = t.add_expr('c = {j}'.format(j=j))
-        goal = cudd.transfer_bdd(goal, other_bdd)
-        transducer = transducer & counter & (goal | ~ selector)
-        transducers.append(transducer)
-        del covered
     log.info(other_bdd)
     log.info('clean intermediate results')
-    for j in store:
-        assert not store[j], (j, store[j])
-        assert not all_new[j], (j, all_new[j])
+    assert not store, store
+    assert not all_new, all_new
     # insert the counters at the top of the order
     # semi-symbolic representation ?
     log.info(other_bdd)
@@ -311,16 +286,45 @@ def construct_streett_transducer(z, aut):
     log.info(other_bdd)
     log.info('transfer bdd')
     log.info('conjoin with sys action')
-    transducer = transducer & sys_action
+    # TODO: try copying both to a fresh BDD
+    transducer = transducer & sys_action_2
     log.info(other_bdd)
     log.info(transducer)
-    del sys_action
+    del sys_action_2
     # TODO: init of counter and strategy_type
     # conjoin with counter limits
     log.info('final conjunction')
     transducer = transducer & t.action['sys'][0]
     t.action['sys'] = [transducer]
     return t
+
+
+def make_strategy(store, all_new, j, goal, aut):
+    log = logging.getLogger('solver')
+    log.info('++ Make strategy for goal: {j}'.format(j=j))
+    bdd = aut.bdd
+    log.info(bdd)
+    covered = bdd.False
+    transducer = bdd.False
+    while store:
+        print('covering...')
+        assert all_new
+        paths = store.pop(0)
+        new = all_new.pop(0)
+        rim = new & ~ covered
+        covered = covered | new
+        del new
+        rim = rim & paths
+        del paths
+        transducer = transducer | rim
+        del rim
+    assert not store, store
+    assert not all_new, all_new
+    counter = aut.add_expr('c = {j}'.format(j=j))
+    selector = aut.add_expr('strat_type')
+    transducer = transducer & counter & (goal | ~ selector)
+    log.info('-- done making strategy for goal: {j}'.format(j=j))
+    return transducer
 
 
 def solve_game(fname):
