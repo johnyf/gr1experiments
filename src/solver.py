@@ -364,6 +364,10 @@ def main():
     h = logging.FileHandler(reordering_fname, 'w')
     log.addHandler(h)
     log.setLevel('DEBUG')
+    # syntax
+    log = logging.getLogger('omega.logic.syntax')
+    log.addHandler(logging.StreamHandler())
+    log.setLevel('DEBUG')
     solve_game(input_fname)
 
 

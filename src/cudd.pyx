@@ -426,10 +426,12 @@ cdef _support(DdManager * mgr, DdNode * u, set supp):
 
 cpdef transfer_bdd(Function u, BDD bdd):
     """Transfer the node `u` to `bdd`."""
+    logger.debug('++ transfer bdd')
     assert u.manager != bdd.manager
     r = Cudd_bddTransfer(u.manager, bdd.manager, u.node)
     f = Function()
     f.init(bdd.manager, r)
+    logger.debug('-- done transfering bdd')
     return f
 
 
