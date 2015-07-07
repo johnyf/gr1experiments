@@ -154,11 +154,15 @@ cdef class BDD(object):
         self._var_with_index = dict()
 
     def __dealloc__(self):
-        n = Cudd_CheckZeroRef(self.manager)
+        n = len(self)
         assert n == 0, (
             'Still {n} nodes '
             'referenced upon shutdown.').format(n=n)
         Cudd_Quit(self.manager)
+
+    def __len__(self):
+        """Return number of nodes with non-zero references."""
+        return Cudd_CheckZeroRef(self.manager)
 
     def __str__(self):
         n = Cudd_ReadNodeCount(self.manager)
