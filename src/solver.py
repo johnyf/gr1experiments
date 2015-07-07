@@ -226,9 +226,13 @@ def construct_streett_transducer(z, aut):
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         log.info(bdd)
+        # for fixpoint
         live_trans = goal & zp
         y = bdd.False
         yold = None
+        # for strategy construction
+        covered = other_bdd.False
+        transducer = other_bdd.False
         while y != yold:
             log.debug('Start Y iteration')
             yold = y
@@ -252,16 +256,30 @@ def construct_streett_transducer(z, aut):
                     x = cudd.or_abstract(new, ~ env_action,
                                          aut.upvars, bdd)
                 good = good | x
+                # strategy construction
                 print('transfer')
                 paths = cudd.transfer_bdd(paths, other_bdd)
                 new = cudd.transfer_bdd(new, other_bdd)
-                store.append(paths)
-                all_new.append(new)
+                rim = new & ~ covered
+                covered = covered | new
+                del new
+                rim = rim & paths
+                del paths
+                transducer = transducer | rim
+                del rim
+                # store.append(paths)
+                # all_new.append(new)
             y = good
+        log.info('other BDD:')
+        log.info(other_bdd)
         # make transducer
         # TODO: maybe transfer the goals at the beginning
         goal = cudd.transfer_bdd(goal, other_bdd)
-        transducer = make_strategy(store, all_new, j, goal, t)
+        # init the transducer with these
+        counter = t.add_expr('c = {j}'.format(j=j))
+        selector = t.add_expr('strat_type')
+        transducer = transducer & counter & (goal | ~ selector)
+        # transducer = make_strategy(store, all_new, j, goal, t)
         transducers.append(transducer)
         del transducer
         # is it more efficient to do this now, or later ?
