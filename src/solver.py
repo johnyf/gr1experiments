@@ -76,7 +76,7 @@ def make_automaton(d, bdd):
     for section, target in sections.iteritems():
         target.extend(d[section])
     a.conjoin('prefix')
-    print(a)
+    logger.debug(a)
     # compile
     a.bdd = bdd  # use `cudd.BDD`, but fill vars
     a = symbolic._bitvector_to_bdd(a)
@@ -176,7 +176,7 @@ def compute_winning_set(aut, z=None):
         log.info('Completed Z iteration at: {t} sec'.format(t=t))
     end_time = time.time()
     t = end_time - start_time
-    print(
+    log.info(
         'Reached Z fixpoint:\n'
         '{u}\n'
         'in: {t:1.0f} sec'.format(
@@ -212,9 +212,9 @@ def construct_streett_transducer(z, aut):
     all_new = list()
     zp = cudd.rename(z, bdd, aut.prime)
     # transducer automaton
-    print('sys action has {n} nodes'.format(n=len(sys_action)))
-    sys_action_2 = cudd.transfer_bdd(sys_action, other_bdd)
-    print('done transferring')
+    log.info('sys action has {n} nodes'.format(n=len(sys_action)))
+    sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
+    log.info('done transferring')
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
     t.vars['strat_type'] = dict(type='bool', owner='sys')
@@ -256,7 +256,7 @@ def construct_streett_transducer(z, aut):
                                        aut.upvars, bdd)
                 good = good | x
                 # strategy construction
-                print('transfer')
+                log.info('transfer')
                 paths = cudd.copy_bdd(paths, bdd, other_bdd)
                 new = cudd.copy_bdd(new, bdd, other_bdd)
                 rim = new & ~ covered
@@ -296,9 +296,8 @@ def construct_streett_transducer(z, aut):
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(lambda x, y: x | y,
                                        transducers, other_bdd)
-    print(len(transducer))
-    print(other_bdd)
-    print(bdd)
+    log.info(other_bdd)
+    log.info(bdd)
     n_remain = len(transducers)
     assert n_remain == 0, n_remain
     log.info(other_bdd)
@@ -325,7 +324,7 @@ def make_strategy(store, all_new, j, goal, aut):
     covered = bdd.False
     transducer = bdd.False
     while store:
-        print('covering...')
+        log.info('covering...')
         assert all_new
         paths = store.pop(0)
         new = all_new.pop(0)
@@ -353,7 +352,7 @@ def solve_game(fname):
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
     t = construct_streett_transducer(z, aut)
-    print(t)
+    logger.info(t)
     del aut, z, t
 
 
@@ -418,7 +417,7 @@ def main():
     # syntax
     log = logging.getLogger('omega.logic.syntax')
     log.addHandler(logging.StreamHandler())
-    log.setLevel('DEBUG')
+    log.setLevel('ERROR')
     solve_game(input_fname)
 
 
