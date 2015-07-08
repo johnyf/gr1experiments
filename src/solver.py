@@ -3,8 +3,7 @@ import argparse
 import copy
 import logging
 import time
-import cudd
-from cudd import BDD
+from dd import cudd
 import natsort
 from omega.logic import syntax
 from omega.symbolic import symbolic
@@ -152,10 +151,10 @@ def compute_winning_set(aut, z=None):
                             x = x | ~ env_action
                             x = bdd.quantify(x, aut.upvars, forall=True)
                         else:
-                            x = cudd.and_abstract(x, sys_action,
-                                                  aut.epvars, bdd)
-                            x = cudd.or_abstract(x, ~ env_action,
-                                                 aut.upvars, bdd)
+                            x = cudd.and_exists(x, sys_action,
+                                                aut.epvars, bdd)
+                            x = cudd.or_forall(x, ~ env_action,
+                                               aut.upvars, bdd)
                     log.debug('Disjoin X of this assumption')
                     good = good | x
                     del x, xold
@@ -202,9 +201,9 @@ def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
     bdd = aut.bdd
-    other_bdd = BDD()
     for var in bdd._index_of_var:
         other_bdd.add_var(var)
+    other_bdd = cudd.BDD()
     # Compute iterates, now that we know the outer fixpoint
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
@@ -251,15 +250,15 @@ def construct_streett_transducer(z, aut):
                     xp = cudd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
                     paths = x | live_trans
-                    new = cudd.and_abstract(paths, sys_action,
-                                            aut.epvars, bdd)
-                    x = cudd.or_abstract(new, ~ env_action,
-                                         aut.upvars, bdd)
+                    new = cudd.and_exists(paths, sys_action,
+                                          aut.epvars, bdd)
+                    x = cudd.or_forall(new, ~ env_action,
+                                       aut.upvars, bdd)
                 good = good | x
                 # strategy construction
                 print('transfer')
-                paths = cudd.transfer_bdd(paths, other_bdd)
-                new = cudd.transfer_bdd(new, other_bdd)
+                paths = cudd.copy_bdd(paths, bdd, other_bdd)
+                new = cudd.copy_bdd(new, bdd, other_bdd)
                 rim = new & ~ covered
                 covered = covered | new
                 del new
@@ -274,7 +273,7 @@ def construct_streett_transducer(z, aut):
         log.info(other_bdd)
         # make transducer
         # TODO: maybe transfer the goals at the beginning
-        goal = cudd.transfer_bdd(goal, other_bdd)
+        goal = cudd.copy_bdd(goal, bdd, other_bdd)
         # init the transducer with these
         counter = t.add_expr('c = {j}'.format(j=j))
         selector = t.add_expr('strat_type')
@@ -349,7 +348,7 @@ def make_strategy(store, all_new, j, goal, aut):
 def solve_game(fname):
     """Construct transducer for game in file `fname`."""
     d = load_slugsin_file(fname)
-    bdd = BDD()
+    bdd = cudd.BDD()
     aut = make_automaton(d, bdd)
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
