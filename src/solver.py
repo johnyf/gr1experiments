@@ -2,10 +2,11 @@
 import argparse
 import copy
 import logging
+import math
 import time
 from dd import cudd
 import natsort
-from omega.logic import syntax
+# from omega.logic import syntax
 from omega.symbolic import symbolic
 
 
@@ -96,7 +97,7 @@ def _init_vars(d):
     return dvars
 
 
-@profile
+# @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     logger.info('++ Compute winning region')
@@ -116,7 +117,7 @@ def compute_winning_set(aut, z=None):
         s = var_order(bdd)
         reordering_log.debug(repr(s))
         zold = z
-        yj = list()
+        # yj = list()
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
@@ -161,12 +162,12 @@ def compute_winning_set(aut, z=None):
                 y = good
                 del good
             log.debug('Reached Y fixpoint')
-            # z = z & y
-            yj.append(y)
+            z = z & y
+            # yj.append(y)
             del y, yold, live_trans
         del zp
         # conjoin
-        z = syntax.recurse_binary(lambda x, y: x & y, yj)
+        # z = syntax.recurse_binary(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
         # z = linear_operator(lambda x, y: x & y, yj)
@@ -197,14 +198,17 @@ def memoize_iterates(z, aut):
     pass
 
 
-@profile
+# @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
     bdd = aut.bdd
     other_bdd = cudd.BDD()
+    final_bdd = [cudd.BDD() for i in xrange(len(aut.win['sys']))]
     for var, index in bdd._index_of_var.iteritems():
         other_bdd.add_var(var, index=index)
+        for each_bdd in final_bdd:
+            each_bdd.add_var(var, index=index)
     # Compute iterates, now that we know the outer fixpoint
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
@@ -221,8 +225,11 @@ def construct_streett_transducer(z, aut):
     t.vars['strat_type'] = dict(type='bool', owner='sys')
     n_goals = len(aut.win['sys'])
     t.vars['c'] = dict(type='saturating', dom=(0, n_goals - 1), owner='sys')
+    for each_bdd in final_bdd:
+        t.build(each_bdd, add=True)
     t = t.build(other_bdd, add=True)
     transducers = list()
+    # final_transducer = final_bdd.False
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         log.info(bdd)
@@ -281,8 +288,12 @@ def construct_streett_transducer(z, aut):
         # TODO: maybe store the transducers to yet a separate manager
         transducer = transducer & counter & (goal | ~ selector) & sys_action_2
         # transducer = make_strategy(store, all_new, j, goal, t)
+        log.info('transfer to final')
+        log.info(final_bdd)
+        transducer = cudd.copy_bdd(transducer, other_bdd, final_bdd[j])
         transducers.append(transducer)
-        del transducer
+        # final_transducer = final_transducer | transducer
+        del transducer, goal, counter, selector
         # is it more efficient to do this now, or later ?
         # problem is that it couples with more variables (the counters)
     log.info(other_bdd)
@@ -297,9 +308,12 @@ def construct_streett_transducer(z, aut):
     log.info('disjoin transducers')
     # transducer = syntax.recurse_binary(lambda x, y: x | y,
     #                                    transducers, other_bdd)
-    transducer = syntax._linear_operator(
-        lambda x, y: x | y,
-        transducers)
+    # transducer = syntax._linear_operator(
+    #     lambda x, y: x | y,
+    #     transducers)
+    f = lambda x, y: x | y
+    transducer, end_bdd = recurse_binary(f, transducers, final_bdd)
+    print('size:', len(transducer))
     log.info(other_bdd)
     log.info(bdd)
     n_remain = len(transducers)
@@ -315,9 +329,39 @@ def construct_streett_transducer(z, aut):
     # TODO: init of counter and strategy_type
     # conjoin with counter limits
     log.info('final conjunction')
-    transducer = transducer & t.action['sys'][0]
+    # transducer = transducer & t_final.action['sys'][0]
     t.action['sys'] = [transducer]
     return t
+
+
+def recurse_binary(f, x, bdds):
+    """Recursively traverse binary tree of computation."""
+    logger = logging.getLogger('solver')
+    logger.info('++ recurse binary')
+    n = len(x)
+    logger.debug('{n} items left to recurse'.format(n=n))
+    assert n > 0
+    if n == 1:
+        assert len(x) == 1, x
+        assert len(bdds) == 1, bdds
+        return x.pop(), bdds.pop()
+    k = int(math.floor(math.log(n, 2)))
+    m = 2**k
+    if m == n:
+        m = int(n / 2.0)
+    left = x[:m]
+    right = x[m:]
+    del x[:]
+    a, bdd_a = recurse_binary(f, left, bdds[:m])
+    b, bdd_b = recurse_binary(f, right, bdds[m:])
+    new_bdd = cudd.BDD()
+    for var, index in bdds[0]._index_of_var.iteritems():
+        new_bdd.add_var(var, index)
+    cpa = cudd.copy_bdd(a, bdd_a, new_bdd)
+    cpb = cudd.copy_bdd(b, bdd_b, new_bdd)
+    # logger.info(bdds)
+    logger.info('-- done recurse binary ({n} items)'.format(n=n))
+    return f(cpa, cpb), new_bdd
 
 
 def make_strategy(store, all_new, j, goal, aut):
