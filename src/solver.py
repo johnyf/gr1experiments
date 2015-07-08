@@ -96,7 +96,7 @@ def _init_vars(d):
     return dvars
 
 
-# @profile
+@profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     logger.info('++ Compute winning region')
@@ -197,6 +197,7 @@ def memoize_iterates(z, aut):
     pass
 
 
+@profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
