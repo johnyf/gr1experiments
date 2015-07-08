@@ -201,9 +201,9 @@ def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
     bdd = aut.bdd
-    for var in bdd._index_of_var:
-        other_bdd.add_var(var)
     other_bdd = cudd.BDD()
+    for var, index in bdd._index_of_var.iteritems():
+        other_bdd.add_var(var, index=index)
     # Compute iterates, now that we know the outer fixpoint
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
