@@ -157,14 +157,16 @@ def compute_winning_set(aut, z=None):
                             x = cudd.or_forall(x, ~ env_action,
                                                aut.upvars, bdd)
                     log.debug('Disjoin X of this assumption')
+                    del xold
                     good = good | x
-                    del x, xold
+                    del x
                 y = good
                 del good
+            del yold, live_trans
             log.debug('Reached Y fixpoint')
             z = z & y
             # yj.append(y)
-            del y, yold, live_trans
+            del y, goal
         del zp
         # conjoin
         # z = syntax.recurse_binary(lambda x, y: x & y, yj)
@@ -262,7 +264,9 @@ def construct_streett_transducer(z, aut):
                                           aut.epvars, bdd)
                     x = cudd.or_forall(new, ~ env_action,
                                        aut.upvars, bdd)
+                del xold
                 good = good | x
+                del x
                 # strategy construction
                 log.info('transfer')
                 paths = cudd.copy_bdd(paths, bdd, other_bdd)
@@ -277,6 +281,8 @@ def construct_streett_transducer(z, aut):
                 # store.append(paths)
                 # all_new.append(new)
             y = good
+            del good
+        del y, yold, covered
         log.info('other BDD:')
         log.info(other_bdd)
         # make transducer
