@@ -294,8 +294,11 @@ def construct_streett_transducer(z, aut):
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
-    transducer = syntax.recurse_binary(lambda x, y: x | y,
-                                       transducers, other_bdd)
+    # transducer = syntax.recurse_binary(lambda x, y: x | y,
+    #                                    transducers, other_bdd)
+    transducer = syntax._linear_operator(
+        lambda x, y: x | y,
+        transducers)
     log.info(other_bdd)
     log.info(bdd)
     n_remain = len(transducers)
