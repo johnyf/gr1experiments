@@ -437,17 +437,17 @@ def main():
     # fname = 'slugs_small.txt'
     logger = logging.getLogger('solver')
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel('INFO')
+    logger.setLevel('ERROR')
     # reordering
     reordering_fname = 'reordering_{f}'.format(f=input_fname)
     log = logging.getLogger(REORDERING_LOG)
     h = logging.FileHandler(reordering_fname, 'w')
     log.addHandler(h)
-    log.setLevel('DEBUG')
+    log.setLevel('ERROR')
     # syntax
     log = logging.getLogger('omega.logic.syntax')
     log.addHandler(logging.StreamHandler())
-    log.setLevel('DEBUG')
+    log.setLevel('ERROR')
     solve_game(input_fname)
 
 
