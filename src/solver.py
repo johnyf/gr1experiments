@@ -216,10 +216,10 @@ def construct_streett_transducer(z, aut):
     log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    store = list()
-    all_new = list()
     zp = cudd.rename(z, bdd, aut.prime)
     # transducer automaton
+    # TODO: insert the counters at the top of the order
+    # TODO: init of counter and strategy_type
     log.info('sys action has {n} nodes'.format(n=len(sys_action)))
     sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
     log.info('done transferring')
@@ -229,8 +229,8 @@ def construct_streett_transducer(z, aut):
     n_goals = len(aut.win['sys'])
     t.vars['c'] = dict(type='saturating', dom=(0, n_goals - 1), owner='sys')
     t = t.build(other_bdd, add=True)
-    final_transducer = other_bdd.False
     transducers = list()
+    selector = t.add_expr('strat_type')
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         log.info(bdd)
@@ -258,12 +258,13 @@ def construct_streett_transducer(z, aut):
                     xold = x
                     xp = cudd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
+                    del xp
                     paths = x | live_trans
                     new = cudd.and_exists(paths, sys_action,
                                           aut.epvars, bdd)
                     x = cudd.or_forall(new, ~ env_action,
                                        aut.upvars, bdd)
-                del xold
+                del xold, excuse
                 good = good | x
                 del x
                 # strategy construction
@@ -283,51 +284,35 @@ def construct_streett_transducer(z, aut):
         log.info('other BDD:')
         log.info(other_bdd)
         # make transducer
-        # TODO: maybe transfer the goals at the beginning
         goal = cudd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('c = {j}'.format(j=j))
-        selector = t.add_expr('strat_type')
-        transducer = transducer & counter & (goal | ~ selector) & sys_action_2
-        # final_transducer = final_transducer | transducer
+        u = goal | ~ selector
+        del goal
+        u = counter & u
+        del counter
+        transducer = transducer & u
+        del u
+        transducer = transducer & sys_action_2
         transducers.append(transducer)
-        del transducer, goal, counter, selector
-    log.info(other_bdd)
-    log.info('clean intermediate results')
-    assert not store, store
-    assert not all_new, all_new
-    # insert the counters at the top of the order
-    # semi-symbolic representation ?
+        del transducer
+    del sys_action_2
     log.info(other_bdd)
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
-    final_transducer = syntax.recurse_binary(
-        lambda x, y: x | y,
-        transducers, other_bdd)
+    transducer = syntax.recurse_binary(lambda x, y: x | y,
+                                       transducers, other_bdd)
     # transducer = syntax._linear_operator(
     #     lambda x, y: x | y,
     #     transducers)
-    #
-    # f = lambda x, y: x | y
-    # transducer, end_bdd = recurse_binary(f, transducers, final_bdd)
-    print('size:', len(final_transducer))
-    log.info(other_bdd)
-    log.info(bdd)
-    # n_remain = len(transducers)
-    # assert n_remain == 0, n_remain
-    log.info(other_bdd)
-    log.info('transfer bdd')
-    log.info('conjoin with sys action')
-    # TODO: try copying both to a fresh BDD
-    # transducer = transducer & sys_action_2
-    log.info(other_bdd)
-    log.info(final_transducer)
-    del sys_action_2
-    # TODO: init of counter and strategy_type
-    # conjoin with counter limits
-    log.info('final conjunction')
-    # transducer = transducer & t_final.action['sys'][0]
-    # t.action['sys'] = [transducer]
+    n_remain = len(transducers)
+    assert n_remain == 0, n_remain
+    print('size of final transducer:', len(transducer))
+    log.info('bdd:\n{b}'.format(b=bdd))
+    log.info('other bdd:\n{b}'.format(b=other_bdd))
+    # add counter limits
+    transducer = transducer & t.action['sys'][0]
+    t.action['sys'] = [transducer]
     return t
 
 
