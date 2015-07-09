@@ -204,7 +204,7 @@ def memoize_iterates(z, aut):
     pass
 
 
-# @profile
+@profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     # copy vars
