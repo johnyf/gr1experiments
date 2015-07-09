@@ -97,9 +97,10 @@ def _init_vars(d):
     return dvars
 
 
-# @profile
+@profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
+    USE_BINARY = True
     logger.info('++ Compute winning region')
     log = logging.getLogger('solver')
     reordering_log = logging.getLogger(REORDERING_LOG)
@@ -117,7 +118,7 @@ def compute_winning_set(aut, z=None):
         s = var_order(bdd)
         reordering_log.debug(repr(s))
         zold = z
-        # yj = list()
+        yj = list()
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
@@ -164,12 +165,15 @@ def compute_winning_set(aut, z=None):
                 del good
             del yold, live_trans
             log.debug('Reached Y fixpoint')
-            z = z & y
-            # yj.append(y)
+            if USE_BINARY:
+                yj.append(y)
+            else:
+                z = z & y
             del y, goal
         del zp
         # conjoin
-        # z = syntax.recurse_binary(lambda x, y: x & y, yj)
+        if USE_BINARY:
+            z = syntax.recurse_binary(lambda x, y: x & y, yj)
         # z_ = linear_operator_simple(lambda x, y: x & y, yj)
         # assert z == z_
         # z = linear_operator(lambda x, y: x & y, yj)
