@@ -207,13 +207,15 @@ def memoize_iterates(z, aut):
 @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
+    log = logging.getLogger('solver')
+    reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
     other_bdd = cudd.BDD()
     for var, index in bdd._index_of_var.iteritems():
         other_bdd.add_var(var, index=index)
+    log.info('done transferring')
     # Compute iterates, now that we know the outer fixpoint
-    log = logging.getLogger('solver')
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
     zp = cudd.rename(z, bdd, aut.prime)
@@ -222,7 +224,6 @@ def construct_streett_transducer(z, aut):
     # TODO: init of counter and strategy_type
     log.info('sys action has {n} nodes'.format(n=len(sys_action)))
     sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
-    log.info('done transferring')
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
     t.vars['strat_type'] = dict(type='bool', owner='sys')
@@ -437,17 +438,20 @@ def main():
     # fname = 'slugs_small.txt'
     logger = logging.getLogger('solver')
     logger.addHandler(logging.StreamHandler())
-    logger.setLevel('ERROR')
+    logger.setLevel('INFO')
     # reordering
     reordering_fname = 'reordering_{f}'.format(f=input_fname)
     log = logging.getLogger(REORDERING_LOG)
     h = logging.FileHandler(reordering_fname, 'w')
     log.addHandler(h)
-    log.setLevel('ERROR')
+    log.setLevel('DEBUG')
     # syntax
     log = logging.getLogger('omega.logic.syntax')
     log.addHandler(logging.StreamHandler())
-    log.setLevel('ERROR')
+    log.setLevel('INFO')
+    log = logging.getLogger('omega.symbolic.symbolic')
+    log.addHandler(logging.StreamHandler())
+    log.setLevel('DEBUG')
     solve_game(input_fname)
 
 
