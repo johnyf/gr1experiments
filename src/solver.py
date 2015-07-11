@@ -188,6 +188,9 @@ def compute_winning_set(aut, z=None):
         '{u}\n'
         'in: {t:1.0f} sec'.format(
             u=z, t=t))
+    # fname = 'winning_set_z_bdd.txt'
+    # z_ = bdd.load(fname)
+    # assert z == z_, (z, z_)
     return z
 
 
