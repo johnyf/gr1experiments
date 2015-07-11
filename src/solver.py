@@ -219,16 +219,19 @@ def construct_streett_transducer(z, aut):
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
     zp = cudd.rename(z, bdd, aut.prime)
-    # transducer automaton
-    # TODO: insert the counters at the top of the order
-    # TODO: init of counter and strategy_type
     log.info('sys action has {n} nodes'.format(n=len(sys_action)))
     sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
+    # transducer automaton
+    # TODO: init of counter and strategy_type
+    # TODO: allow passing a desired level for the first bit
+    #       of an integer
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
-    t.vars['strat_type'] = dict(type='bool', owner='sys')
+    t.vars['strat_type'] = dict(type='bool', owner='sys', level=0)
     n_goals = len(aut.win['sys'])
-    t.vars['c'] = dict(type='saturating', dom=(0, n_goals - 1), owner='sys')
+    t.vars['c'] = dict(
+        type='saturating', dom=(0, n_goals - 1),
+        owner='sys', level=0)
     t = t.build(other_bdd, add=True)
     transducers = list()
     selector = t.add_expr('strat_type')
@@ -295,6 +298,8 @@ def construct_streett_transducer(z, aut):
         del u
         transducer = transducer & sys_action_2
         transducers.append(transducer)
+        s = var_order(other_bdd)
+        reordering_log.debug(repr(s))
         del transducer
     del sys_action_2
     log.info(other_bdd)
