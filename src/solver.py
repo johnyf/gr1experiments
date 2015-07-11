@@ -221,6 +221,7 @@ def construct_streett_transducer(z, aut):
     zp = cudd.rename(z, bdd, aut.prime)
     log.info('sys action has {n} nodes'.format(n=len(sys_action)))
     sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
+    env_action_2 = cudd.copy_bdd(env_action, bdd, other_bdd)
     # transducer automaton
     # TODO: init of counter and strategy_type
     # TODO: allow passing a desired level for the first bit
@@ -318,6 +319,7 @@ def construct_streett_transducer(z, aut):
     log.info('other bdd:\n{b}'.format(b=other_bdd))
     # add counter limits
     transducer = transducer & t.action['sys'][0]
+    transducer = transducer | ~ env_action_2
     t.action['sys'] = [transducer]
     return t
 
