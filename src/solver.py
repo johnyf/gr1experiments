@@ -26,16 +26,8 @@ REORDERING_LOG = 'reorder'
 # use a CUDD map for repeated renaming
 
 
-def load_slugsin_file(fname):
-    """Return `dict` keyed by slugsin file section."""
-    with open(fname, 'r') as f:
-        s = f.read()
-    d = _parser_slugsin(s)
-    return d
-
-
-def _parser_slugsin(s):
-    """Return sections of slugsin file, as `dict`."""
+def parser_slugsin(s):
+    """Return `dict` keyed by `slugsin` file section."""
     sections = dict(
         INPUT='input',
         OUTPUT='output',
@@ -385,9 +377,12 @@ def make_strategy(store, all_new, j, goal, aut):
     return transducer
 
 
-def solve_game(fname):
-    """Construct transducer for game in file `fname`."""
-    d = load_slugsin_file(fname)
+def solve_game(s):
+    """Construct transducer for game in file `fname`.
+
+    @param s: `str` in `slugs` syntax
+    """
+    d = parser_slugsin(s)
     bdd = cudd.BDD()
     aut = make_automaton(d, bdd)
     # aut.action['sys'][0] = bdd.False
@@ -445,12 +440,18 @@ def main():
         plt.show()
         return
     input_fname = args.file
+    with open(input_fname, 'r') as f:
+        s = f.read()
+    synthesize(s, fname=input_fname)
+
+
+def synthesize(s, fname='reordering'):
     # fname = 'slugs_small.txt'
     logger = logging.getLogger('solver')
     logger.addHandler(logging.StreamHandler())
     logger.setLevel('INFO')
     # reordering
-    reordering_fname = 'reordering_{f}'.format(f=input_fname)
+    reordering_fname = 'reordering_{f}'.format(f=fname)
     log = logging.getLogger(REORDERING_LOG)
     h = logging.FileHandler(reordering_fname, 'w')
     log.addHandler(h)
@@ -462,7 +463,7 @@ def main():
     log = logging.getLogger('omega.symbolic.symbolic')
     log.addHandler(logging.StreamHandler())
     log.setLevel('DEBUG')
-    solve_game(input_fname)
+    solve_game(s)
 
 
 def test_indices_and_levels():
