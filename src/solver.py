@@ -387,6 +387,7 @@ def solve_game(s):
     aut = make_automaton(d, bdd)
     # aut.action['sys'][0] = bdd.False
     z = compute_winning_set(aut)
+    assert z != bdd.False, 'unrealizable'
     t = construct_streett_transducer(z, aut)
     logger.info(t)
     del aut, z, t
