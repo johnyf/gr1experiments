@@ -1,3 +1,5 @@
+.DS_Store
+._.DS_Store
 build/*
 src/build/*
 *.pyc
@@ -9,4 +11,5 @@ src/build/*
 *.swp
 *.prof
 *.lprof
+*.pdf
 
