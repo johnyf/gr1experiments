@@ -439,6 +439,11 @@ def make_strategy(store, all_new, j, goal, aut):
     return transducer
 
 
+def compare_winning_set(z, bdd):
+    """Raise `Exception` if winning set different than BDD file."""
+    fname = 'winning_set_z_bdd.txt'
+    z_ = bdd.load(fname)
+    assert z == z_, (z, z_)
 
 
 def var_order(bdd):
