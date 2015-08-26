@@ -153,9 +153,7 @@ def compute_winning_set(aut, z=None):
                 yp = cudd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
                 good = y
-                for excuse in aut.win['env']:
-                    # log.debug(
-                    #     'Assumption: {excuse}'.format(excuse=excuse))
+                for i, excuse in enumerate(aut.win['env']):
                     x = bdd.True
                     xold = None
                     while x != xold:
@@ -227,9 +225,6 @@ def compute_winning_set(aut, z=None):
         '{u}\n'
         'in: {t:1.0f} sec'.format(
             u=z, t=t))
-    # fname = 'winning_set_z_bdd.txt'
-    # z_ = bdd.load(fname)
-    # assert z == z_, (z, z_)
     return z
 
 
@@ -281,7 +276,7 @@ def construct_streett_transducer(z, aut):
             yp = cudd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
             good = y
-            for excuse in aut.win['env']:
+            for i, excuse in enumerate(aut.win['env']):
                 x = bdd.True
                 xold = None
                 paths = None
@@ -335,6 +330,7 @@ def construct_streett_transducer(z, aut):
                 del rim
             y = good
             del good
+        assert y == z, (y, z)
         del y, yold, covered
         log.info('other BDD:')
         log.info(other_bdd)
@@ -348,6 +344,7 @@ def construct_streett_transducer(z, aut):
         transducer = transducer & u
         del u
         transducer = transducer & sys_action_2
+        check_winning_region(transducer, aut, t, bdd, other_bdd, z, j)
         transducers.append(transducer)
         # log
         s = var_order(other_bdd)
@@ -378,7 +375,18 @@ def construct_streett_transducer(z, aut):
         'goal: 0, '
         'nodes: all: 100, '
         'combined_strategy: 0\n')
+    # self-check
+    check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
     return t
+
+
+def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
+    u = symbolic.cofactor(transducer, 'c', j, other_bdd, t.vars)
+    u = other_bdd.quantify(u, ['strat_type'], forall=False)
+    u = other_bdd.quantify(u, t.epvars, forall=False)
+    u = other_bdd.quantify(u, t.upvars, forall=True)
+    z_ = cudd.copy_bdd(z, bdd, other_bdd)
+    print('u == z', u == z_)
 
 
 def recurse_binary(f, x, bdds):
