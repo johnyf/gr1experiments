@@ -233,19 +233,6 @@ def compute_winning_set(aut, z=None):
     return z
 
 
-def var_order(bdd):
-    """Return `dict` that maps each variable to a level.
-
-    @rtype: `dict(str: int)`
-    """
-    return {var: bdd.level_of_var(var) for var in bdd.vars}
-
-
-def memoize_iterates(z, aut):
-    """Store iterates of X, Y, given Z fixpoint."""
-    pass
-
-
 # @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
@@ -453,7 +440,18 @@ def make_strategy(store, all_new, j, goal, aut):
 
 
 
+
+def var_order(bdd):
+    """Return `dict` that maps each variable to a level.
+
+    @rtype: `dict(str: int)`
     """
+    return {var: bdd.level_of_var(var) for var in bdd.vars}
+
+
+def memoize_iterates(z, aut):
+    """Compute winning set, while storing iterates."""
+    pass
 
 
 def load_order_history(fname):
