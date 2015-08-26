@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import argparse
 import copy
 import logging
@@ -25,9 +24,38 @@ SOLVER_LOG = 'solver'
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # use a CUDD map for repeated renaming
+#
+# init of counter and strategy_type
+# allow passing a desired level for the first bit
+#     of an integer
 
 
-def parser_slugsin(s):
+def solve_game(s):
+    """Construct transducer for game in file `fname`.
+
+    @param s: `str` in `slugs` syntax
+    """
+    d = parse_slugsin(s)
+    bdd = cudd.BDD()
+    aut = make_automaton(d, bdd)
+    z = compute_winning_set(aut)
+    assert z != bdd.False, 'unrealizable'
+    t = construct_streett_transducer(z, aut)
+    logger.info(t)
+    log = logging.getLogger(SOLVER_LOG)
+    log.info(aut)
+    del aut, z, t
+
+
+def log_reordering(fname):
+    reordering_fname = 'reordering_{f}'.format(f=fname)
+    log = logging.getLogger(REORDERING_LOG)
+    h = logging.FileHandler(reordering_fname, 'w')
+    log.addHandler(h)
+    log.setLevel('ERROR')
+
+
+def parse_slugsin(s):
     """Return `dict` keyed by `slugsin` file section."""
     sections = dict(
         INPUT='input',
@@ -424,20 +452,8 @@ def make_strategy(store, all_new, j, goal, aut):
     return transducer
 
 
-def solve_game(s):
-    """Construct transducer for game in file `fname`.
 
-    @param s: `str` in `slugs` syntax
     """
-    d = parser_slugsin(s)
-    bdd = cudd.BDD()
-    aut = make_automaton(d, bdd)
-    # aut.action['sys'][0] = bdd.False
-    z = compute_winning_set(aut)
-    assert z != bdd.False, 'unrealizable'
-    t = construct_streett_transducer(z, aut)
-    logger.info(t)
-    del aut, z, t
 
 
 def load_order_history(fname):
@@ -488,29 +504,17 @@ def main():
         plt.show()
         return
     input_fname = args.file
-    with open(input_fname, 'r') as f:
+    command_line_wrapper(input_fname)
+
+
+def command_line_wrapper():
+    """Solve game in `slugsin` file `fname`."""
+    p = argparse.ArgumentParser()
+    p.add_argument('file', type=str, help='`slugsin` input')
+    args = p.parse_args()
+    fname = args.file
+    with open(fname, 'r') as f:
         s = f.read()
-    synthesize(s, fname=input_fname)
-
-
-def synthesize(s, fname='reordering'):
-    # fname = 'slugs_small.txt'
-    logger = logging.getLogger('solver')
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel('INFO')
-    # reordering
-    reordering_fname = 'reordering_{f}'.format(f=fname)
-    log = logging.getLogger(REORDERING_LOG)
-    h = logging.FileHandler(reordering_fname, 'w')
-    log.addHandler(h)
-    log.setLevel('DEBUG')
-    # syntax
-    log = logging.getLogger('omega.logic.syntax')
-    log.addHandler(logging.StreamHandler())
-    log.setLevel('INFO')
-    log = logging.getLogger('omega.symbolic.symbolic')
-    log.addHandler(logging.StreamHandler())
-    log.setLevel('DEBUG')
     solve_game(s)
 
 
@@ -526,7 +530,3 @@ def test_indices_and_levels():
     u = bdd.var('a') & bdd.var('b')
     print str(u)
     print bdd.var_at_level(10)
-
-
-if __name__ == '__main__':
-    main()
