@@ -12,6 +12,7 @@ from omega.symbolic import symbolic
 
 logger = logging.getLogger(__name__)
 REORDERING_LOG = 'reorder'
+SOLVER_LOG = 'solver'
 
 
 # TODO:
@@ -94,7 +95,7 @@ def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     USE_BINARY = True
     logger.info('++ Compute winning region')
-    log = logging.getLogger('solver')
+    log = logging.getLogger(SOLVER_LOG)
     reordering_log = logging.getLogger(REORDERING_LOG)
     bdd = aut.bdd
     env_action = aut.action['env'][0]
@@ -149,6 +150,26 @@ def compute_winning_set(aut, z=None):
                                                 aut.epvars, bdd)
                             x = cudd.or_forall(x, ~ env_action,
                                                aut.upvars, bdd)
+                        stats = bdd.statistics()
+                        current_time = time.time()
+                        t = current_time - start_time
+                        log.info((
+                            'time (ms): {t}, '
+                            'reordering (ms): {reorder_time}, '
+                            'sysj: {sysj}, '
+                            'envi: {envi}, '
+                            'nodes: all: {n_nodes}, '
+                            'Z: {z}, '
+                            'Y: {y}, '
+                            'X: {x}\n').format(
+                                t=t,
+                                reorder_time=stats['reordering_time'],
+                                sysj=j,
+                                envi=i,
+                                n_nodes=stats['n_nodes'],
+                                z=len(z),
+                                y=len(y),
+                                x=len(x)))
                     log.debug('Disjoin X of this assumption')
                     del xold
                     good = good | x
@@ -202,14 +223,13 @@ def memoize_iterates(z, aut):
 # @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
-    log = logging.getLogger('solver')
+    log = logging.getLogger(SOLVER_LOG)
     reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
     other_bdd = cudd.BDD()
     for var, index in bdd._index_of_var.iteritems():
         other_bdd.add_var(var, index=index)
-    log.info('done transferring')
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -231,6 +251,7 @@ def construct_streett_transducer(z, aut):
     t = t.build(other_bdd, add=True)
     transducers = list()
     selector = t.add_expr('strat_type')
+    start_time = time.time()
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         log.info(bdd)
@@ -264,10 +285,31 @@ def construct_streett_transducer(z, aut):
                                           aut.epvars, bdd)
                     x = cudd.or_forall(new, ~ env_action,
                                        aut.upvars, bdd)
+                    stats = bdd.statistics()
+                    current_time = time.time()
+                    dtime = current_time - start_time
+                    log.info((
+                        'time (ms): {t}, '
+                        'reordering (ms): {reorder_time}, '
+                        'goal: {j}, '
+                        'onion_ring: 0, '
+                        'nodes: all: {n_nodes}, '
+                        'strategy: {strategy}, '
+                        'cases_covered: 0, '
+                        'new_cases: 0\n').format(
+                            t=dtime,
+                            reorder_time=int(stats['reordering_time']),
+                            j=j,
+                            strategy=len(transducer),
+                            n_nodes=stats['n_nodes'],
+                            z=len(z),
+                            y=len(y),
+                            x=len(x)))
                 del xold, excuse
                 good = good | x
                 del x
                 # strategy construction
+                # in `other_bdd`
                 log.info('transfer')
                 paths = cudd.copy_bdd(paths, bdd, other_bdd)
                 new = cudd.copy_bdd(new, bdd, other_bdd)
@@ -294,6 +336,7 @@ def construct_streett_transducer(z, aut):
         del u
         transducer = transducer & sys_action_2
         transducers.append(transducer)
+        # log
         s = var_order(other_bdd)
         reordering_log.debug(repr(s))
         del transducer
@@ -316,12 +359,18 @@ def construct_streett_transducer(z, aut):
     transducer = transducer & t.action['sys'][0]
     transducer = transducer | ~ env_action_2
     t.action['sys'] = [transducer]
+    log.debug(
+        'time (ms): 0, '
+        'reordering (ms): 0, '
+        'goal: 0, '
+        'nodes: all: 100, '
+        'combined_strategy: 0\n')
     return t
 
 
 def recurse_binary(f, x, bdds):
     """Recursively traverse binary tree of computation."""
-    logger = logging.getLogger('solver')
+    logger = logging.getLogger(SOLVER_LOG)
     logger.info('++ recurse binary')
     n = len(x)
     logger.debug('{n} items left to recurse'.format(n=n))
@@ -350,7 +399,7 @@ def recurse_binary(f, x, bdds):
 
 
 def make_strategy(store, all_new, j, goal, aut):
-    log = logging.getLogger('solver')
+    log = logging.getLogger(SOLVER_LOG)
     log.info('++ Make strategy for goal: {j}'.format(j=j))
     bdd = aut.bdd
     log.info(bdd)
