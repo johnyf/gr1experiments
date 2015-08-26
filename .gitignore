@@ -1,8 +1,10 @@
+_version.py
 .DS_Store
 ._.DS_Store
 build/*
 src/build/*
 *.pyc
+*.egg-info
 *.out
 *.so
 *.o
