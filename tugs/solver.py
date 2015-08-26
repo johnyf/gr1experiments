@@ -3,7 +3,7 @@ import copy
 import logging
 import math
 import time
-from dd import cudd
+from dd import autoref as _bdd
 import natsort
 from omega.logic import syntax
 from omega.symbolic import symbolic
@@ -34,7 +34,7 @@ def solve_game(s):
     @param s: `str` in `slugs` syntax
     """
     d = parse_slugsin(s)
-    bdd = cudd.BDD()
+    bdd = _bdd.BDD()
     aut = make_automaton(d, bdd)
     z = compute_winning_set(aut)
     assert z != bdd.False, 'unrealizable'
@@ -141,14 +141,14 @@ def compute_winning_set(aut, z=None):
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
             log.info(bdd)
-            zp = cudd.rename(z, bdd, aut.prime)
+            zp = _bdd.rename(z, bdd, aut.prime)
             live_trans = goal & zp
             y = bdd.False
             yold = None
             while y != yold:
                 log.debug('Start Y iteration')
                 yold = y
-                yp = cudd.rename(y, bdd, aut.prime)
+                yp = _bdd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
                 good = y
                 for i, excuse in enumerate(aut.win['env']):
@@ -157,7 +157,7 @@ def compute_winning_set(aut, z=None):
                     while x != xold:
                         log.debug('Start X iteration')
                         xold = x
-                        xp = cudd.rename(x, bdd, aut.prime)
+                        xp = _bdd.rename(x, bdd, aut.prime)
                         # desired transitions
                         x = xp & ~ excuse
                         x = x | live_trans
@@ -170,9 +170,9 @@ def compute_winning_set(aut, z=None):
                             x = x | ~ env_action
                             x = bdd.quantify(x, aut.upvars, forall=True)
                         else:
-                            x = cudd.and_exists(x, sys_action,
+                            x = _bdd.and_exists(x, sys_action,
                                                 aut.epvars, bdd)
-                            x = cudd.or_forall(x, ~ env_action,
+                            x = _bdd.or_forall(x, ~ env_action,
                                                aut.upvars, bdd)
                         stats = bdd.statistics()
                         current_time = time.time()
@@ -233,16 +233,16 @@ def construct_streett_transducer(z, aut):
     reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
-    other_bdd = cudd.BDD()
+    other_bdd = _bdd.BDD()
     for var, index in bdd._index_of_var.iteritems():
         other_bdd.add_var(var, index=index)
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
-    env_action_2 = cudd.copy_bdd(env_action, bdd, other_bdd)
+    sys_action_2 = _bdd.copy_bdd(sys_action, bdd, other_bdd)
+    env_action_2 = _bdd.copy_bdd(env_action, bdd, other_bdd)
     log.info('done copying actions')
-    zp = cudd.rename(z, bdd, aut.prime)
+    zp = _bdd.rename(z, bdd, aut.prime)
     # transducer automaton
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
@@ -268,7 +268,7 @@ def construct_streett_transducer(z, aut):
         while y != yold:
             log.debug('Start Y iteration')
             yold = y
-            yp = cudd.rename(y, bdd, aut.prime)
+            yp = _bdd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
             good = y
             for i, excuse in enumerate(aut.win['env']):
@@ -280,13 +280,13 @@ def construct_streett_transducer(z, aut):
                     del paths, new
                     log.debug('Start X iteration')
                     xold = x
-                    xp = cudd.rename(x, bdd, aut.prime)
+                    xp = _bdd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
                     del xp
                     paths = x | live_trans
-                    new = cudd.and_exists(paths, sys_action,
+                    new = _bdd.and_exists(paths, sys_action,
                                           aut.epvars, bdd)
-                    x = cudd.or_forall(new, ~ env_action,
+                    x = _bdd.or_forall(new, ~ env_action,
                                        aut.upvars, bdd)
                     stats = bdd.statistics()
                     current_time = time.time()
@@ -314,8 +314,8 @@ def construct_streett_transducer(z, aut):
                 # strategy construction
                 # in `other_bdd`
                 log.info('transfer')
-                paths = cudd.copy_bdd(paths, bdd, other_bdd)
-                new = cudd.copy_bdd(new, bdd, other_bdd)
+                paths = _bdd.copy_bdd(paths, bdd, other_bdd)
+                new = _bdd.copy_bdd(new, bdd, other_bdd)
                 rim = new & ~ covered
                 covered = covered | new
                 del new
@@ -330,7 +330,7 @@ def construct_streett_transducer(z, aut):
         log.info('other BDD:')
         log.info(other_bdd)
         # make transducer
-        goal = cudd.copy_bdd(goal, bdd, other_bdd)
+        goal = _bdd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('c = {j}'.format(j=j))
         u = goal | ~ selector
         del goal
@@ -380,7 +380,7 @@ def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
     u = other_bdd.quantify(u, ['strat_type'], forall=False)
     u = other_bdd.quantify(u, t.epvars, forall=False)
     u = other_bdd.quantify(u, t.upvars, forall=True)
-    z_ = cudd.copy_bdd(z, bdd, other_bdd)
+    z_ = _bdd.copy_bdd(z, bdd, other_bdd)
     print('u == z', u == z_)
 
 
@@ -404,11 +404,11 @@ def recurse_binary(f, x, bdds):
     del x[:]
     a, bdd_a = recurse_binary(f, left, bdds[:m])
     b, bdd_b = recurse_binary(f, right, bdds[m:])
-    new_bdd = cudd.BDD()
+    new_bdd = _bdd.BDD()
     for var, index in bdds[0]._index_of_var.iteritems():
         new_bdd.add_var(var, index)
-    cpa = cudd.copy_bdd(a, bdd_a, new_bdd)
-    cpb = cudd.copy_bdd(b, bdd_b, new_bdd)
+    cpa = _bdd.copy_bdd(a, bdd_a, new_bdd)
+    cpb = _bdd.copy_bdd(b, bdd_b, new_bdd)
     # logger.info(bdds)
     logger.info('-- done recurse binary ({n} items)'.format(n=n))
     return f(cpa, cpb), new_bdd
@@ -525,7 +525,7 @@ def command_line_wrapper():
 
 
 def test_indices_and_levels():
-    bdd = cudd.BDD()
+    bdd = _bdd.BDD()
     ja = bdd.add_var('a', index=3)
     jb = bdd.add_var('b', index=10)
     jc = bdd.add_var('c', index=0)
