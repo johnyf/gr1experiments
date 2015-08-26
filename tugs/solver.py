@@ -19,8 +19,6 @@ SOLVER_LOG = 'solver'
 # record events (reordering, garbage collection)
 # plot events in annotated timeline
 #
-# check that `config.json` is the same
-#
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # use a CUDD map for repeated renaming
@@ -246,9 +244,6 @@ def construct_streett_transducer(z, aut):
     log.info('done copying actions')
     zp = cudd.rename(z, bdd, aut.prime)
     # transducer automaton
-    # TODO: init of counter and strategy_type
-    # TODO: allow passing a desired level for the first bit
-    #       of an integer
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
     t.vars['strat_type'] = dict(type='bool', owner='sys', level=0)
