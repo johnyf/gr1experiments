@@ -241,10 +241,10 @@ def construct_streett_transducer(z, aut):
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    zp = cudd.rename(z, bdd, aut.prime)
-    log.info('sys action has {n} nodes'.format(n=len(sys_action)))
     sys_action_2 = cudd.copy_bdd(sys_action, bdd, other_bdd)
     env_action_2 = cudd.copy_bdd(env_action, bdd, other_bdd)
+    log.info('done copying actions')
+    zp = cudd.rename(z, bdd, aut.prime)
     # transducer automaton
     # TODO: init of counter and strategy_type
     # TODO: allow passing a desired level for the first bit
