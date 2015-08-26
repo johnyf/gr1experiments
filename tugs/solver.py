@@ -185,11 +185,9 @@ def compute_winning_set(aut, z=None):
             del y, goal
         del zp
         # conjoin
-        if USE_BINARY:
-            z = syntax.recurse_binary(lambda x, y: x & y, yj)
-        # z_ = linear_operator_simple(lambda x, y: x & y, yj)
-        # assert z == z_
-        # z = linear_operator(lambda x, y: x & y, yj)
+        # if USE_BINARY:
+        # z = syntax.recurse_binary(lambda x, y: x & y, yj)
+        z = syntax._linear_operator_simple(lambda x, y: x & y, yj)
         bdd.assert_consistent()
         current_time = time.time()
         t = current_time - start_time
@@ -345,13 +343,13 @@ def construct_streett_transducer(z, aut):
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
-    transducer = syntax.recurse_binary(lambda x, y: x | y,
-                                       transducers, other_bdd)
-    # transducer = syntax._linear_operator(
-    #     lambda x, y: x | y,
-    #     transducers)
-    n_remain = len(transducers)
-    assert n_remain == 0, n_remain
+    # transducer = syntax.recurse_binary(lambda x, y: x | y,
+    #                                    transducers, other_bdd)
+    transducer = syntax._linear_operator_simple(
+        lambda x, y: x | y,
+        transducers)
+    # n_remain = len(transducers)
+    # assert n_remain == 0, n_remain
     print('size of final transducer:', len(transducer))
     log.info('bdd:\n{b}'.format(b=bdd))
     log.info('other bdd:\n{b}'.format(b=other_bdd))
