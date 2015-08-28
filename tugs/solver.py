@@ -375,6 +375,7 @@ def construct_streett_transducer(z, aut):
     # transducer = transducer & t.action['sys'][0]
     # env lost ?
     # transducer = transducer | ~ env_action_2
+    print('size of final transducer:', len(transducer))
     t.action['sys'] = [transducer]
     log.debug(
         'time (ms): 0, '
