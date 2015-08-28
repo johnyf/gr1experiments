@@ -18,8 +18,14 @@ SELECTOR = 'strat_type'
 
 # TODO:
 #
-# record events (reordering, garbage collection)
+# 1. record events (reordering, garbage collection)
 # plot events in annotated timeline
+#
+# 2. implement `slugs` algorithm in Cython
+#
+# 3. compare 2 to `slugs`
+#
+# 4. add a case study
 #
 # group primed and unprimed vars
 # use efficient rename for neighbors
