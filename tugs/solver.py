@@ -354,7 +354,7 @@ def construct_streett_transducer(z, aut):
         transducer = transducer & u
         del u
         transducer = transducer & sys_action_2
-        check_winning_region(transducer, aut, t, bdd, other_bdd, z, j)
+        # check_winning_region(transducer, aut, t, bdd, other_bdd, z, j)
         transducers.append(transducer)
         # log
         s = var_order(other_bdd)
