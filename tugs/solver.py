@@ -244,8 +244,7 @@ def construct_streett_transducer(z, aut):
     # copy vars
     bdd = aut.bdd
     other_bdd = _bdd.BDD()
-    for var, index in bdd._index_of_var.iteritems():
-        other_bdd.add_var(var, index=index)
+    _bdd.copy_vars(bdd, other_bdd)
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -419,8 +418,7 @@ def recurse_binary(f, x, bdds):
     a, bdd_a = recurse_binary(f, left, bdds[:m])
     b, bdd_b = recurse_binary(f, right, bdds[m:])
     new_bdd = _bdd.BDD()
-    for var, index in bdds[0]._index_of_var.iteritems():
-        new_bdd.add_var(var, index)
+    _bdd.copy_vars(bdds[0], new_bdd)
     cpa = _bdd.copy_bdd(a, bdd_a, new_bdd)
     cpb = _bdd.copy_bdd(b, bdd_b, new_bdd)
     # logger.info(bdds)
