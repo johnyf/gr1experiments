@@ -3,7 +3,7 @@ import copy
 import logging
 import math
 import time
-from dd import autoref as _bdd
+from dd import cudd as _bdd
 import natsort
 from omega.logic import syntax
 from omega.symbolic import symbolic
