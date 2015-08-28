@@ -219,7 +219,7 @@ def compute_winning_set(aut, z=None):
         # conjoin
         # if USE_BINARY:
         z = syntax.recurse_binary(conj, yj)
-        # z = syntax._linear_operator_simple(lambda x, y: x & y, yj)
+        # z = syntax._linear_operator_simple(conj, yj)
         bdd.assert_consistent()
         current_time = time.time()
         t = current_time - start_time
@@ -365,9 +365,7 @@ def construct_streett_transducer(z, aut):
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
-    # transducer = syntax._linear_operator_simple(
-    #     lambda x, y: x | y,
-    #     transducers)
+    # transducer = syntax._linear_operator_simple(disj, transducers)
     n_remain = len(transducers)
     assert n_remain == 0, n_remain
     log.info('bdd:\n{b}'.format(b=bdd))
