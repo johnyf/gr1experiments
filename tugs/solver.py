@@ -223,7 +223,7 @@ def compute_winning_set(aut, z=None):
         bdd.assert_consistent()
         current_time = time.time()
         t = current_time - start_time
-        log.info('Completed Z iteration at: {t} sec'.format(t=t))
+        log.info('Completed Z iteration in: {t} sec'.format(t=t))
     end_time = time.time()
     t = end_time - start_time
     log.info(
