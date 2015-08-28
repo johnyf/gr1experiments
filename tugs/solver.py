@@ -12,6 +12,8 @@ from omega.symbolic import symbolic
 logger = logging.getLogger(__name__)
 REORDERING_LOG = 'reorder'
 SOLVER_LOG = 'solver'
+COUNTER = '_jx_b'
+SELECTOR = 'strat_type'
 
 
 # TODO:
@@ -252,14 +254,14 @@ def construct_streett_transducer(z, aut):
     # transducer automaton
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
-    t.vars['strat_type'] = dict(type='bool', owner='sys', level=0)
+    t.vars[SELECTOR] = dict(type='bool', owner='sys', level=0)
     n_goals = len(aut.win['sys'])
-    t.vars['c'] = dict(
+    t.vars[COUNTER] = dict(
         type='saturating', dom=(0, n_goals - 1),
         owner='sys', level=0)
     t = t.build(other_bdd, add=True)
     transducers = list()
-    selector = t.add_expr('strat_type')
+    selector = t.add_expr(SELECTOR)
     start_time = time.time()
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
@@ -343,7 +345,7 @@ def construct_streett_transducer(z, aut):
         log.info(other_bdd)
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
-        counter = t.add_expr('c = {j}'.format(j=j))
+        counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
         u = goal | ~ selector
         del goal
         u = counter & u
@@ -386,8 +388,9 @@ def construct_streett_transducer(z, aut):
 
 
 def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
-    u = symbolic.cofactor(transducer, 'c', j, other_bdd, t.vars)
-    u = other_bdd.quantify(u, ['strat_type'], forall=False)
+    u = transducer
+    u = symbolic.cofactor(transducer, COUNTER, j, other_bdd, t.vars)
+    u = other_bdd.quantify(u, [SELECTOR], forall=False)
     u = other_bdd.quantify(u, t.epvars, forall=False)
     u = other_bdd.quantify(u, t.upvars, forall=True)
     z_ = _bdd.copy_bdd(z, bdd, other_bdd)
@@ -445,8 +448,8 @@ def make_strategy(store, all_new, j, goal, aut):
         del rim
     assert not store, store
     assert not all_new, all_new
-    counter = aut.add_expr('c = {j}'.format(j=j))
-    selector = aut.add_expr('strat_type')
+    counter = aut.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
+    selector = aut.add_expr(SELECTOR)
     transducer = transducer & counter & (goal | ~ selector)
     log.info('-- done making strategy for goal: {j}'.format(j=j))
     return transducer
