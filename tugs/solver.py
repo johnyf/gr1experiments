@@ -174,27 +174,33 @@ def compute_winning_set(aut, z=None):
                                                 aut.epvars, bdd)
                             x = _bdd.or_forall(x, ~ env_action,
                                                aut.upvars, bdd)
-                        stats = bdd.statistics()
-                        current_time = time.time()
-                        t = current_time - start_time
-                        log.info((
-                            'time (ms): {t}, '
-                            'reordering (ms): {reorder_time}, '
-                            'sysj: {sysj}, '
-                            'envi: {envi}, '
-                            'nodes: all: {n_nodes}, '
-                            'Z: {z}, '
-                            'Y: {y}, '
-                            'X: {x}\n').format(
-                                t=t,
-                                reorder_time=stats['reordering_time'],
-                                sysj=j,
-                                envi=i,
-                                n_nodes=stats['n_nodes'],
-                                z=len(z),
-                                y=len(y),
-                                x=len(x)))
-                    log.debug('Disjoin X of this assumption')
+                        # log
+                        try:
+                            stats = bdd.statistics()
+                            n_nodes = stats['n_nodes']
+                            reordering_time = stats['reordering_time']
+                            current_time = time.time()
+                            t = current_time - start_time
+                            log.info((
+                                'time (ms): {t}, '
+                                'reordering (ms): {reorder_time}, '
+                                'sysj: {sysj}, '
+                                'envi: {envi}, '
+                                'nodes: all: {n_nodes}, '
+                                'Z: {z}, '
+                                'Y: {y}, '
+                                'X: {x}\n').format(
+                                    t=t,
+                                    reorder_time=reordering_time,
+                                    sysj=j,
+                                    envi=i,
+                                    n_nodes=n_nodes,
+                                    z=len(z),
+                                    y=len(y),
+                                    x=len(x)))
+                        except:
+                            pass
+                    log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
                     del x
@@ -288,26 +294,32 @@ def construct_streett_transducer(z, aut):
                                           aut.epvars, bdd)
                     x = _bdd.or_forall(new, ~ env_action,
                                        aut.upvars, bdd)
-                    stats = bdd.statistics()
-                    current_time = time.time()
-                    dtime = current_time - start_time
-                    log.info((
-                        'time (ms): {t}, '
-                        'reordering (ms): {reorder_time}, '
-                        'goal: {j}, '
-                        'onion_ring: 0, '
-                        'nodes: all: {n_nodes}, '
-                        'strategy: {strategy}, '
-                        'cases_covered: 0, '
-                        'new_cases: 0\n').format(
-                            t=dtime,
-                            reorder_time=int(stats['reordering_time']),
-                            j=j,
-                            strategy=len(transducer),
-                            n_nodes=stats['n_nodes'],
-                            z=len(z),
-                            y=len(y),
-                            x=len(x)))
+                    # log
+                    try:
+                        stats = bdd.statistics()
+                        n_nodes = stats['n_nodes']
+                        reordering_time = stats['reordering_time']
+                        current_time = time.time()
+                        dtime = current_time - start_time
+                        log.info((
+                            'time (ms): {t}, '
+                            'reordering (ms): {reorder_time}, '
+                            'goal: {j}, '
+                            'onion_ring: 0, '
+                            'nodes: all: {n_nodes}, '
+                            'strategy: {strategy}, '
+                            'cases_covered: 0, '
+                            'new_cases: 0\n').format(
+                                t=dtime,
+                                reorder_time=int(reordering_time),
+                                j=j,
+                                strategy=len(transducer),
+                                n_nodes=n_nodes,
+                                z=len(z),
+                                y=len(y),
+                                x=len(x)))
+                    except:
+                        pass
                 del xold, excuse
                 good = good | x
                 del x
