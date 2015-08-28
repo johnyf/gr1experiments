@@ -372,8 +372,9 @@ def construct_streett_transducer(z, aut):
     log.info('bdd:\n{b}'.format(b=bdd))
     log.info('other bdd:\n{b}'.format(b=other_bdd))
     # add counter limits
-    transducer = transducer & t.action['sys'][0]
-    transducer = transducer | ~ env_action_2
+    # transducer = transducer & t.action['sys'][0]
+    # env lost ?
+    # transducer = transducer | ~ env_action_2
     t.action['sys'] = [transducer]
     log.debug(
         'time (ms): 0, '
