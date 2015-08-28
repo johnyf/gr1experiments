@@ -41,6 +41,8 @@ def solve_game(s):
     z = compute_winning_set(aut)
     assert z != bdd.False, 'unrealizable'
     t = construct_streett_transducer(z, aut)
+    fname = 'tugs_strategy.txt'
+    t.bdd.dump(t.action['sys'][0], fname)
     logger.info(t)
     log = logging.getLogger(SOLVER_LOG)
     log.info(aut)
