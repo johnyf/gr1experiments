@@ -170,10 +170,10 @@ def compute_winning_set(aut, z=None):
                             x = x | ~ env_action
                             x = bdd.quantify(x, aut.upvars, forall=True)
                         else:
-                            x = _bdd.and_exists(x, sys_action,
-                                                aut.epvars, bdd)
-                            x = _bdd.or_forall(x, ~ env_action,
-                                               aut.upvars, bdd)
+                            x = and_exists(x, sys_action,
+                                           aut.epvars, bdd)
+                            x = or_forall(x, ~ env_action,
+                                          aut.upvars, bdd)
                         # log
                         try:
                             stats = bdd.statistics()
@@ -290,10 +290,10 @@ def construct_streett_transducer(z, aut):
                     x = xp & ~ excuse
                     del xp
                     paths = x | live_trans
-                    new = _bdd.and_exists(paths, sys_action,
-                                          aut.epvars, bdd)
-                    x = _bdd.or_forall(new, ~ env_action,
-                                       aut.upvars, bdd)
+                    new = and_exists(paths, sys_action,
+                                     aut.epvars, bdd)
+                    x = or_forall(new, ~ env_action,
+                                  aut.upvars, bdd)
                     # log
                     try:
                         stats = bdd.statistics()
@@ -452,6 +452,22 @@ def make_strategy(store, all_new, j, goal, aut):
     transducer = transducer & counter & (goal | ~ selector)
     log.info('-- done making strategy for goal: {j}'.format(j=j))
     return transducer
+
+
+def and_exists(u, v, qvars, bdd):
+    try:
+        return _bdd.and_exists(u, v, qvars, bdd)
+    except:
+        r = u & v
+        return bdd.quantify(r, qvars, forall=False)
+
+
+def or_forall(u, v, qvars, bdd):
+    try:
+        return _bdd.or_forall(u, v, qvars, bdd)
+    except:
+        r = u | v
+        return bdd.quantify(r, qvars, forall=True)
 
 
 
