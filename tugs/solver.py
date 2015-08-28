@@ -184,32 +184,8 @@ def compute_winning_set(aut, z=None):
                                            aut.epvars, bdd)
                             x = or_forall(x, ~ env_action,
                                           aut.upvars, bdd)
-                        # log
-                        try:
-                            stats = bdd.statistics()
-                            n_nodes = stats['n_nodes']
-                            reordering_time = stats['reordering_time']
-                            current_time = time.time()
-                            t = current_time - start_time
-                            log.info((
-                                'time (ms): {t}, '
-                                'reordering (ms): {reorder_time}, '
-                                'sysj: {sysj}, '
-                                'envi: {envi}, '
-                                'nodes: all: {n_nodes}, '
-                                'Z: {z}, '
-                                'Y: {y}, '
-                                'X: {x}\n').format(
-                                    t=t,
-                                    reorder_time=reordering_time,
-                                    sysj=j,
-                                    envi=i,
-                                    n_nodes=n_nodes,
-                                    z=len(z),
-                                    y=len(y),
-                                    x=len(x)))
-                        except:
-                            pass
+                        log_bdd(bdd, start_time, i, j,
+                                None, x, y, z)
                     log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -303,32 +279,19 @@ def construct_streett_transducer(z, aut):
                                      aut.epvars, bdd)
                     x = or_forall(new, ~ env_action,
                                   aut.upvars, bdd)
-                    # log
-                    try:
-                        stats = bdd.statistics()
-                        n_nodes = stats['n_nodes']
-                        reordering_time = stats['reordering_time']
-                        current_time = time.time()
-                        dtime = current_time - start_time
-                        log.info((
-                            'time (ms): {t}, '
-                            'reordering (ms): {reorder_time}, '
-                            'goal: {j}, '
-                            'onion_ring: 0, '
-                            'nodes: all: {n_nodes}, '
-                            'strategy: {strategy}, '
-                            'cases_covered: 0, '
-                            'new_cases: 0\n').format(
-                                t=dtime,
-                                reorder_time=int(reordering_time),
-                                j=j,
-                                strategy=len(transducer),
-                                n_nodes=n_nodes,
-                                z=len(z),
-                                y=len(y),
-                                x=len(x)))
-                    except:
-                        pass
+                    log_bdd(bdd, start_time, i, j,
+                            transducer, x, y, z)
+                    # other_bdd
+                    stats = other_bdd.statistics()
+                    reordering_time = float(stats['reordering_time'])
+                    peak_nodes = int(stats['peak_n_nodes'])
+                    current_time = time.time()
+                    dlog = dict(
+                        time=current_time,
+                        other_reordering_time=reordering_time,
+                        other_total_nodes=len(other_bdd),
+                        other_peak_nodes=peak_nodes)
+                    log.info(repr(dlog))
                 del xold, excuse
                 good = good | x
                 del x
@@ -393,6 +356,35 @@ def construct_streett_transducer(z, aut):
     check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
     del selector, env_action_2, transducer
     return t
+
+
+def log_bdd(bdd, start_time, i, j, transducer, x, y, z):
+    log = logging.getLogger(SOLVER_LOG)
+    if transducer is not None:
+        transducer_nodes = len(transducer)
+    else:
+        transducer_nodes = None
+    try:
+        stats = bdd.statistics()
+        reordering_time = float(stats['reordering_time'])
+        peak_nodes = int(stats['peak_n_nodes'])
+    except AttributeError:
+        reordering_time = None
+        peak_nodes = None
+    current_time = time.time()
+    dtime = current_time
+    dlog = dict(
+        time=dtime,
+        reordering_time=reordering_time,
+        goal=j,
+        excuse=i,
+        transducer_nodes=transducer_nodes,
+        total_nodes=len(bdd),
+        peak_nodes=peak_nodes,
+        x_nodes=len(x),
+        y_nodes=len(y),
+        z_nodes=len(z))
+    log.info(repr(dlog))
 
 
 def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
