@@ -353,7 +353,7 @@ def construct_streett_transducer(z, aut):
         'nodes: all: 100, '
         'combined_strategy: 0\n')
     # self-check
-    check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
+    # check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
     del selector, env_action_2, transducer
     return t
 
