@@ -44,7 +44,7 @@ def solve_game(s):
     logger.info(t)
     log = logging.getLogger(SOLVER_LOG)
     log.info(aut)
-    del aut, z, t
+    del z
 
 
 def log_reordering(fname):
@@ -359,7 +359,7 @@ def construct_streett_transducer(z, aut):
         s = var_order(other_bdd)
         reordering_log.debug(repr(s))
         del transducer
-    del sys_action_2
+    del sys_action_2, zp
     log.info(other_bdd)
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
@@ -382,6 +382,7 @@ def construct_streett_transducer(z, aut):
         'combined_strategy: 0\n')
     # self-check
     check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
+    del selector, env_action_2, transducer
     return t
 
 
