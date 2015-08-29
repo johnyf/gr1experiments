@@ -139,7 +139,7 @@ def compute_winning_set(aut, z=None):
     USE_BINARY = True
     logger.info('++ Compute winning region')
     log = logging.getLogger(SOLVER_LOG)
-    reordering_log = logging.getLogger(REORDERING_LOG)
+    # reordering_log = logging.getLogger(REORDERING_LOG)
     bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -151,19 +151,19 @@ def compute_winning_set(aut, z=None):
     log.debug('before z fixpoint')
     while z != zold:
         log.debug('Start Z iteration')
-        s = var_order(bdd)
-        reordering_log.debug(repr(s))
+        # s = var_order(bdd)
+        # reordering_log.debug(repr(s))
         zold = z
         yj = list()
         for j, goal in enumerate(aut.win['sys']):
             log.info('Goal: {j}'.format(j=j))
-            log.info(bdd)
+            # log.info(bdd)
             zp = _bdd.rename(z, bdd, aut.prime)
             live_trans = goal & zp
             y = bdd.False
             yold = None
             while y != yold:
-                log.debug('Start Y iteration')
+                # log.debug('Start Y iteration')
                 yold = y
                 yp = _bdd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
@@ -172,7 +172,7 @@ def compute_winning_set(aut, z=None):
                     x = bdd.True
                     xold = None
                     while x != xold:
-                        log.debug('Start X iteration')
+                        # log.debug('Start X iteration')
                         xold = x
                         xp = _bdd.rename(x, bdd, aut.prime)
                         # desired transitions
@@ -193,14 +193,14 @@ def compute_winning_set(aut, z=None):
                                           aut.upvars, bdd)
                         log_bdd(bdd, start_time, i, j,
                                 None, x, y, z)
-                    log.debug('Reached X fixpoint')
+                    # log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
                     del x
                 y = good
                 del good
             del yold, live_trans
-            log.debug('Reached Y fixpoint')
+            # log.debug('Reached Y fixpoint')
             if USE_BINARY:
                 yj.append(y)
             else:
@@ -255,7 +255,7 @@ def construct_streett_transducer(z, aut):
     start_time = time.time()
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
-        log.info(bdd)
+        # log.info(bdd)
         # for fixpoint
         live_trans = goal & zp
         y = bdd.False
@@ -264,7 +264,7 @@ def construct_streett_transducer(z, aut):
         covered = other_bdd.False
         transducer = other_bdd.False
         while y != yold:
-            log.debug('Start Y iteration')
+            # log.debug('Start Y iteration')
             yold = y
             yp = _bdd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
@@ -276,7 +276,7 @@ def construct_streett_transducer(z, aut):
                 new = None
                 while x != xold:
                     del paths, new
-                    log.debug('Start X iteration')
+                    # log.debug('Start X iteration')
                     xold = x
                     xp = _bdd.rename(x, bdd, aut.prime)
                     x = xp & ~ excuse
@@ -304,7 +304,7 @@ def construct_streett_transducer(z, aut):
                 del x
                 # strategy construction
                 # in `other_bdd`
-                log.info('transfer')
+                # log.info('transfer')
                 paths = _bdd.copy_bdd(paths, bdd, other_bdd)
                 new = _bdd.copy_bdd(new, bdd, other_bdd)
                 rim = new & ~ covered
@@ -318,8 +318,7 @@ def construct_streett_transducer(z, aut):
             del good
         assert y == z, (y, z)
         del y, yold, covered
-        log.info('other BDD:')
-        log.info(other_bdd)
+        # log.info(other_bdd)
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
@@ -333,11 +332,11 @@ def construct_streett_transducer(z, aut):
         # check_winning_region(transducer, aut, t, bdd, other_bdd, z, j)
         transducers.append(transducer)
         # log
-        s = var_order(other_bdd)
-        reordering_log.debug(repr(s))
+        # s = var_order(other_bdd)
+        # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    log.info(other_bdd)
+    # log.info(other_bdd)
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
     log.info('disjoin transducers')
@@ -345,8 +344,8 @@ def construct_streett_transducer(z, aut):
     # transducer = syntax._linear_operator_simple(disj, transducers)
     n_remain = len(transducers)
     assert n_remain == 0, n_remain
-    log.info('bdd:\n{b}'.format(b=bdd))
-    log.info('other bdd:\n{b}'.format(b=other_bdd))
+    # log.info('bdd:\n{b}'.format(b=bdd))
+    # log.info('other bdd:\n{b}'.format(b=other_bdd))
     # add counter limits
     # transducer = transducer & t.action['sys'][0]
     # env lost ?
