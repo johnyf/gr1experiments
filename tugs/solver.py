@@ -149,7 +149,6 @@ def compute_winning_set(aut, z=None):
     bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    start_time = time.time()
     # todo: add counter variable
     if z is None:
         z = bdd.True
@@ -211,16 +210,10 @@ def compute_winning_set(aut, z=None):
         z = syntax.recurse_binary(conj, yj)
         # z = syntax._linear_operator_simple(conj, yj)
         bdd.assert_consistent()
-        current_time = time.time()
-        t = current_time - start_time
-        log.info('Completed Z iteration in: {t} sec'.format(t=t))
-    end_time = time.time()
-    t = end_time - start_time
-    log.info(
-        'Reached Z fixpoint:\n'
-        '{u}\n'
-        'in: {t:1.0f} sec'.format(
-            u=z, t=t))
+        log.info('Completed Z iteration.')
+    log.info('Reached Z fixpoint.')
+    dlog = dict(time=time.time(), winning_set_done=True)
+    log.info(dlog)
     return z
 
 
@@ -238,6 +231,8 @@ def construct_streett_transducer(z, aut):
     sys_action = aut.action['sys'][0]
     sys_action_2 = _bdd.copy_bdd(sys_action, bdd, other_bdd)
     env_action_2 = _bdd.copy_bdd(env_action, bdd, other_bdd)
+    dlog = dict(time=time.time(), other_total_nodes=len(other_bdd))
+    log.info(dlog)
     log.info('done copying actions')
     zp = _bdd.rename(z, bdd, aut.prime)
     # transducer automaton
@@ -251,7 +246,6 @@ def construct_streett_transducer(z, aut):
     t = t.build(other_bdd, add=True)
     transducers = list()
     selector = t.add_expr(SELECTOR)
-    start_time = time.time()
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
         # log.info(bdd)
@@ -339,14 +333,10 @@ def construct_streett_transducer(z, aut):
     # transducer = transducer & t.action['sys'][0]
     # env lost ?
     # transducer = transducer | ~ env_action_2
-    print('size of final transducer:', len(transducer))
+    print('Transducer BDD: {n} nodes'.format(n=len(transducer)))
     t.action['sys'] = [transducer]
-    log.debug(
-        'time (ms): 0, '
-        'reordering (ms): 0, '
-        'goal: 0, '
-        'nodes: all: 100, '
-        'combined_strategy: 0\n')
+    dlog = dict(time=time.time(), total_nodes=len(bdd))
+    log.debug(dlog)
     # self-check
     # check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
     del selector, env_action_2, transducer
