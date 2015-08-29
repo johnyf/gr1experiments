@@ -184,21 +184,14 @@ def compute_winning_set(aut, z=None):
                         # desired transitions
                         x = xp & ~ excuse
                         x = x | live_trans
-                        old = False
-                        s = var_order(bdd)
-                        reordering_log.debug(repr(s))
-                        if old:
-                            x = x & sys_action
-                            x = bdd.quantify(x, aut.epvars, forall=False)
-                            x = x | ~ env_action
-                            x = bdd.quantify(x, aut.upvars, forall=True)
-                        else:
-                            x = and_exists(x, sys_action,
-                                           aut.epvars, bdd)
-                            x = or_forall(x, ~ env_action,
-                                          aut.upvars, bdd)
-                        log_bdd(bdd, start_time, i, j,
-                                None, x, y, z)
+                        # s = var_order(bdd)
+                        # reordering_log.debug(repr(s))
+                        x = and_exists(x, sys_action,
+                                       aut.epvars, bdd)
+                        x = or_forall(x, ~ env_action,
+                                      aut.upvars, bdd)
+                        # log_bdd(bdd, start_time, i, j,
+                        #         None, x, y, z)
                     # log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -407,6 +400,15 @@ def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
     u = other_bdd.quantify(u, t.upvars, forall=True)
     z_ = _bdd.copy_bdd(z, bdd, other_bdd)
     print('u == z', u == z_)
+
+
+def old_cox(x, env_action, sys_action, aut):
+    bdd = aut.bdd
+    x = x & sys_action
+    x = bdd.quantify(x, aut.epvars, forall=False)
+    x = x | ~ env_action
+    x = bdd.quantify(x, aut.upvars, forall=True)
+    return x
 
 
 def recurse_binary(f, x, bdds):
