@@ -79,6 +79,9 @@ def log_reordering(fname):
 
 def parse_slugsin(s):
     """Return `dict` keyed by `slugsin` file section."""
+    log = logging.getLogger(SOLVER_LOG)
+    dlog = dict(time=time.time(), parse_slugsin=True)
+    log.info(dlog)
     sections = dict(
         INPUT='input',
         OUTPUT='output',
@@ -111,6 +114,9 @@ def make_automaton(d, bdd):
 
     @type d: dict(str: list)
     """
+    log = logging.getLogger(SOLVER_LOG)
+    dlog = dict(time=time.time(), make_automaton=True)
+    log.info(dlog)
     # bits -- shouldn't produce safety or init formulae
     a = symbolic.Automaton()
     a.vars = _init_vars(d)
@@ -145,6 +151,8 @@ def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     logger.info('++ Compute winning region')
     log = logging.getLogger(SOLVER_LOG)
+    dlog = dict(time=time.time(), winning_set_start=True)
+    log.info(dlog)
     # reordering_log = logging.getLogger(REORDERING_LOG)
     bdd = aut.bdd
     env_action = aut.action['env'][0]
@@ -212,8 +220,8 @@ def compute_winning_set(aut, z=None):
         # bdd.assert_consistent()
         log.info('Completed Z iteration.')
     log.info('Reached Z fixpoint.')
-    dlog = dict(time=time.time(), winning_set_done=True)
     log_bdd(bdd, '')
+    dlog = dict(time=time.time(), winning_set_end=True)
     log.info(dlog)
     return z
 
@@ -222,6 +230,8 @@ def compute_winning_set(aut, z=None):
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     log = logging.getLogger(SOLVER_LOG)
+    dlog = dict(time=time.time(), make_transducer_start=True)
+    log.info(dlog)
     # reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
@@ -338,6 +348,8 @@ def construct_streett_transducer(z, aut):
     log.debug(dlog)
     log_bdd(bdd, '')
     log_bdd(other_bdd, 'other')
+    dlog = dict(time=time.time(), make_transducer_end=True)
+    log.info(dlog)
     # self-check
     # check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
     del selector, env_action_2, transducer
