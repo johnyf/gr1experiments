@@ -287,7 +287,7 @@ def construct_streett_transducer(z, aut):
                                   aut.upvars, bdd)
                     # log_loop(i, j, transducer, x, y, z)
                     # log_bdd(bdd, '')
-                    # log_bdd(other_bdd, 'other')
+                    # log_bdd(other_bdd, 'other_')
                 del xold, excuse
                 good = good | x
                 del x
@@ -307,7 +307,7 @@ def construct_streett_transducer(z, aut):
             del good
         assert y == z, (y, z)
         del y, yold, covered
-        # log_bdd(other_bdd, 'other')
+        # log_bdd(other_bdd, 'other_')
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
@@ -324,7 +324,7 @@ def construct_streett_transducer(z, aut):
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    # log_bdd(other_bdd, 'other')
+    # log_bdd(other_bdd, 'other_')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
     # transducer = syntax._linear_operator_simple(disj, transducers)
@@ -339,7 +339,7 @@ def construct_streett_transducer(z, aut):
     dlog = dict(time=time.time(), total_nodes=len(bdd))
     log.debug(dlog)
     log_bdd(bdd, '')
-    log_bdd(other_bdd, 'other')
+    log_bdd(other_bdd, 'other_')
     dlog = dict(time=time.time(), make_transducer_end=True)
     log.info(dlog)
     # self-check
