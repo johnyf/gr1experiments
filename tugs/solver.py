@@ -189,8 +189,8 @@ def compute_winning_set(aut, z=None):
                                        aut.epvars, bdd)
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
-                        # log_bdd(bdd, start_time, i, j,
-                        #         None, x, y, z)
+                        # log_loop(i, j, transducer, x, y, z)
+                        # log_bdd(bdd, '')
                     # log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -213,6 +213,7 @@ def compute_winning_set(aut, z=None):
         log.info('Completed Z iteration.')
     log.info('Reached Z fixpoint.')
     dlog = dict(time=time.time(), winning_set_done=True)
+    log_bdd(bdd, '')
     log.info(dlog)
     return z
 
@@ -248,7 +249,7 @@ def construct_streett_transducer(z, aut):
     selector = t.add_expr(SELECTOR)
     for j, goal in enumerate(aut.win['sys']):
         log.info('Goal: {j}'.format(j=j))
-        # log.info(bdd)
+        # log_bdd(bdd, '')
         # for fixpoint
         live_trans = goal & zp
         y = bdd.False
@@ -279,9 +280,9 @@ def construct_streett_transducer(z, aut):
                                      aut.epvars, bdd)
                     x = or_forall(new, ~ env_action,
                                   aut.upvars, bdd)
-                    # log_bdd(bdd, start_time, i, j,
-                    #         transducer, x, y, z)
-                    # log_other_bdd(other_bdd)
+                    # log_loop(i, j, transducer, x, y, z)
+                    # log_bdd(bdd, '')
+                    # log_bdd(other_bdd, 'other')
                 del xold, excuse
                 good = good | x
                 del x
@@ -301,7 +302,7 @@ def construct_streett_transducer(z, aut):
             del good
         assert y == z, (y, z)
         del y, yold, covered
-        # log.info(other_bdd)
+        # log_bdd(other_bdd, 'other')
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
@@ -319,16 +320,14 @@ def construct_streett_transducer(z, aut):
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    # log.info(other_bdd)
     # disjoin the strategies for the individual goals
     # transducer = linear_operator(lambda x, y: x | y, transducers)
+    # log_bdd(other_bdd, 'other')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
     # transducer = syntax._linear_operator_simple(disj, transducers)
     n_remain = len(transducers)
     assert n_remain == 0, n_remain
-    # log.info('bdd:\n{b}'.format(b=bdd))
-    # log.info('other bdd:\n{b}'.format(b=other_bdd))
     # add counter limits
     # transducer = transducer & t.action['sys'][0]
     # env lost ?
@@ -337,53 +336,49 @@ def construct_streett_transducer(z, aut):
     t.action['sys'] = [transducer]
     dlog = dict(time=time.time(), total_nodes=len(bdd))
     log.debug(dlog)
+    log_bdd(bdd, '')
+    log_bdd(other_bdd, 'other')
     # self-check
     # check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
     del selector, env_action_2, transducer
     return t
 
 
-def log_bdd(bdd, start_time, i, j, transducer, x, y, z):
+def log_loop(i, j, transducer, x, y, z):
     log = logging.getLogger(SOLVER_LOG)
     if transducer is not None:
         transducer_nodes = len(transducer)
     else:
         transducer_nodes = None
+    t = time.time()
+    dlog = dict(
+        time=t,
+        goal=j,
+        excuse=i,
+        transducer_nodes=transducer_nodes,
+        x_nodes=len(x),
+        y_nodes=len(y),
+        z_nodes=len(z))
+    log.info(dlog)
+
+
+def log_bdd(bdd, name):
+    log = logging.getLogger(SOLVER_LOG)
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
         peak_nodes = int(stats['peak_n_nodes'])
     except AttributeError:
+        # using `autoref`
         reordering_time = None
         peak_nodes = None
-    current_time = time.time()
-    dtime = current_time
-    dlog = dict(
-        time=dtime,
-        reordering_time=reordering_time,
-        goal=j,
-        excuse=i,
-        transducer_nodes=transducer_nodes,
-        total_nodes=len(bdd),
-        peak_nodes=peak_nodes,
-        x_nodes=len(x),
-        y_nodes=len(y),
-        z_nodes=len(z))
-    log.info(repr(dlog))
-
-
-def log_other_bdd(other_bdd):
-    log = logging.getLogger(SOLVER_LOG)
-    stats = other_bdd.statistics()
-    reordering_time = float(stats['reordering_time'])
-    peak_nodes = int(stats['peak_n_nodes'])
-    current_time = time.time()
-    dlog = dict(
-        time=current_time,
-        other_reordering_time=reordering_time,
-        other_total_nodes=len(other_bdd),
-        other_peak_nodes=peak_nodes)
-    log.info(repr(dlog))
+    t = time.time()
+    dlog = {
+        time: t,
+        name + 'reordering_time': reordering_time,
+        name + 'total_nodes': len(bdd),
+        name + 'peak_nodes': peak_nodes}
+    log.info(dlog)
 
 
 def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
