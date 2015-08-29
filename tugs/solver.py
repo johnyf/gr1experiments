@@ -21,6 +21,7 @@ SOLVER_LOG = 'solver'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 STRATEGY_FILE = 'tugs_strategy.txt'
+USE_BINARY = True
 
 
 # TODO:
@@ -142,7 +143,6 @@ def _init_vars(d):
 @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
-    USE_BINARY = True
     logger.info('++ Compute winning region')
     log = logging.getLogger(SOLVER_LOG)
     # reordering_log = logging.getLogger(REORDERING_LOG)
