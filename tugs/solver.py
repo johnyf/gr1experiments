@@ -20,6 +20,7 @@ REORDERING_LOG = 'reorder'
 SOLVER_LOG = 'solver'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
+STRATEGY_FILE = 'tugs_strategy.txt'
 
 
 # TODO:
@@ -54,12 +55,17 @@ def solve_game(s):
     z = compute_winning_set(aut)
     assert z != bdd.False, 'unrealizable'
     t = construct_streett_transducer(z, aut)
-    fname = 'tugs_strategy.txt'
-    t.bdd.dump(t.action['sys'][0], fname)
-    logger.info(t)
-    log = logging.getLogger(SOLVER_LOG)
-    log.info(aut)
+    dump_strategy(t)
     del z
+
+
+def dump_strategy(t):
+    t0 = time.time()
+    action = t.action['sys'][0]
+    t.bdd.dump(action, STRATEGY_FILE)
+    t1 = time.time()
+    dt = t1 - t0
+    print('Strategy dumped in {dt:1.2} sec.'.format(dt=dt))
 
 
 def log_reordering(fname):
