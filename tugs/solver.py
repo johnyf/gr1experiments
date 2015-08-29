@@ -228,7 +228,7 @@ def compute_winning_set(aut, z=None):
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     log = logging.getLogger(SOLVER_LOG)
-    reordering_log = logging.getLogger(REORDERING_LOG)
+    # reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
     other_bdd = _bdd.BDD()
@@ -285,19 +285,9 @@ def construct_streett_transducer(z, aut):
                                      aut.epvars, bdd)
                     x = or_forall(new, ~ env_action,
                                   aut.upvars, bdd)
-                    log_bdd(bdd, start_time, i, j,
-                            transducer, x, y, z)
-                    # other_bdd
-                    stats = other_bdd.statistics()
-                    reordering_time = float(stats['reordering_time'])
-                    peak_nodes = int(stats['peak_n_nodes'])
-                    current_time = time.time()
-                    dlog = dict(
-                        time=current_time,
-                        other_reordering_time=reordering_time,
-                        other_total_nodes=len(other_bdd),
-                        other_peak_nodes=peak_nodes)
-                    log.info(repr(dlog))
+                    # log_bdd(bdd, start_time, i, j,
+                    #         transducer, x, y, z)
+                    # log_other_bdd(other_bdd)
                 del xold, excuse
                 good = good | x
                 del x
@@ -389,6 +379,20 @@ def log_bdd(bdd, start_time, i, j, transducer, x, y, z):
         x_nodes=len(x),
         y_nodes=len(y),
         z_nodes=len(z))
+    log.info(repr(dlog))
+
+
+def log_other_bdd(other_bdd):
+    log = logging.getLogger(SOLVER_LOG)
+    stats = other_bdd.statistics()
+    reordering_time = float(stats['reordering_time'])
+    peak_nodes = int(stats['peak_n_nodes'])
+    current_time = time.time()
+    dlog = dict(
+        time=current_time,
+        other_reordering_time=reordering_time,
+        other_total_nodes=len(other_bdd),
+        other_peak_nodes=peak_nodes)
     log.info(repr(dlog))
 
 
