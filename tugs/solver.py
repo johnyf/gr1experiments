@@ -7,6 +7,12 @@ from dd import cudd as _bdd
 import natsort
 from omega.logic import syntax
 from omega.symbolic import symbolic
+import __builtin__
+try:
+    __builtin__.profile
+except AttributeError:
+    def profile(func):
+        return func
 
 
 logger = logging.getLogger(__name__)
@@ -36,6 +42,7 @@ SELECTOR = 'strat_type'
 #     of an integer
 
 
+@profile
 def solve_game(s):
     """Construct transducer for game in file `fname`.
 
@@ -126,7 +133,7 @@ def _init_vars(d):
     return dvars
 
 
-# @profile
+@profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
     USE_BINARY = True
@@ -218,7 +225,7 @@ def compute_winning_set(aut, z=None):
     return z
 
 
-# @profile
+@profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     log = logging.getLogger(SOLVER_LOG)
