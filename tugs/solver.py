@@ -378,7 +378,7 @@ def log_bdd(bdd, name):
         peak_nodes = None
     t = time.time()
     dlog = {
-        time: t,
+        'time': t,
         name + 'reordering_time': reordering_time,
         name + 'total_nodes': len(bdd),
         name + 'peak_nodes': peak_nodes}
