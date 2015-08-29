@@ -203,8 +203,8 @@ def compute_winning_set(aut, z=None):
                     del x
                 y = good
                 del good
-            del yold, live_trans
             # log.debug('Reached Y fixpoint')
+            del yold, live_trans
             if USE_BINARY:
                 yj.append(y)
             else:
@@ -334,8 +334,8 @@ def construct_streett_transducer(z, aut):
     # transducer = transducer & t.action['sys'][0]
     # env lost ?
     # transducer = transducer | ~ env_action_2
-    print('Transducer BDD: {n} nodes'.format(n=len(transducer)))
     t.action['sys'] = [transducer]
+    print('Transducer BDD: {n} nodes'.format(n=len(transducer)))
     dlog = dict(time=time.time(), total_nodes=len(bdd))
     log.debug(dlog)
     log_bdd(bdd, '')
