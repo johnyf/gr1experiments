@@ -149,7 +149,6 @@ def _init_vars(d):
 @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
-    logger.info('++ Compute winning region')
     log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), winning_set_start=True)
     log.info(dlog)
@@ -157,7 +156,6 @@ def compute_winning_set(aut, z=None):
     bdd = aut.bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    # todo: add counter variable
     if z is None:
         z = bdd.True
     zold = None
@@ -213,12 +211,9 @@ def compute_winning_set(aut, z=None):
                 z = z & y
             del y, goal
         del zp
-        # conjoin
-        # if USE_BINARY:
         z = syntax.recurse_binary(conj, yj)
         # z = syntax._linear_operator_simple(conj, yj)
         # bdd.assert_consistent()
-        log.info('Completed Z iteration.')
     log.info('Reached Z fixpoint.')
     log_bdd(bdd, '')
     dlog = dict(time=time.time(), winning_set_end=True)
@@ -325,13 +320,10 @@ def construct_streett_transducer(z, aut):
         transducer = transducer & sys_action_2
         # check_winning_region(transducer, aut, t, bdd, other_bdd, z, j)
         transducers.append(transducer)
-        # log
         # s = var_order(other_bdd)
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    # disjoin the strategies for the individual goals
-    # transducer = linear_operator(lambda x, y: x | y, transducers)
     # log_bdd(other_bdd, 'other')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
