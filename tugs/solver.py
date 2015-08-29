@@ -209,7 +209,7 @@ def compute_winning_set(aut, z=None):
         # if USE_BINARY:
         z = syntax.recurse_binary(conj, yj)
         # z = syntax._linear_operator_simple(conj, yj)
-        bdd.assert_consistent()
+        # bdd.assert_consistent()
         log.info('Completed Z iteration.')
     log.info('Reached Z fixpoint.')
     dlog = dict(time=time.time(), winning_set_done=True)
