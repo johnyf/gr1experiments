@@ -26,9 +26,6 @@ USE_BINARY = True
 
 # TODO:
 #
-# 1. record events (reordering, garbage collection)
-# plot events in annotated timeline
-#
 # 2. implement `slugs` algorithm in Cython
 #
 # 3. compare 2 to `slugs`
