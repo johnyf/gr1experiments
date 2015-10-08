@@ -89,8 +89,8 @@ def parse_slugsin(s):
         SYS_INIT='sys_init',
         ENV_TRANS='env_action',
         SYS_TRANS='sys_action',
-        ENV_LIVENESS='env_win',
-        SYS_LIVENESS='sys_win')
+        ENV_LIVENESS='<>[]',
+        SYS_LIVENESS='[]<>')
     sections = {
         '[{k}]'.format(k=k): v
         for k, v in sections.iteritems()}
@@ -166,7 +166,7 @@ def compute_winning_set(aut, z=None):
         # reordering_log.debug(repr(s))
         zold = z
         yj = list()
-        for j, goal in enumerate(aut.win['sys']):
+        for j, goal in enumerate(aut.win['[]<>']):
             log.info('Goal: {j}'.format(j=j))
             # log.info(bdd)
             zp = _bdd.rename(z, bdd, aut.prime)
@@ -179,7 +179,7 @@ def compute_winning_set(aut, z=None):
                 yp = _bdd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
                 good = y
-                for i, excuse in enumerate(aut.win['env']):
+                for i, excuse in enumerate(aut.win['<>[]']):
                     x = bdd.True
                     xold = None
                     while x != xold:
@@ -245,14 +245,14 @@ def construct_streett_transducer(z, aut):
     t = symbolic.Automaton()
     t.vars = copy.deepcopy(aut.vars)
     t.vars[SELECTOR] = dict(type='bool', owner='sys', level=0)
-    n_goals = len(aut.win['sys'])
+    n_goals = len(aut.win['[]<>'])
     t.vars[COUNTER] = dict(
         type='saturating', dom=(0, n_goals - 1),
         owner='sys', level=0)
     t = t.build(other_bdd, add=True)
     transducers = list()
     selector = t.add_expr(SELECTOR)
-    for j, goal in enumerate(aut.win['sys']):
+    for j, goal in enumerate(aut.win['[]<>']):
         log.info('Goal: {j}'.format(j=j))
         # log_bdd(bdd, '')
         # for fixpoint
@@ -268,7 +268,7 @@ def construct_streett_transducer(z, aut):
             yp = _bdd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
             good = y
-            for i, excuse in enumerate(aut.win['env']):
+            for i, excuse in enumerate(aut.win['<>[]']):
                 x = bdd.True
                 xold = None
                 paths = None
