@@ -430,7 +430,6 @@ def plot_single_experiment(details_file, i, fig_file):
 
 
 def main():
-    # args
     p = argparse.ArgumentParser()
     p.add_argument('--min', default=N, type=int,
                    help='from this # of masters')
