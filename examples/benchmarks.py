@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-"""Run AMBA AHB case study for increasing number of masters.
+"""Compare new solver `gr1x` to `slugs`.
 
-Process logs and plot results.
+Analyze logs and plot results.
 """
 import argparse
 import datetime
@@ -38,6 +38,7 @@ M = 17
 
 
 def run_slugs(args):
+    """Run `slugs` for a range of AMBA spec instances."""
     n = args.min
     m = args.max + 1
     # config logging
@@ -74,6 +75,7 @@ def run_slugs(args):
 
 
 def run_gr1x(args):
+    """Run `gr1x` for a range of AMBA spec instances."""
     n = args.min
     m = args.max + 1
     # capture execution environment
@@ -112,7 +114,7 @@ def run_gr1x(args):
 
 
 def run_gr1x_slugs_comparison(args):
-    """Compare the winning sets."""
+    """Check that both solvers return same winning set."""
     slugs_winning_set_file = 'winning_set_bdd.txt'
     slugs_strategy_file = 'slugs_strategy.txt'
     gr1x_strategy_file = 'gr1x_strategy.txt'
@@ -144,6 +146,7 @@ def run_gr1x_slugs_comparison(args):
 
 
 def compare_strategies(s, slugs_file, gr1x_file):
+    """Check that both solvers return same strategy."""
     print('++ compare strategies')
     COUNTER = solver.COUNTER
     d = solver.parse_slugsin(s)
@@ -180,6 +183,7 @@ def compare_strategies(s, slugs_file, gr1x_file):
 
 
 def generate_code(i):
+    """Form open Promela code for AMBA instance with `i` masters."""
     # check if other users
     users = psutil.users()
     if len(users) > 1:
@@ -215,6 +219,14 @@ def form_progress(i):
 
 
 def plot_trends_for_experiments(args):
+    """Plot time, ratios, BDD nodes over parameterized experiments.
+
+      - time
+      - winning set computation / total time
+      - reordering / total time
+      - total nodes
+      - peak nodes
+    """
     n = args.min
     m = args.max + 1
     fsz = 20
@@ -346,6 +358,14 @@ def plot_trends_for_experiments(args):
 
 
 def plot_single_experiment(details_file, i, fig_file):
+    """Plot BDD node changes during an experiment.
+
+    For each BDD manager:
+
+      - total nodes
+      - peak nodes
+      - reordering / total time
+    """
     data = utils.load_log_file(details_file)
     # total time interval
     t_min = min(v['time'][0] for v in data.itervalues())
