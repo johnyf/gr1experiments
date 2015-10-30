@@ -193,6 +193,13 @@ def generate_code(i):
     return s
 
 
+def load_test():
+    fname = 'test.pml'
+    with open(fname, 'r') as f:
+        s = f.read()
+    return s
+
+
 def load_synt15_amba_code(i):
     """Form open Promela code for AMBA instance with `i` masters."""
     fname = INPUT_FILE
