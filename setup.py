@@ -17,7 +17,7 @@ s = (
     "version = '{version}'\n").format(version=version)
 install_requires = [
     'dd == 0.1.3',
-    'omega >= 0.0.2']
+    'omega == 0.0.3']
 tests_require = [
     'nose >= 1.3.4']
 
