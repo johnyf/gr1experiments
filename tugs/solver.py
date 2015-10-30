@@ -184,7 +184,7 @@ def compute_winning_set(aut, z=None):
                         xold = x
                         xp = _bdd.rename(x, bdd, aut.prime)
                         # desired transitions
-                        x = xp & ~ excuse
+                        x = xp & excuse
                         x = x | live_trans
                         # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
@@ -275,7 +275,7 @@ def construct_streett_transducer(z, aut):
                     # log.debug('Start X iteration')
                     xold = x
                     xp = _bdd.rename(x, bdd, aut.prime)
-                    x = xp & ~ excuse
+                    x = xp & excuse
                     del xp
                     paths = x | live_trans
                     new = and_exists(paths, sys_action,
