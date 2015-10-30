@@ -188,8 +188,8 @@ def generate_code(i):
     if len(users) > 1:
         print('warning: other users logged in'
               '(may start running expensive jobs).')
-    # s = load_synt15_amba_code(i)
-    s = load_test()
+    s = load_synt15_amba_code(i)
+    # s = load_test()
     return s
 
 
