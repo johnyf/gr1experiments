@@ -26,12 +26,6 @@ from tugs import solver
 from tugs import utils
 
 
-logger = logging.getLogger(__name__)
-DEBUG = False  # for this script only
-if DEBUG:
-    sh = logging.StreamHandler()
-    logger.addHandler(sh)
-    logger.setLevel(logging.DEBUG)
 mpl.rc('xtick', labelsize=7)
 mpl.rc('ytick', labelsize=7)
 mpl.rc('font', size=7)
@@ -207,7 +201,6 @@ def generate_code(i):
     j = i - 1
     newline = '#define N {j}'.format(j=j)
     code = re.sub('#define N.*', newline, s)
-    logger.debug(code)
     # add multiple weak fairness assumptions
     code += form_progress(i)
     return code
