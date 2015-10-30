@@ -316,7 +316,8 @@ def plot_trends_for_experiments(args):
     # ratios
     ax = plt.subplot(3, 1, 2)
     plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
-    plt.plot(n_masters, upratio_0, 'b-o', label='Up ratio (1)', markevery=10)
+    plt.plot(n_masters, upratio_0, 'b-o',
+             label='Up ratio (1)', markevery=10)
     if bdd2:
         plt.plot(n_masters, upratio_1, 'r--o',
                  label='Up ratio (2)', markevery=10)
@@ -330,8 +331,10 @@ def plot_trends_for_experiments(args):
     plt.legend(loc='upper left')
     # nodes
     ax = plt.subplot(3, 1, 3)
-    plt.plot(n_masters, total_nodes_0, 'b-+', label='Total (1)', markevery=10)
-    plt.plot(n_masters, peak_nodes_0, 'b-*', label='Peak (1)', markevery=10)
+    plt.plot(n_masters, total_nodes_0, 'b-+',
+             label='Total (1)', markevery=10)
+    plt.plot(n_masters, peak_nodes_0, 'b-*',
+             label='Peak (1)', markevery=10)
     if bdd2:
         plt.plot(n_masters, total_nodes_1, 'r--+',
                  label='Total (2)', markevery=10)
