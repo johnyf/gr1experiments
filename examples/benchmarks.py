@@ -183,25 +183,22 @@ def compare_strategies(s, slugs_file, gr1x_file):
 
 
 def generate_code(i):
-    """Form open Promela code for AMBA instance with `i` masters."""
     # check if other users
     users = psutil.users()
     if len(users) > 1:
         print('warning: other users logged in'
               '(may start running expensive jobs).')
-    # input and iter
-    #
-    # use this for revised AMBA spec
-    input_file = INPUT_FILE
-    #
-    # use this for original AMBA spec
-    # input_file = 'amba_{i}.txt'.format(i=i)
-    #
-    # use this for original AMBA spec with fairness as BA
-    # input_file = 'amba_{i}_merged.txt'.format(i=i)
-    with open(input_file) as f:
+    # s = load_synt15_amba_code(i)
+    s = load_test()
+    return s
+
+
+def load_synt15_amba_code(i):
+    """Form open Promela code for AMBA instance with `i` masters."""
+    fname = INPUT_FILE
+    with open(fname, 'r') as f:
         s = f.read()
-    # prep input
+    # set number of masters
     j = i - 1
     newline = '#define N {j}'.format(j=j)
     code = re.sub('#define N.*', newline, s)
@@ -216,6 +213,13 @@ def form_progress(i):
         '[]<>(request[{k}] -> (master == {k}))'.format(k=k)
         for k in xrange(i))
     return 'assert ltl { ' + prog + ' }'
+
+
+def jcss12_amba_code(i):
+    fname = 'amba_{i}.txt'.format(i=i)
+    with open(fname, 'r') as f:
+        s = f.read()
+    return s
 
 
 def plot_trends_for_experiments(args):
