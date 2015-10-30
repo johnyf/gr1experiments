@@ -445,8 +445,6 @@ def main():
                    choices=['slugs', 'gr1x', 'compare'])
     p.add_argument('--plot', action='store_true',
                    help='generate plots')
-    p.add_argument('--plot-stats', action='store_true',
-                   help='plot time and memory for logged repeated runs')
     args = p.parse_args()
     # multiple runs should be w/o plots
     assert args.repeat == 1 or not args.plot
