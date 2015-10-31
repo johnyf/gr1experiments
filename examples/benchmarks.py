@@ -188,7 +188,7 @@ def generate_code(i):
     if len(users) > 1:
         print('warning: other users logged in'
               '(may start running expensive jobs).')
-    s = load_synt15_amba_code(i)
+    s = load_jcss12_amba_code(i)
     # s = load_test()
     return s
 
@@ -222,8 +222,8 @@ def form_progress(i):
     return 'assert ltl { ' + prog + ' }'
 
 
-def jcss12_amba_code(i):
-    fname = 'amba_{i}.txt'.format(i=i)
+def load_jcss12_amba_code(i):
+    fname = 'jcss12/amba_{i}.txt'.format(i=i)
     with open(fname, 'r') as f:
         s = f.read()
     return s
