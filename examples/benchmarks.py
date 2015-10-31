@@ -371,7 +371,16 @@ def plot_trends_for_experiments(args):
         pickle.dump(d, f)
 
 
-def plot_single_experiment(details_file, i, fig_file):
+def plot_multiple_experiments(args):
+    n = args.min
+    m = args.max + 1
+    for i in xrange(n, m):
+        log_fname = 'details_{i}_masters.txt'.format(i=i)
+        fig_fname = 'details_{i}.pdf'.format(i=i)
+        plot_single_experiment(log_fname, fig_fname)
+
+
+def plot_single_experiment(details_file, fig_file):
     """Plot BDD node changes during an experiment.
 
     For each BDD manager:
@@ -474,11 +483,8 @@ def main():
                     'unknown solver: {s}'.format(s=args.solver))
     # plot
     if args.plot:
-        plot_trends_for_experiments(args)
-        # i = args.min
-        # fname = 'details_{i}_masters.txt'.format(i=i)
-        # fig_file = 'test.pdf'
-        # plot_single_experiment(fname, i, fig_file)
+        # plot_trends_for_experiments(args)
+        plot_multiple_experiments(args)
 
 
 if __name__ == '__main__':
