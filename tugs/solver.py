@@ -48,7 +48,7 @@ def solve_game(s):
     @param s: `str` in `slugs` syntax
     """
     d = parse_slugsin(s)
-    bdd = _bdd.BDD()
+    bdd = _bdd.BDD(memory=10 * 1024**3)
     aut = make_automaton(d, bdd)
     z = compute_winning_set(aut)
     assert z != bdd.False, 'unrealizable'
@@ -171,7 +171,7 @@ def compute_winning_set(aut, z=None):
             y = bdd.False
             yold = None
             while y != yold:
-                # log.debug('Start Y iteration')
+                log.debug('Start Y iteration')
                 yold = y
                 yp = _bdd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
@@ -180,27 +180,37 @@ def compute_winning_set(aut, z=None):
                     x = bdd.True
                     xold = None
                     while x != xold:
-                        # log.debug('Start X iteration')
+                        log.debug('Start X iteration')
                         xold = x
                         xp = _bdd.rename(x, bdd, aut.prime)
+                        # log.debug('renamed')
                         # desired transitions
                         x = xp & excuse
+                        # log.debug('conjoined')
                         x = x | live_trans
+                        # log.debug('disjoined')
                         # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
+                        stats = bdd.statistics()
+                        # reordering_time = float(stats['reordering_time'])
+                        # peak_nodes = int(stats['peak_n_nodes'])
+                        # log.debug('peak nodes: {n}'.format(n=peak_nodes))
+                        # bdd.garbage_collection(False)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
+                        # bdd.garbage_collection(True)
+                        # log.debug('and_exists done')
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
                         # log_loop(i, j, transducer, x, y, z)
                         # log_bdd(bdd, '')
-                    # log.debug('Reached X fixpoint')
+                    log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
                     del x
                 y = good
                 del good
-            # log.debug('Reached Y fixpoint')
+            log.debug('Reached Y fixpoint')
             del yold, live_trans
             if USE_BINARY:
                 yj.append(y)
