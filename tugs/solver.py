@@ -47,8 +47,10 @@ def solve_game(s):
 
     @param s: `str` in `slugs` syntax
     """
+    log = logging.getLogger(SOLVER_LOG)
     d = parse_slugsin(s)
     bdd = _bdd.BDD(memory=10 * 1024**3)
+    log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     z = compute_winning_set(aut)
     assert z != bdd.False, 'unrealizable'
