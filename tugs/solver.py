@@ -51,6 +51,9 @@ def solve_game(s):
     d = parse_slugsin(s)
     bdd = _bdd.BDD(memory=10 * 1024**3)
     log.info(bdd.configure())
+    params = dict(max_growth=1.7)
+    bdd.configure(params)
+    log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     z = compute_winning_set(aut)
     assert z != bdd.False, 'unrealizable'
