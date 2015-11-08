@@ -30,6 +30,7 @@ mpl.rc('xtick', labelsize=7)
 mpl.rc('ytick', labelsize=7)
 mpl.rc('font', size=7)
 col_gen = cycle('bgrcmk')
+GR1X_LOG = 'tugs.solver'
 JSON_FILE = 'details.json'
 INPUT_FILE = 'amba_conj.pml'
 CONFIG_FILE = 'config.json'
@@ -82,8 +83,7 @@ def run_gr1x(args):
     utils.snapshot_versions()
     # config log
     level = logging.DEBUG
-    SOLVER_LOG = 'solver'
-    log = logging.getLogger(SOLVER_LOG)
+    log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
     for i in xrange(n, m):
         print('starting {i} masters...'.format(i=i))
@@ -91,7 +91,7 @@ def run_gr1x(args):
         details_log = 'details_{i}_masters.txt'.format(i=i)
         h = logging.FileHandler(details_log, mode='w')
         h.setLevel(level)
-        log = logging.getLogger(SOLVER_LOG)
+        log = logging.getLogger(GR1X_LOG)
         log.addHandler(h)
         # synthesize
         code = generate_code(i)
@@ -107,7 +107,7 @@ def run_gr1x(args):
         print('Done synthesizing {i} masters in {dt}.'.format(
             i=i, dt=dt))
         # close log file
-        log = logging.getLogger(SOLVER_LOG)
+        log = logging.getLogger(GR1X_LOG)
         log.removeHandler(h)
         h.close()
         sys.stdout.flush()

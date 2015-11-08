@@ -15,9 +15,8 @@ except AttributeError:
         return func
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 REORDERING_LOG = 'reorder'
-SOLVER_LOG = 'solver'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 STRATEGY_FILE = 'tugs_strategy.txt'
@@ -47,7 +46,6 @@ def solve_game(s):
 
     @param s: `str` in `slugs` syntax
     """
-    log = logging.getLogger(SOLVER_LOG)
     d = parse_slugsin(s)
     bdd = _bdd.BDD(memory=10 * 1024**3)
     log.info(bdd.configure())
@@ -81,7 +79,6 @@ def log_reordering(fname):
 
 def parse_slugsin(s):
     """Return `dict` keyed by `slugsin` file section."""
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), parse_slugsin=True)
     log.info(dlog)
     sections = dict(
@@ -116,7 +113,6 @@ def make_automaton(d, bdd):
 
     @type d: dict(str: list)
     """
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), make_automaton=True)
     log.info(dlog)
     # bits -- shouldn't produce safety or init formulae
@@ -128,7 +124,6 @@ def make_automaton(d, bdd):
     for section, target in sections.iteritems():
         target.extend(d[section])
     a.conjoin('prefix')
-    logger.debug(a)
     # compile
     a.bdd = bdd  # use `cudd.BDD`, but fill vars
     a = symbolic._bitvector_to_bdd(a)
@@ -151,7 +146,6 @@ def _init_vars(d):
 @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), winning_set_start=True)
     log.info(dlog)
     # reordering_log = logging.getLogger(REORDERING_LOG)
@@ -236,7 +230,6 @@ def compute_winning_set(aut, z=None):
 @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), make_transducer_start=True)
     log.info(dlog)
     # reordering_log = logging.getLogger(REORDERING_LOG)
@@ -361,7 +354,6 @@ def construct_streett_transducer(z, aut):
 
 
 def log_loop(i, j, transducer, x, y, z):
-    log = logging.getLogger(SOLVER_LOG)
     if transducer is not None:
         transducer_nodes = len(transducer)
     else:
@@ -379,7 +371,6 @@ def log_loop(i, j, transducer, x, y, z):
 
 
 def log_bdd(bdd, name):
-    log = logging.getLogger(SOLVER_LOG)
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
@@ -418,10 +409,9 @@ def old_cox(x, env_action, sys_action, aut):
 
 def recurse_binary(f, x, bdds):
     """Recursively traverse binary tree of computation."""
-    logger = logging.getLogger(SOLVER_LOG)
-    logger.info('++ recurse binary')
+    log.debug('++ recurse binary')
     n = len(x)
-    logger.debug('{n} items left to recurse'.format(n=n))
+    log.debug('{n} items left to recurse'.format(n=n))
     assert n > 0
     if n == 1:
         assert len(x) == 1, x
@@ -441,12 +431,11 @@ def recurse_binary(f, x, bdds):
     cpa = _bdd.copy_bdd(a, bdd_a, new_bdd)
     cpb = _bdd.copy_bdd(b, bdd_b, new_bdd)
     # logger.info(bdds)
-    logger.info('-- done recurse binary ({n} items)'.format(n=n))
+    log.debug('-- done recurse binary ({n} items)'.format(n=n))
     return f(cpa, cpb), new_bdd
 
 
 def make_strategy(store, all_new, j, goal, aut):
-    log = logging.getLogger(SOLVER_LOG)
     log.info('++ Make strategy for goal: {j}'.format(j=j))
     bdd = aut.bdd
     log.info(bdd)
