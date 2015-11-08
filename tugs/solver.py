@@ -371,7 +371,7 @@ def log_loop(i, j, transducer, x, y, z):
     log.info(dlog)
 
 
-def log_bdd(bdd, name):
+def log_bdd(bdd, name=''):
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
