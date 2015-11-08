@@ -355,6 +355,8 @@ def construct_streett_transducer(z, aut):
 
 
 def log_loop(i, j, transducer, x, y, z):
+    if log.getEffectiveLevel() > logging.INFO:
+        return
     if transducer is not None:
         transducer_nodes = len(transducer)
     else:
@@ -372,6 +374,8 @@ def log_loop(i, j, transducer, x, y, z):
 
 
 def log_bdd(bdd, name=''):
+    if log.getEffectiveLevel() > logging.INFO:
+        return
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
