@@ -79,10 +79,10 @@ def run_gr1x(args):
     """Run `gr1x` for a range of AMBA spec instances."""
     n = args.min
     m = args.max + 1
+    level = args.debug
     # capture execution environment
     utils.snapshot_versions()
     # config log
-    level = logging.DEBUG
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
     for i in xrange(n, m):
