@@ -56,7 +56,7 @@ def solve_game(s):
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     z = compute_winning_set(aut)
-    assert z != bdd.False, 'unrealizable'
+    assert z != bdd.false, 'unrealizable'
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
     del z
@@ -159,7 +159,7 @@ def compute_winning_set(aut, z=None):
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
     if z is None:
-        z = bdd.True
+        z = bdd.true
     zold = None
     log.debug('before z fixpoint')
     while z != zold:
@@ -173,7 +173,7 @@ def compute_winning_set(aut, z=None):
             # log.info(bdd)
             zp = _bdd.rename(z, bdd, aut.prime)
             live_trans = goal & zp
-            y = bdd.False
+            y = bdd.false
             yold = None
             while y != yold:
                 log.debug('Start Y iteration')
@@ -182,7 +182,7 @@ def compute_winning_set(aut, z=None):
                 live_trans = live_trans | yp
                 good = y
                 for i, excuse in enumerate(aut.win['<>[]']):
-                    x = bdd.True
+                    x = bdd.true
                     xold = None
                     while x != xold:
                         log.debug('Start X iteration')
@@ -269,11 +269,11 @@ def construct_streett_transducer(z, aut):
         # log_bdd(bdd, '')
         # for fixpoint
         live_trans = goal & zp
-        y = bdd.False
+        y = bdd.false
         yold = None
         # for strategy construction
-        covered = other_bdd.False
-        transducer = other_bdd.False
+        covered = other_bdd.false
+        transducer = other_bdd.false
         while y != yold:
             # log.debug('Start Y iteration')
             yold = y
@@ -281,7 +281,7 @@ def construct_streett_transducer(z, aut):
             live_trans = live_trans | yp
             good = y
             for i, excuse in enumerate(aut.win['<>[]']):
-                x = bdd.True
+                x = bdd.true
                 xold = None
                 paths = None
                 new = None
@@ -450,8 +450,8 @@ def make_strategy(store, all_new, j, goal, aut):
     log.info('++ Make strategy for goal: {j}'.format(j=j))
     bdd = aut.bdd
     log.info(bdd)
-    covered = bdd.False
-    transducer = bdd.False
+    covered = bdd.false
+    transducer = bdd.false
     while store:
         log.info('covering...')
         assert all_new
