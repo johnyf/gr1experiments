@@ -202,8 +202,8 @@ def compute_winning_set(aut, z=None):
                         # log.debug('and_exists done')
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
-                        # log_loop(i, j, transducer, x, y, z)
-                        # log_bdd(bdd, '')
+                        log_loop(i, j, None, x, y, z)
+                        log_bdd(bdd, '')
                     log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -260,7 +260,7 @@ def construct_streett_transducer(z, aut):
     selector = t.add_expr(SELECTOR)
     for j, goal in enumerate(aut.win['[]<>']):
         log.info('Goal: {j}'.format(j=j))
-        # log_bdd(bdd, '')
+        log_bdd(bdd, '')
         # for fixpoint
         live_trans = goal & zp
         y = bdd.false
@@ -269,7 +269,7 @@ def construct_streett_transducer(z, aut):
         covered = other_bdd.false
         transducer = other_bdd.false
         while y != yold:
-            # log.debug('Start Y iteration')
+            log.debug('Start Y iteration')
             yold = y
             yp = _bdd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
@@ -281,7 +281,7 @@ def construct_streett_transducer(z, aut):
                 new = None
                 while x != xold:
                     del paths, new
-                    # log.debug('Start X iteration')
+                    log.debug('Start X iteration')
                     xold = x
                     xp = _bdd.rename(x, bdd, aut.prime)
                     x = xp & excuse
@@ -291,15 +291,15 @@ def construct_streett_transducer(z, aut):
                                      aut.epvars, bdd)
                     x = or_forall(new, ~ env_action,
                                   aut.upvars, bdd)
-                    # log_loop(i, j, transducer, x, y, z)
-                    # log_bdd(bdd, '')
-                    # log_bdd(other_bdd, 'other_')
+                    log_loop(i, j, transducer, x, y, z)
+                    log_bdd(bdd, '')
+                    log_bdd(other_bdd, 'other_')
                 del xold, excuse
                 good = good | x
                 del x
                 # strategy construction
                 # in `other_bdd`
-                # log.info('transfer')
+                log.info('transfer')
                 paths = _bdd.copy_bdd(paths, bdd, other_bdd)
                 new = _bdd.copy_bdd(new, bdd, other_bdd)
                 rim = new & ~ covered
@@ -313,7 +313,7 @@ def construct_streett_transducer(z, aut):
             del good
         assert y == z, (y, z)
         del y, yold, covered
-        # log_bdd(other_bdd, 'other_')
+        log_bdd(other_bdd, 'other_')
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
@@ -330,7 +330,7 @@ def construct_streett_transducer(z, aut):
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    # log_bdd(other_bdd, 'other_')
+    log_bdd(other_bdd, 'other_')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
     # transducer = syntax._linear_operator_simple(disj, transducers)
