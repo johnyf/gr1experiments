@@ -374,6 +374,7 @@ def log_bdd(bdd, name):
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
+        n_reorderings = int(stats['n_reorderings'])
         peak_nodes = int(stats['peak_n_nodes'])
     except AttributeError:
         # using `autoref`
@@ -383,6 +384,7 @@ def log_bdd(bdd, name):
     dlog = {
         'time': t,
         name + 'reordering_time': reordering_time,
+        name + 'n_reorderings': n_reorderings,
         name + 'total_nodes': len(bdd),
         name + 'peak_nodes': peak_nodes}
     log.info(dlog)
