@@ -185,19 +185,15 @@ def compute_winning_set(aut, z=None):
                         log.debug('Start X iteration')
                         xold = x
                         xp = _bdd.rename(x, bdd, aut.prime)
-                        # log.debug('renamed')
                         # desired transitions
                         x = xp & excuse
-                        # log.debug('conjoined')
                         x = x | live_trans
-                        # log.debug('disjoined')
                         # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
                         # bdd.garbage_collection(False)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
                         # bdd.garbage_collection(True)
-                        # log.debug('and_exists done')
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
                         log_loop(i, j, None, x, y, z)
