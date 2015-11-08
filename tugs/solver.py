@@ -55,7 +55,6 @@ def solve_game(s):
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     log_bdd(bdd)
-    _bdd.reorder(bdd)
     z = compute_winning_set(aut)
     log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
