@@ -3,6 +3,8 @@ _version.py
 ._.DS_Store
 build/*
 src/build/*
+*.egg
+*.pickle
 *.pyc
 *.egg-info
 *.out
