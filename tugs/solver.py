@@ -190,10 +190,8 @@ def compute_winning_set(aut, z=None):
                         x = x | live_trans
                         # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
-                        # bdd.garbage_collection(False)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
-                        # bdd.garbage_collection(True)
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
                         log_loop(i, j, None, x, y, z)
