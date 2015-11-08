@@ -48,12 +48,15 @@ def solve_game(s):
     """
     d = parse_slugsin(s)
     bdd = _bdd.BDD(memory=10 * 1024**3)
+    log_bdd(bdd)
     log.info(bdd.configure())
     params = dict(max_growth=1.7)
     bdd.configure(params)
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
+    log_bdd(bdd)
     z = compute_winning_set(aut)
+    log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
@@ -191,9 +194,7 @@ def compute_winning_set(aut, z=None):
                         # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
                         stats = bdd.statistics()
-                        # reordering_time = float(stats['reordering_time'])
-                        # peak_nodes = int(stats['peak_n_nodes'])
-                        # log.debug('peak nodes: {n}'.format(n=peak_nodes))
+                        log_bdd(bdd)
                         # bdd.garbage_collection(False)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
