@@ -193,8 +193,6 @@ def compute_winning_set(aut, z=None):
                         # log.debug('disjoined')
                         # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
-                        stats = bdd.statistics()
-                        log_bdd(bdd)
                         # bdd.garbage_collection(False)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
