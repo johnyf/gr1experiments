@@ -485,14 +485,6 @@ def conj(x, y):
     return x & y
 
 
-def var_order(bdd):
-    """Return `dict` that maps each variable to a level.
-
-    @rtype: `dict(str: int)`
-    """
-    return {var: bdd.level_of_var(var) for var in bdd.vars}
-
-
 def memoize_iterates(z, aut):
     """Compute winning set, while storing iterates."""
     pass
@@ -515,6 +507,14 @@ def log_var_order(bdd):
     reordering_log = logging.getLogger(REORDERING_LOG)
     s = var_order(bdd)
     reordering_log.debug(repr(s))
+
+
+def var_order(bdd):
+    """Return `dict` that maps each variable to a level.
+
+    @rtype: `dict(str: int)`
+    """
+    return {var: bdd.level_of_var(var) for var in bdd.vars}
 
 
 def main():
