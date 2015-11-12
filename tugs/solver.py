@@ -379,7 +379,7 @@ def log_bdd(bdd, name=''):
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
         n_reorderings = int(stats['n_reorderings'])
-        peak_nodes = int(stats['peak_n_nodes'])
+        peak_nodes = int(stats['peak_nodes'])
     except AttributeError:
         # using `autoref`
         reordering_time = None
