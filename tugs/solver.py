@@ -21,6 +21,7 @@ COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 STRATEGY_FILE = 'tugs_strategy.txt'
 USE_BINARY = True
+MAX_MEMORY = 10 * 1024**3
 
 
 # TODO:
@@ -47,7 +48,11 @@ def solve_game(s):
     @param s: `str` in `slugs` syntax
     """
     d = parse_slugsin(s)
-    bdd = _bdd.BDD(memory=10 * 1024**3)
+    max_memory = MAX_MEMORY
+    initial_cache_size = 2**18
+    bdd = _bdd.BDD(
+        max_memory=max_memory,
+        initial_cache_size=initial_cache_size)
     log_bdd(bdd)
     log.info(bdd.configure())
     params = dict(max_growth=1.7)
