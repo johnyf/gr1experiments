@@ -195,6 +195,7 @@ def compute_winning_set(aut, z=None):
                         x = xp & excuse
                         x = x | live_trans
                         # reordering_log.debug(repr(s))
+                        '''
                         dvars = var_order(bdd)
                         epvars = aut.epvars
                         pickle_data = dict(
@@ -214,12 +215,15 @@ def compute_winning_set(aut, z=None):
                         log.info(cfg)
                         stats = bdd.statistics()
                         log.info(stats)
+                        '''
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
+                        '''
                         cfg = dict(
                             reordering=True,
                             garbage_collection=True)
                         bdd.configure(cfg)
+                        '''
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
                         log_loop(i, j, None, x, y, z)
