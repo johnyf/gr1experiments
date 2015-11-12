@@ -2,6 +2,7 @@ import argparse
 import copy
 import logging
 import math
+import pickle
 import time
 from dd import cudd as _bdd
 import natsort
@@ -193,10 +194,32 @@ def compute_winning_set(aut, z=None):
                         # desired transitions
                         x = xp & excuse
                         x = x | live_trans
-                        # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
+                        dvars = var_order(bdd)
+                        epvars = aut.epvars
+                        pickle_data = dict(
+                            dvars=dvars,
+                            epvars=epvars)
+                        pickle_fname = 'bug_vars.pickle'
+                        with open(pickle_fname, 'wb') as fid:
+                            pickle.dump(pickle_data, fid, protocol=2)
+                        bdd_fname = 'bug_bdd.txt'
+                        bdd.dump(x, bdd_fname)
+                        bdd_fname = 'sys_action.txt'
+                        bdd.dump(sys_action, bdd_fname)
+                        cfg = dict(
+                            reordering=False,
+                            garbage_collection=False)
+                        cfg = bdd.configure(cfg)
+                        log.info(cfg)
+                        stats = bdd.statistics()
+                        log.info(stats)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
+                        cfg = dict(
+                            reordering=True,
+                            garbage_collection=True)
+                        bdd.configure(cfg)
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
                         log_loop(i, j, None, x, y, z)
