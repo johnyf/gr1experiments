@@ -233,7 +233,9 @@ def construct_streett_transducer(z, aut):
     # reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
-    other_bdd = _bdd.BDD()
+    max_memory = MAX_MEMORY
+    other_bdd = _bdd.BDD(
+        max_memory=max_memory)
     _bdd.copy_vars(bdd, other_bdd)
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
