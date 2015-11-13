@@ -42,12 +42,14 @@ def main():
     # load bdd
     file_name = 'bug_bdd.txt'
     u = load_bdd(file_name, bdd)
+    print('loaded ' + file_name)
     # file_name = 'bug_bdd_old.txt'
     # u_ = load_bdd(file_name, bdd)
     # assert u == u_, (u, u_)
     # del u_
     file_name = 'sys_action.txt'
     sys_action = load_bdd(file_name, bdd)
+    print('loaded ' + file_name)
     dvars_ = var_order(bdd)
     assert dvars == dvars_, (dvars, dvars_)
     cfg = bdd.configure()
@@ -67,7 +69,6 @@ def load_bdd(file_name, bdd):
 
 def exercise_bdd(u, sys_action, epvars, bdd):
     log.info('++ exercise_bdd')
-    # bdd.dump(x, 'bug_bdd.txt')
     cfg = dict(
         reordering=True,
         garbage_collection=True)
