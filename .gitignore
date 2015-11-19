@@ -3,6 +3,7 @@ _version.py
 ._.DS_Store
 build/*
 src/build/*
+*.dddmp
 *.egg
 *.pickle
 *.pyc
