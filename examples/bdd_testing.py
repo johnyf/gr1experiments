@@ -1,3 +1,11 @@
+"""Experiment to diagnose the error with instance 23.
+
+- Dumped order from 24 and loaded it to 23.
+  that worked well.
+- Tried with reordering and garbage collection on/off.
+- Tried with separate conjunction and quantification.
+- Tried with relational product in a temporary, dedicated manager.
+"""
 import logging
 import pickle
 import pprint
