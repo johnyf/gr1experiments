@@ -14,7 +14,7 @@ import sys
 import time
 from dd import cudd
 import matplotlib as mpl
-# matplotlib.use('Agg')
+mpl.use('Agg')
 from matplotlib import pyplot as plt
 import numpy as np
 from omega.logic import bitvector as bv
