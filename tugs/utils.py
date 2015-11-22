@@ -30,7 +30,6 @@ def snapshot_versions():
         d_old = None
     # get SHA
     paths = [
-        '~/github/openpromela',
         '~/github/omega']
     d = dict()
     for path in paths:
