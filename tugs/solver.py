@@ -53,7 +53,9 @@ def solve_game(s):
     bdd = _bdd.BDD(
         memory_estimate=MAX_MEMORY,
         initial_cache_size=INIT_CACHE)
-    # bdd.configure(max_growth=1.7)
+    bdd.configure(
+        max_memory=MAX_MEMORY,
+        max_growth=1.2)
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     log_bdd(bdd)
@@ -258,6 +260,7 @@ def construct_streett_transducer(z, aut):
     bdd = aut.bdd
     other_bdd = _bdd.BDD(
         memory_estimate=MAX_MEMORY)
+    other_bdd.configure(max_memory=MAX_MEMORY)
     _bdd.copy_vars(bdd, other_bdd)
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
