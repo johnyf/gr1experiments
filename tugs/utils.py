@@ -30,7 +30,9 @@ def snapshot_versions():
         d_old = None
     # get SHA
     paths = [
-        '~/github/omega']
+        '~/github/omega',
+        '~/github/tugs',
+        '~/github/dd']
     d = dict()
     for path in paths:
         sha = git_version(path)
