@@ -22,7 +22,8 @@ COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 STRATEGY_FILE = 'tugs_strategy.txt'
 USE_BINARY = True
-MAX_MEMORY = 10 * 1024**3
+GB = 2**30
+MAX_MEMORY = 10 * GB
 INIT_CACHE = 2**18
 
 # TODO:
