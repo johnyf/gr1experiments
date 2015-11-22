@@ -2,6 +2,7 @@ import argparse
 import copy
 import logging
 import math
+import pickle
 import time
 from dd import cudd as _bdd
 import natsort
@@ -15,14 +16,14 @@ except AttributeError:
         return func
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 REORDERING_LOG = 'reorder'
-SOLVER_LOG = 'solver'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 STRATEGY_FILE = 'tugs_strategy.txt'
 USE_BINARY = True
-
+MAX_MEMORY = 10 * 1024**3
+INIT_CACHE = 2**18
 
 # TODO:
 #
@@ -47,15 +48,16 @@ def solve_game(s):
 
     @param s: `str` in `slugs` syntax
     """
-    log = logging.getLogger(SOLVER_LOG)
     d = parse_slugsin(s)
-    bdd = _bdd.BDD(memory=10 * 1024**3)
-    # log.info(bdd.configure())
-    # params = dict(max_growth=1.7)
-    # bdd.configure(params)
-    #log.info(bdd.configure())
+    bdd = _bdd.BDD(
+        memory_estimate=MAX_MEMORY,
+        initial_cache_size=INIT_CACHE)
+    # bdd.configure(max_growth=1.7)
+    log.info(bdd.configure())
     aut = make_automaton(d, bdd)
+    log_bdd(bdd)
     z = compute_winning_set(aut)
+    log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
@@ -81,7 +83,6 @@ def log_reordering(fname):
 
 def parse_slugsin(s):
     """Return `dict` keyed by `slugsin` file section."""
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), parse_slugsin=True)
     log.info(dlog)
     sections = dict(
@@ -116,7 +117,6 @@ def make_automaton(d, bdd):
 
     @type d: dict(str: list)
     """
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), make_automaton=True)
     log.info(dlog)
     # bits -- shouldn't produce safety or init formulae
@@ -128,7 +128,6 @@ def make_automaton(d, bdd):
     for section, target in sections.iteritems():
         target.extend(d[section])
     a.conjoin('prefix')
-    logger.debug(a)
     # compile
     a.bdd = bdd  # use `cudd.BDD`, but fill vars
     a = symbolic._bitvector_to_bdd(a)
@@ -151,7 +150,6 @@ def _init_vars(d):
 @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), winning_set_start=True)
     log.info(dlog)
     # reordering_log = logging.getLogger(REORDERING_LOG)
@@ -188,27 +186,43 @@ def compute_winning_set(aut, z=None):
                         log.debug('Start X iteration')
                         xold = x
                         xp = _bdd.rename(x, bdd, aut.prime)
-                        # log.debug('renamed')
                         # desired transitions
                         x = xp & excuse
-                        # log.debug('conjoined')
                         x = x | live_trans
-                        # log.debug('disjoined')
-                        # s = var_order(bdd)
                         # reordering_log.debug(repr(s))
+                        '''
+                        dvars = var_order(bdd)
+                        epvars = aut.epvars
+                        pickle_data = dict(
+                            dvars=dvars,
+                            epvars=epvars)
+                        pickle_fname = 'bug_vars.pickle'
+                        with open(pickle_fname, 'wb') as fid:
+                            pickle.dump(pickle_data, fid, protocol=2)
+                        bdd_fname = 'bug_bdd.txt'
+                        bdd.dump(x, bdd_fname)
+                        bdd_fname = 'sys_action.txt'
+                        bdd.dump(sys_action, bdd_fname)
+                        cfg = dict(
+                            reordering=False,
+                            garbage_collection=False)
+                        cfg = bdd.configure(cfg)
+                        log.info(cfg)
                         stats = bdd.statistics()
-                        # reordering_time = float(stats['reordering_time'])
-                        # peak_nodes = int(stats['peak_n_nodes'])
-                        # log.debug('peak nodes: {n}'.format(n=peak_nodes))
-                        # bdd.garbage_collection(False)
+                        log.info(stats)
+                        '''
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
-                        # bdd.garbage_collection(True)
-                        # log.debug('and_exists done')
+                        '''
+                        cfg = dict(
+                            reordering=True,
+                            garbage_collection=True)
+                        bdd.configure(cfg)
+                        '''
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
-                        # log_loop(i, j, transducer, x, y, z)
-                        # log_bdd(bdd, '')
+                        log_loop(i, j, None, x, y, z)
+                        log_bdd(bdd, '')
                     log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -236,13 +250,14 @@ def compute_winning_set(aut, z=None):
 @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
-    log = logging.getLogger(SOLVER_LOG)
     dlog = dict(time=time.time(), make_transducer_start=True)
     log.info(dlog)
     # reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
-    other_bdd = _bdd.BDD()
+    max_memory = MAX_MEMORY
+    other_bdd = _bdd.BDD(
+        max_memory=max_memory)
     _bdd.copy_vars(bdd, other_bdd)
     # Compute iterates, now that we know the outer fixpoint
     env_action = aut.action['env'][0]
@@ -266,7 +281,7 @@ def construct_streett_transducer(z, aut):
     selector = t.add_expr(SELECTOR)
     for j, goal in enumerate(aut.win['[]<>']):
         log.info('Goal: {j}'.format(j=j))
-        # log_bdd(bdd, '')
+        log_bdd(bdd, '')
         # for fixpoint
         live_trans = goal & zp
         y = bdd.false
@@ -275,7 +290,7 @@ def construct_streett_transducer(z, aut):
         covered = other_bdd.false
         transducer = other_bdd.false
         while y != yold:
-            # log.debug('Start Y iteration')
+            log.debug('Start Y iteration')
             yold = y
             yp = _bdd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
@@ -287,7 +302,7 @@ def construct_streett_transducer(z, aut):
                 new = None
                 while x != xold:
                     del paths, new
-                    # log.debug('Start X iteration')
+                    log.debug('Start X iteration')
                     xold = x
                     xp = _bdd.rename(x, bdd, aut.prime)
                     x = xp & excuse
@@ -297,15 +312,15 @@ def construct_streett_transducer(z, aut):
                                      aut.epvars, bdd)
                     x = or_forall(new, ~ env_action,
                                   aut.upvars, bdd)
-                    # log_loop(i, j, transducer, x, y, z)
-                    # log_bdd(bdd, '')
-                    # log_bdd(other_bdd, 'other_')
+                    log_loop(i, j, transducer, x, y, z)
+                    log_bdd(bdd, '')
+                    log_bdd(other_bdd, 'other_')
                 del xold, excuse
                 good = good | x
                 del x
                 # strategy construction
                 # in `other_bdd`
-                # log.info('transfer')
+                log.info('transfer')
                 paths = _bdd.copy_bdd(paths, bdd, other_bdd)
                 new = _bdd.copy_bdd(new, bdd, other_bdd)
                 rim = new & ~ covered
@@ -319,7 +334,7 @@ def construct_streett_transducer(z, aut):
             del good
         assert y == z, (y, z)
         del y, yold, covered
-        # log_bdd(other_bdd, 'other_')
+        log_bdd(other_bdd, 'other_')
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
         counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
@@ -336,7 +351,7 @@ def construct_streett_transducer(z, aut):
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    # log_bdd(other_bdd, 'other_')
+    log_bdd(other_bdd, 'other_')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
     # transducer = syntax._linear_operator_simple(disj, transducers)
@@ -361,7 +376,8 @@ def construct_streett_transducer(z, aut):
 
 
 def log_loop(i, j, transducer, x, y, z):
-    log = logging.getLogger(SOLVER_LOG)
+    if log.getEffectiveLevel() > logging.INFO:
+        return
     if transducer is not None:
         transducer_nodes = len(transducer)
     else:
@@ -378,12 +394,14 @@ def log_loop(i, j, transducer, x, y, z):
     log.info(dlog)
 
 
-def log_bdd(bdd, name):
-    log = logging.getLogger(SOLVER_LOG)
+def log_bdd(bdd, name=''):
+    if log.getEffectiveLevel() > logging.INFO:
+        return
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
-        peak_nodes = int(stats['peak_n_nodes'])
+        n_reorderings = int(stats['n_reorderings'])
+        peak_nodes = int(stats['peak_nodes'])
     except AttributeError:
         # using `autoref`
         reordering_time = None
@@ -392,6 +410,7 @@ def log_bdd(bdd, name):
     dlog = {
         'time': t,
         name + 'reordering_time': reordering_time,
+        name + 'n_reorderings': n_reorderings,
         name + 'total_nodes': len(bdd),
         name + 'peak_nodes': peak_nodes}
     log.info(dlog)
@@ -418,10 +437,9 @@ def old_cox(x, env_action, sys_action, aut):
 
 def recurse_binary(f, x, bdds):
     """Recursively traverse binary tree of computation."""
-    logger = logging.getLogger(SOLVER_LOG)
-    logger.info('++ recurse binary')
+    log.debug('++ recurse binary')
     n = len(x)
-    logger.debug('{n} items left to recurse'.format(n=n))
+    log.debug('{n} items left to recurse'.format(n=n))
     assert n > 0
     if n == 1:
         assert len(x) == 1, x
@@ -441,12 +459,11 @@ def recurse_binary(f, x, bdds):
     cpa = _bdd.copy_bdd(a, bdd_a, new_bdd)
     cpb = _bdd.copy_bdd(b, bdd_b, new_bdd)
     # logger.info(bdds)
-    logger.info('-- done recurse binary ({n} items)'.format(n=n))
+    log.debug('-- done recurse binary ({n} items)'.format(n=n))
     return f(cpa, cpb), new_bdd
 
 
 def make_strategy(store, all_new, j, goal, aut):
-    log = logging.getLogger(SOLVER_LOG)
     log.info('++ Make strategy for goal: {j}'.format(j=j))
     bdd = aut.bdd
     log.info(bdd)
@@ -497,14 +514,6 @@ def conj(x, y):
     return x & y
 
 
-def var_order(bdd):
-    """Return `dict` that maps each variable to a level.
-
-    @rtype: `dict(str: int)`
-    """
-    return {var: bdd.level_of_var(var) for var in bdd.vars}
-
-
 def memoize_iterates(z, aut):
     """Compute winning set, while storing iterates."""
     pass
@@ -527,6 +536,14 @@ def log_var_order(bdd):
     reordering_log = logging.getLogger(REORDERING_LOG)
     s = var_order(bdd)
     reordering_log.debug(repr(s))
+
+
+def var_order(bdd):
+    """Return `dict` that maps each variable to a level.
+
+    @rtype: `dict(str: int)`
+    """
+    return {var: bdd.level_of_var(var) for var in bdd.vars}
 
 
 def main():
