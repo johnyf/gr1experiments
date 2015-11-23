@@ -94,7 +94,7 @@ def dump_strategy(t):
     t.bdd.dump(action, STRATEGY_FILE)
     t1 = time.time()
     dt = t1 - t0
-    print('Strategy dumped in {dt:1.2} sec.'.format(dt=dt))
+    log.info('Strategy dumped in {dt:1.2} sec.'.format(dt=dt))
 
 
 def log_reordering(fname):
@@ -133,6 +133,7 @@ def parse_slugsin(s):
         else:
             assert store is not None
             store.append(line)
+    log.info('-- done parse_slugsin')
     return d
 
 
@@ -183,7 +184,7 @@ def compute_winning_set(aut, z=None):
     if z is None:
         z = bdd.true
     zold = None
-    log.debug('before z fixpoint')
+    log.debug('Before z fixpoint')
     while z != zold:
         log.debug('Start Z iteration')
         # s = var_order(bdd)
@@ -230,8 +231,7 @@ def compute_winning_set(aut, z=None):
                         cfg = dict(
                             reordering=False,
                             garbage_collection=False)
-                        cfg = bdd.configure(cfg)
-                        log.info(cfg)
+                        log.info(bdd.configure())
                         stats = bdd.statistics()
                         log.info(stats)
                         '''
@@ -264,7 +264,7 @@ def compute_winning_set(aut, z=None):
         z = syntax.recurse_binary(conj, yj)
         # z = syntax._linear_operator_simple(conj, yj)
         # bdd.assert_consistent()
-    log.info('Reached Z fixpoint.')
+    log.info('Reached Z fixpoint')
     log_bdd(bdd, '')
     dlog = dict(time=time.time(), winning_set_end=True)
     log.info(dlog)
@@ -339,6 +339,7 @@ def construct_streett_transducer(z, aut):
                     log_loop(i, j, transducer, x, y, z)
                     log_bdd(bdd, '')
                     log_bdd(other_bdd, 'other_')
+                log.debug('Reached X fixpoint')
                 del xold, excuse
                 good = good | x
                 del x
@@ -356,6 +357,7 @@ def construct_streett_transducer(z, aut):
                 del rim
             y = good
             del good
+        log.debug('Reached Y fixpoint (Y = Z)')
         assert y == z, (y, z)
         del y, yold, covered
         log_bdd(other_bdd, 'other_')
