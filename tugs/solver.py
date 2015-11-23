@@ -79,6 +79,7 @@ def dump_winning_set(z, bdd):
     _bdd.reorder(b, order)
     u = _bdd.copy_bdd(z, bdd, b)
     b.dump(u, WINNING_SET_FILE)
+    del u
     t1 = time.time()
     dt = t1 - t0
     log.info(
