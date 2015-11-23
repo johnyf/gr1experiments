@@ -3,12 +3,6 @@ import pickle
 import pprint
 import time
 from dd import cudd as _bdd
-import __builtin__
-try:
-    __builtin__.profile
-except AttributeError:
-    def profile(func):
-        return func
 
 
 log = logging.getLogger(__name__)
@@ -19,7 +13,6 @@ STRATEGY_FILE = 'tugs_strategy.txt'
 USE_BINARY = True
 
 
-@profile
 def main():
     max_memory = 10 * 1024**3
     initial_cache_size = 2**18
@@ -70,7 +63,6 @@ def load_bdd(file_name, bdd):
     return u
 
 
-@profile
 def exercise_bdd(u, sys_action, epvars, bdd):
     log.info('++ exercise_bdd')
     # bdd.dump(x, 'bug_bdd.txt')
