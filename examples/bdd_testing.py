@@ -196,6 +196,31 @@ def var_order(bdd):
     return {var: bdd.level_of_var(var) for var in bdd.vars}
 
 
+def confirm_layered_copy():
+    """Check whether same order implies linear copy.
+
+    For CUDD.
+    You must see equal number of nodes to
+    total nodes in manager `b`.
+    """
+    a = _bdd.BDD()
+    b = _bdd.BDD()
+    u = _bdd.load('winning_set', a)
+    _bdd.copy_vars(a, b)
+    order = var_order(a)
+    _bdd.reorder(b, order)
+    b.configure(reordering=False)
+    v = _bdd.copy_bdd(u, a, b)
+    assert var_order(a) == var_order(b)
+    pprint.pprint(a.statistics())
+    print(len(u))
+    print(len(v))
+    pprint.pprint(b.statistics())
+    b.configure(reordering=True)
+    del u
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    main()
+    # main()
+    confirm_layered_copy()
