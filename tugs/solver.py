@@ -616,11 +616,14 @@ def command_line_wrapper():
     """Solve game in `slugsin` file `fname`."""
     p = argparse.ArgumentParser()
     p.add_argument('file', type=str, help='`slugsin` input')
+    p.add_argument('--win_set', type=str,
+                   help='winning set BDD as DDDMP file')
     args = p.parse_args()
     fname = args.file
     with open(fname, 'r') as f:
         s = f.read()
-    solve_game(s)
+    win_set_fname = args.win_set
+    solve_game(s, win_set_fname=win_set_fname)
 
 
 def test_indices_and_levels():
