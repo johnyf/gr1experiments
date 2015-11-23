@@ -289,12 +289,10 @@ def construct_streett_transducer(z, aut):
     order = var_order(bdd)
     _bdd.reorder(other_bdd, order)
     # copy actions with reordering off
-    other_bdd.configure(reordering=False)
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
     sys_action_2 = _bdd.copy_bdd(sys_action, bdd, other_bdd)
     env_action_2 = _bdd.copy_bdd(env_action, bdd, other_bdd)
-    other_bdd.configure(reordering=True)
     # Compute iterates, now that we know the outer fixpoint
     dlog = dict(time=time.time(), other_total_nodes=len(other_bdd))
     log.info(dlog)
