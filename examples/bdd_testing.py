@@ -11,10 +11,12 @@ COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 STRATEGY_FILE = 'tugs_strategy.txt'
 USE_BINARY = True
+GB = 10**30
+MAX_MEMORY = 10 * GB
 
 
 def main():
-    max_memory = 10 * 1024**3
+    max_memory = 10 * GB
     initial_cache_size = 2**18
     bdd = _bdd.BDD(
         max_memory=max_memory,
