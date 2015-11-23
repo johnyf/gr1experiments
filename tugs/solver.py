@@ -63,6 +63,7 @@ def solve_game(s):
     z = compute_winning_set(aut)
     log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
+    dump_winning_set(z, bdd)
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
     del z
