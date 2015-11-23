@@ -130,6 +130,20 @@ def or_forall(u, v, qvars, bdd):
         return bdd.quantify(r, qvars, forall=True)
 
 
+def and_exists_isolated(u, v, qvars, bdd):
+    b = _bdd.BDD(memory_estimate=MAX_MEMORY)
+    b.configure(reordering=True, max_growth=1.7)
+    _bdd.copy_vars(bdd, b)
+    order = var_order(bdd)
+    _bdd.reorder(b, order)
+    p = _bdd.copy_bdd(u, bdd, b)
+    q = _bdd.copy_bdd(v, bdd, b)
+    b.configure(reordering=True)
+    r = _bdd.and_exists(p, q, qvars, b)
+    w = _bdd.copy_bdd(r, b, bdd)
+    return w
+
+
 def disj(x, y):
     return x | y
 
