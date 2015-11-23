@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
+WINNING_SET_FILE = 'winning_set.dddmp'
 STRATEGY_FILE = 'tugs_strategy.dddmp'
 USE_BINARY = True
 GB = 2**30
@@ -65,6 +66,24 @@ def solve_game(s):
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
     del z
+
+
+def dump_winning_set(z, bdd):
+    log.debug('++ dump_winning_set')
+    t0 = time.time()
+    b = _bdd.BDD(memory_estimate=MAX_MEMORY)
+    b.configure(max_memory=MAX_MEMORY, reordering=False)
+    _bdd.copy_vars(bdd, b)
+    order = var_order(bdd)
+    _bdd.reorder(b, order)
+    u = _bdd.copy_bdd(z, bdd, b)
+    b.dump(u, WINNING_SET_FILE)
+    t1 = time.time()
+    dt = t1 - t0
+    log.info(
+        'Winning set dumped in {dt:1.2} sec'.format(
+            dt=dt))
+    log.debug('-- done dump_winning_set')
 
 
 def dump_strategy(t):
