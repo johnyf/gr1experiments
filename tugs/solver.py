@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
-WINNING_SET_FILE = 'winning_set.dddmp'
+WINNING_SET_FILE = 'winning_set'
 STRATEGY_FILE = 'tugs_strategy.dddmp'
 USE_BINARY = True
 GB = 2**30
@@ -45,7 +45,7 @@ INIT_CACHE = 2**18
 
 
 @profile
-def solve_game(s):
+def solve_game(s, win_set_fname=None):
     """Construct transducer for game in file `fname`.
 
     @param s: `str` in `slugs` syntax
@@ -60,7 +60,10 @@ def solve_game(s):
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     log_bdd(bdd)
-    z = compute_winning_set(aut)
+    if win_set_fname is None:
+        z = compute_winning_set(aut)
+    else:
+        z = _bdd.load(win_set_fname, bdd)
     log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
     dump_winning_set(z, bdd)
@@ -78,7 +81,7 @@ def dump_winning_set(z, bdd):
     order = var_order(bdd)
     _bdd.reorder(b, order)
     u = _bdd.copy_bdd(z, bdd, b)
-    b.dump(u, WINNING_SET_FILE)
+    _bdd.dump(u, WINNING_SET_FILE, b)
     del u
     t1 = time.time()
     dt = t1 - t0
