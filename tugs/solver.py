@@ -228,7 +228,7 @@ def compute_winning_set(aut, z=None):
                         bdd.dump(x, bdd_fname)
                         bdd_fname = 'sys_action.txt'
                         bdd.dump(sys_action, bdd_fname)
-                        cfg = dict(
+                        bdd.configure(
                             reordering=False,
                             garbage_collection=False)
                         log.info(bdd.configure())
@@ -238,10 +238,9 @@ def compute_winning_set(aut, z=None):
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
                         '''
-                        cfg = dict(
+                        bdd.configure(
                             reordering=True,
                             garbage_collection=True)
-                        bdd.configure(cfg)
                         '''
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
