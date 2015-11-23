@@ -81,7 +81,7 @@ def run_gr1x(args):
     m = args.max + 1
     level = args.debug
     # capture execution environment
-    utils.snapshot_versions()
+    versions = utils.snapshot_versions()
     # config log
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
@@ -93,6 +93,7 @@ def run_gr1x(args):
         h.setLevel(level)
         log = logging.getLogger(GR1X_LOG)
         log.addHandler(h)
+        log.log(versions)
         # synthesize
         code = generate_code(i)
         t0 = time.time()
