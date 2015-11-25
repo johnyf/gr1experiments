@@ -97,7 +97,8 @@ def dump_strategy(t):
     t.bdd.dump(action, STRATEGY_FILE)
     t1 = time.time()
     dt = t1 - t0
-    log.info('Strategy dumped in {dt:1.2} sec.'.format(dt=dt))
+    log.info(
+        'Strategy dumped in {dt:1.2} sec.'.format(dt=dt))
 
 
 def log_reordering(fname):
@@ -226,7 +227,8 @@ def compute_winning_set(aut, z=None):
                             epvars=epvars)
                         pickle_fname = 'bug_vars.pickle'
                         with open(pickle_fname, 'wb') as fid:
-                            pickle.dump(pickle_data, fid, protocol=2)
+                            pickle.dump(pickle_data,
+                                        fid, protocol=2)
                         bdd_fname = 'bug_bdd.txt'
                         bdd.dump(x, bdd_fname)
                         bdd_fname = 'sys_action.txt'
@@ -294,7 +296,8 @@ def construct_streett_transducer(z, aut):
     sys_action_2 = _bdd.copy_bdd(sys_action, bdd, other_bdd)
     env_action_2 = _bdd.copy_bdd(env_action, bdd, other_bdd)
     # Compute iterates, now that we know the outer fixpoint
-    dlog = dict(time=time.time(), other_total_nodes=len(other_bdd))
+    dlog = dict(time=time.time(),
+                other_total_nodes=len(other_bdd))
     log.info(dlog)
     log.info('done copying actions')
     zp = _bdd.rename(z, bdd, aut.prime)
@@ -377,7 +380,8 @@ def construct_streett_transducer(z, aut):
         transducer = transducer & u
         del u
         transducer = transducer & sys_action_2
-        # check_winning_region(transducer, aut, t, bdd, other_bdd, z, j)
+        # check_winning_region(transducer, aut, t,
+        #                      bdd, other_bdd, z, j)
         transducers.append(transducer)
         # s = var_order(other_bdd)
         # reordering_log.debug(repr(s))
@@ -386,7 +390,8 @@ def construct_streett_transducer(z, aut):
     log_bdd(other_bdd, 'other_')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
-    # transducer = syntax._linear_operator_simple(disj, transducers)
+    # transducer = syntax._linear_operator_simple(
+    #   disj, transducers)
     n_remain = len(transducers)
     assert n_remain == 0, n_remain
     # add counter limits
@@ -394,7 +399,8 @@ def construct_streett_transducer(z, aut):
     # env lost ?
     # transducer = transducer | ~ env_action_2
     t.action['sys'] = [transducer]
-    print('Transducer BDD: {n} nodes'.format(n=len(transducer)))
+    n = len(transducer)
+    print('Transducer BDD: {n} nodes'.format(n=n))
     dlog = dict(time=time.time(), total_nodes=len(bdd))
     log.debug(dlog)
     log_bdd(bdd, '')
@@ -402,7 +408,8 @@ def construct_streett_transducer(z, aut):
     dlog = dict(time=time.time(), make_transducer_end=True)
     log.info(dlog)
     # self-check
-    # check_winning_region(transducer, aut, t, bdd, other_bdd, z, 0)
+    # check_winning_region(transducer, aut, t, bdd,
+    #                      other_bdd, z, 0)
     del selector, env_action_2, transducer
     return t
 
@@ -448,9 +455,11 @@ def log_bdd(bdd, name=''):
     log.info(dlog)
 
 
-def check_winning_region(transducer, aut, t, bdd, other_bdd, z, j):
+def check_winning_region(transducer, aut, t, bdd,
+                         other_bdd, z, j):
     u = transducer
-    u = symbolic.cofactor(transducer, COUNTER, j, other_bdd, t.vars)
+    u = symbolic.cofactor(transducer, COUNTER, j,
+                          other_bdd, t.vars)
     u = other_bdd.quantify(u, [SELECTOR], forall=False)
     u = other_bdd.quantify(u, t.epvars, forall=False)
     u = other_bdd.quantify(u, t.upvars, forall=True)
@@ -491,7 +500,8 @@ def recurse_binary(f, x, bdds):
     cpa = _bdd.copy_bdd(a, bdd_a, new_bdd)
     cpb = _bdd.copy_bdd(b, bdd_b, new_bdd)
     # logger.info(bdds)
-    log.debug('-- done recurse binary ({n} items)'.format(n=n))
+    log.debug(
+        '-- done recurse binary ({n} items)'.format(n=n))
     return f(cpa, cpb), new_bdd
 
 
@@ -518,7 +528,8 @@ def make_strategy(store, all_new, j, goal, aut):
     counter = aut.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
     selector = aut.add_expr(SELECTOR)
     transducer = transducer & counter & (goal | ~ selector)
-    log.info('-- done making strategy for goal: {j}'.format(j=j))
+    log.info(
+        '-- done making strategy for goal: {j}'.format(j=j))
     return transducer
 
 
@@ -582,7 +593,8 @@ def main():
     fname = 'reordering_slugs_31.txt'
     other_fname = 'reordering_slugs_31_old.txt'
     p = argparse.ArgumentParser()
-    p.add_argument('--file', type=str, help='slugsin input file')
+    p.add_argument('--file', type=str,
+                   help='slugsin input file')
     p.add_argument('--plot-order', action='store_true',
                    help='plot reordering of variales from log')
     args = p.parse_args()
