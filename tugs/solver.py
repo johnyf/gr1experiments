@@ -288,8 +288,8 @@ def construct_streett_transducer(z, aut):
     other_bdd.configure(max_memory=MAX_MEMORY)
     _bdd.copy_vars(bdd, other_bdd)
     # copy var order
-    order = var_order(bdd)
-    _bdd.reorder(other_bdd, order)
+    # order = var_order(bdd)
+    # _bdd.reorder(other_bdd, order)
     # copy actions with reordering off
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
