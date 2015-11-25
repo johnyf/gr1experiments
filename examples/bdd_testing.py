@@ -11,6 +11,7 @@ import pickle
 import pprint
 import time
 from dd import cudd as _bdd
+from dd import dddmp
 
 
 log = logging.getLogger(__name__)
@@ -220,7 +221,32 @@ def confirm_layered_copy():
     del u
 
 
+def compress_strategy():
+    """Load strategy and compress it."""
+    fname = 'tugs_strategy_25.dddmp'
+    parser = dddmp.Parser()
+    order, roots = parser._parse_header(fname, None)
+    bdd = _bdd.BDD()
+    for var in order:
+        bdd.add_var(var)
+    _bdd.reorder(bdd, order)
+    bdd.configure(reordering=False, max_memory=MAX_MEMORY)
+    u = bdd.load(fname)
+    bdd.configure(reordering=True)
+    n = len(u)
+    print('As loaded, strategy has {n} nodes'.format(n=n))
+    _bdd.reorder(bdd)
+    n = len(u)
+    print((
+        'After forced reordering, '
+        'strategy has {n} nodes').format(n=n))
+    # TODO: `cudd.BDD.find_or_add`
+    # TODO: loader in pure Python
+    return
+
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     # main()
-    confirm_layered_copy()
+    # confirm_layered_copy()
+    compress_strategy()
