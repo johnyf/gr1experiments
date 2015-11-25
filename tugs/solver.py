@@ -372,7 +372,8 @@ def construct_streett_transducer(z, aut):
         log_bdd(other_bdd, 'other_')
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, other_bdd)
-        counter = t.add_expr('{c} = {j}'.format(c=COUNTER, j=j))
+        e = '{c} = {j}'.format(c=COUNTER, j=j)
+        counter = t.add_expr(e)
         u = goal | ~ selector
         del goal
         u = counter & u
