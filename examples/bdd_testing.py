@@ -247,6 +247,7 @@ def compress_strategy():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    logging.getLogger('dd').setLevel(logging.ERROR)
     # main()
     # confirm_layered_copy()
     compress_strategy()
