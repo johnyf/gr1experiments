@@ -657,7 +657,11 @@ def command_line_wrapper():
     p.add_argument('file', type=str, help='`slugsin` input')
     p.add_argument('--win_set', type=str,
                    help='winning set BDD as DDDMP file')
+    p.add_argument('--debug', type=int, help='logging level')
     args = p.parse_args()
+    log.setLevel(level=args.debug)
+    h = logging.StreamHandler()
+    log.addHandler(h)
     fname = args.file
     with open(fname, 'r') as f:
         s = f.read()
