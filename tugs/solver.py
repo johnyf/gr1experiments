@@ -316,6 +316,7 @@ def construct_streett_transducer(z, aut):
     t = t.build(b3, add=True)
     transducers = list()
     selector = t.add_expr(SELECTOR)
+    b3.configure(max_vars=20)
     for j, goal in enumerate(aut.win['[]<>']):
         log.info('Goal: {j}'.format(j=j))
         log_bdd(bdd, '')
