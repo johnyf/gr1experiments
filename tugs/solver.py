@@ -416,9 +416,10 @@ def construct_streett_transducer(z, aut):
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    log_bdd(other_bdd, 'other_')
+    log_bdd(b3, 'b3_')
     log.info('disjoin transducers')
     transducer = syntax.recurse_binary(disj, transducers)
+    log.info('done with disjunction')
     # transducer = syntax._linear_operator_simple(
     #   disj, transducers)
     n_remain = len(transducers)
