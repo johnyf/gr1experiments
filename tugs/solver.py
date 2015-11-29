@@ -393,6 +393,8 @@ def construct_streett_transducer(z, aut):
             log_bdd(b3, name='b3_')
             pq = p & q
             res.append(pq)
+        del all_paths
+        del all_rims
         transducer = syntax.recurse_binary(disj, res)
         log_bdd(b3, 'b3_')
         log.info('done with this transducer')
