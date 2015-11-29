@@ -387,14 +387,12 @@ def construct_streett_transducer(z, aut):
         log_bdd(other_bdd, 'other_')
         # conjoin `rim & paths`
         res = list()
-        b3.configure(reordering=False)
         for k, (p, q) in enumerate(zip(all_paths, all_rims)):
             log.debug('conjoin pair {k}'.format(k=k))
             log_bdd(b3, name='b3_')
             pq = p & q
             res.append(pq)
         transducer = syntax.recurse_binary(disj, res)
-        # b3.configure(reordering=True)
         log_bdd(b3, 'b3_')
         log.info('done with this transducer')
         # make transducer
