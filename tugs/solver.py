@@ -373,15 +373,13 @@ def construct_streett_transducer(z, aut):
                 del rim
                 covered = covered | new
                 del new
-                '''
-                rim = new & ~ covered
-                covered = covered | new
-                del new
-                rim = rim & paths
-                del paths
-                transducer = transducer | rim
-                del rim
-                '''
+                # rim = new & ~ covered
+                # covered = covered | new
+                # del new
+                # rim = rim & paths
+                # del paths
+                # transducer = transducer | rim
+                # del rim
             y = good
             del good
         log.debug('Reached Y fixpoint (Y = Z)')
