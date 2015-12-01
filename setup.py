@@ -18,7 +18,7 @@ VERSION_TEXT = (
     '# This file was generated from setup.py\n'
     "version = '{version}'\n")
 install_requires = [
-    'dd >= 0.1.3',
+    'dd >= 0.2.0',
     'omega >= 0.0.3']
 tests_require = [
     'nose >= 1.3.4']
