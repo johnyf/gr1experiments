@@ -30,9 +30,7 @@ def snapshot_versions():
         d_old = None
     # get SHA
     paths = [
-        '~/github/omega',
-        '~/github/tugs',
-        '~/github/dd']
+        '~/github/omega']
     d = dict()
     for path in paths:
         sha = git_version(path)
@@ -47,7 +45,9 @@ def snapshot_versions():
     slugs_version = p.stdout.read().strip()
     d['slugs'] = slugs_version
     # versions of python packages
-    packages = ['dd', 'omega', 'promela', 'openpromela']
+    packages = [
+        'dd', 'omega', 'tugs',
+        'openpromela', 'promela']
     for s in packages:
         pkg = importlib.import_module(s)
         d[s] = pkg.__version__
