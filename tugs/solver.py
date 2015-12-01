@@ -56,7 +56,7 @@ def solve_game(s, win_set_fname=None):
         initial_cache_size=INIT_CACHE)
     bdd.configure(
         max_memory=MAX_MEMORY,
-        max_growth=1.2)
+        max_growth=1.7)
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     log_bdd(bdd)
