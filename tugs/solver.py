@@ -370,7 +370,9 @@ def construct_streett_transducer(z, aut):
                 rim = new & ~ covered
                 rim = _bdd.copy_bdd(rim, other_bdd, b3)
                 all_rims.append(rim)
+                del rim
                 covered = covered | new
+                del new
                 '''
                 rim = new & ~ covered
                 covered = covered | new
@@ -391,10 +393,10 @@ def construct_streett_transducer(z, aut):
         for k, (p, q) in enumerate(zip(all_paths, all_rims)):
             log.debug('conjoin pair {k}'.format(k=k))
             log_bdd(b3, name='b3_')
-            pq = p & q
-            res.append(pq)
+            res.append(p & q)
         del all_paths
         del all_rims
+        del p, q
         transducer = syntax.recurse_binary(disj, res)
         log_bdd(b3, 'b3_')
         log.info('done with this transducer')
