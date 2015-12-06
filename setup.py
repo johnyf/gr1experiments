@@ -28,9 +28,13 @@ def git_version(version):
     try:
         import git
         repo = git.Repo('.git')
+    except ImportError:
+        print('gitpython not found: Assume release.')
+        return ''
+    try:
         repo.git.status()
-    except ImportError, git.GitCommandNotFound:
-        print('gitpython or git not found: Assume release.')
+    except git.GitCommandNotFound:
+        print('git not found: Assume release.')
         return ''
     sha = repo.head.commit.hexsha
     if repo.is_dirty():
