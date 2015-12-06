@@ -282,17 +282,13 @@ def construct_streett_transducer(z, aut):
     # reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
-    other_bdd = _bdd.BDD(
-        memory_estimate=MAX_MEMORY)
-    other_bdd.configure(max_memory=MAX_MEMORY)
-    _bdd.copy_vars(bdd, other_bdd)
     # one more manager
     b3 = _bdd.BDD(memory_estimate=MAX_MEMORY)
     b3.configure(max_memory=MAX_MEMORY)
     _bdd.copy_vars(bdd, b3)
     # copy var order
     # order = var_order(bdd)
-    # _bdd.reorder(other_bdd, order)
+    # _bdd.reorder(b3, order)
     # copy actions with reordering off
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
@@ -321,8 +317,8 @@ def construct_streett_transducer(z, aut):
         y = bdd.false
         yold = None
         # for strategy construction
-        covered = other_bdd.false
-        transducer = other_bdd.false
+        covered = bdd.false
+        # transducer = bdd.false
         all_paths = list()
         all_rims = list()
         while y != yold:
@@ -348,9 +344,8 @@ def construct_streett_transducer(z, aut):
                                      aut.epvars, bdd)
                     x = or_forall(new, ~ env_action,
                                   aut.upvars, bdd)
-                    log_loop(i, j, transducer, x, y, z)
+                    log_loop(i, j, None, x, y, z)
                     log_bdd(bdd, '')
-                    log_bdd(other_bdd, 'other_')
                 log.debug('Reached X fixpoint')
                 del xold, excuse
                 good = good | x
@@ -361,10 +356,9 @@ def construct_streett_transducer(z, aut):
                 paths = _bdd.copy_bdd(paths, bdd, b3)
                 all_paths.append(paths)
                 del paths
-                new = _bdd.copy_bdd(new, bdd, other_bdd)
                 log.info('done transferring')
                 rim = new & ~ covered
-                rim = _bdd.copy_bdd(rim, other_bdd, b3)
+                rim = _bdd.copy_bdd(rim, bdd, b3)
                 all_rims.append(rim)
                 del rim
                 covered = covered | new
@@ -381,7 +375,7 @@ def construct_streett_transducer(z, aut):
         log.debug('Reached Y fixpoint (Y = Z)')
         assert y == z, (y, z)
         del y, yold, covered
-        log_bdd(other_bdd, 'other_')
+        log_bdd(b3, 'b3_')
         # conjoin `rim & paths`
         res = list()
         for k, (p, q) in enumerate(zip(all_paths, all_rims)):
@@ -428,7 +422,6 @@ def construct_streett_transducer(z, aut):
     n = len(transducer)
     print('Transducer BDD: {n} nodes'.format(n=n))
     log_bdd(bdd, '')
-    log_bdd(other_bdd, 'other_')
     log_bdd(b3, 'b3_')
     log_event(make_transducer_end=True)
     # self-check
