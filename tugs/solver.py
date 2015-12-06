@@ -78,8 +78,9 @@ def solve_game(s, win_set_fname=None):
 def dump_winning_set(z, bdd):
     log.debug('++ dump_winning_set')
     t0 = time.time()
-    b = _bdd.BDD(memory_estimate=MAX_MEMORY)
-    b.configure(max_memory=MAX_MEMORY, reordering=False)
+    memory = 3 * GB
+    b = _bdd.BDD(memory_estimate=memory)
+    b.configure(max_memory=memory, reordering=False)
     _bdd.copy_vars(bdd, b)
     order = var_order(bdd)
     _bdd.reorder(b, order)
