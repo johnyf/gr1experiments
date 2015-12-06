@@ -2,6 +2,7 @@
 import importlib
 import json
 import logging
+import os
 import subprocess
 import time
 import git
@@ -53,6 +54,7 @@ def snapshot_versions():
         d[s] = pkg.__version__
     t_now = time.strftime('%Y-%b-%d-%A-%T-%Z')
     d['time'] = t_now
+    d['platform'] = os.uname()
     # check versions
     compare = list(packages)
     compare.append('slugs')
