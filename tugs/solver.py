@@ -298,9 +298,6 @@ def construct_streett_transducer(z, aut):
     sys_action_2 = _bdd.copy_bdd(sys_action, bdd, b3)
     env_action_2 = _bdd.copy_bdd(env_action, bdd, b3)
     # Compute iterates, now that we know the outer fixpoint
-    dlog = dict(time=time.time(),
-                other_total_nodes=len(other_bdd))
-    log.info(dlog)
     log.info('done copying actions')
     zp = _bdd.rename(z, bdd, aut.prime)
     # transducer automaton
@@ -429,8 +426,6 @@ def construct_streett_transducer(z, aut):
     t.action['sys'] = [transducer]
     n = len(transducer)
     print('Transducer BDD: {n} nodes'.format(n=n))
-    dlog = dict(time=time.time(), total_nodes=len(bdd))
-    log.debug(dlog)
     log_bdd(bdd, '')
     log_bdd(other_bdd, 'other_')
     log_bdd(b3, 'b3_')
