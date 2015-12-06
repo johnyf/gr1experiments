@@ -3,7 +3,6 @@ import copy
 import datetime
 import logging
 import math
-import pickle
 import os
 import time
 from dd import cudd as _bdd
