@@ -4,11 +4,14 @@ import datetime
 import logging
 import math
 import pickle
+import os
 import time
 from dd import cudd as _bdd
+import humanize
 import natsort
 from omega.logic import syntax
 from omega.symbolic import symbolic
+import psutil
 import __builtin__
 try:
     __builtin__.profile
@@ -474,6 +477,10 @@ def log_loop(i, j, transducer, x, y, z):
 def log_bdd(bdd, name=''):
     if log.getEffectiveLevel() > logging.INFO:
         return
+    # `psutil` used as in `openpromela.slugsin`
+    pid = os.getpid()
+    proc = psutil.Process(pid)
+    rss, vms = proc.memory_info()
     try:
         stats = bdd.statistics()
         reordering_time = float(stats['reordering_time'])
@@ -486,6 +493,8 @@ def log_bdd(bdd, name=''):
     t = time.time()
     dlog = {
         'time': t,
+        'rss': humanize.naturalsize(rss),
+        'vms': humanize.naturalsize(vms),
         name + 'reordering_time': reordering_time,
         name + 'n_reorderings': n_reorderings,
         name + 'total_nodes': len(bdd),
