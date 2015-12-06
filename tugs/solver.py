@@ -1,5 +1,6 @@
 import argparse
 import copy
+import datetime
 import logging
 import math
 import pickle
@@ -111,8 +112,7 @@ def log_reordering(fname):
 
 def parse_slugsin(s):
     """Return `dict` keyed by `slugsin` file section."""
-    dlog = dict(time=time.time(), parse_slugsin=True)
-    log.info(dlog)
+    log_event(parse_slugsin=True)
     sections = dict(
         INPUT='input',
         OUTPUT='output',
@@ -146,8 +146,7 @@ def make_automaton(d, bdd):
 
     @type d: dict(str: list)
     """
-    dlog = dict(time=time.time(), make_automaton=True)
-    log.info(dlog)
+    log_event(make_automaton=True)
     # bits -- shouldn't produce safety or init formulae
     a = symbolic.Automaton()
     a.vars = _init_vars(d)
@@ -179,8 +178,7 @@ def _init_vars(d):
 @profile
 def compute_winning_set(aut, z=None):
     """Compute winning region, w/o memoizing iterates."""
-    dlog = dict(time=time.time(), winning_set_start=True)
-    log.info(dlog)
+    log_event(winning_set_start=True)
     # reordering_log = logging.getLogger(REORDERING_LOG)
     bdd = aut.bdd
     env_action = aut.action['env'][0]
@@ -270,16 +268,14 @@ def compute_winning_set(aut, z=None):
         # bdd.assert_consistent()
     log.info('Reached Z fixpoint')
     log_bdd(bdd, '')
-    dlog = dict(time=time.time(), winning_set_end=True)
-    log.info(dlog)
+    log_event(winning_set_end=True)
     return z
 
 
 @profile
 def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
-    dlog = dict(time=time.time(), make_transducer_start=True)
-    log.info(dlog)
+    log_event(make_transducer_start=True)
     # reordering_log = logging.getLogger(REORDERING_LOG)
     # copy vars
     bdd = aut.bdd
@@ -436,13 +432,24 @@ def construct_streett_transducer(z, aut):
     log_bdd(bdd, '')
     log_bdd(other_bdd, 'other_')
     log_bdd(b3, 'b3_')
-    dlog = dict(time=time.time(), make_transducer_end=True)
-    log.info(dlog)
+    log_event(make_transducer_end=True)
     # self-check
     # check_winning_region(transducer, aut, t, bdd,
     #                      other_bdd, z, 0)
     del selector, env_action_2, transducer
     return t
+
+
+def log_event(**d):
+    """Log `dict` `d` with timestamp."""
+    t = time.time()
+    dlog = dict(d)
+    dlog['time'] = t
+    log.info('')
+    log.info(dlog)
+    date = datetime.datetime.fromtimestamp(t)
+    s = date.strftime('%Y-%m-%d %H:%M:%S')
+    log.info(s)  # for direct reading by humans
 
 
 def log_loop(i, j, transducer, x, y, z):
