@@ -295,6 +295,7 @@ def construct_streett_transducer(z, aut):
     sys_action_2 = _bdd.copy_bdd(sys_action, bdd, b3)
     env_action_2 = _bdd.copy_bdd(env_action, bdd, b3)
     # Compute iterates, now that we know the outer fixpoint
+    log_bdd(b3, 'b3_')
     log.info('done copying actions')
     zp = _bdd.rename(z, bdd, aut.prime)
     # transducer automaton
@@ -351,14 +352,16 @@ def construct_streett_transducer(z, aut):
                 good = good | x
                 del x
                 # strategy construction
-                # in `other_bdd`
-                log.info('transfer')
+                # in `b3`
+                log.info('transfer `paths` to `b3`')
                 paths = _bdd.copy_bdd(paths, bdd, b3)
+                log.info('done transferring')
                 all_paths.append(paths)
                 del paths
-                log.info('done transferring')
                 rim = new & ~ covered
+                log.info('transfer `rim` to `b3`')
                 rim = _bdd.copy_bdd(rim, bdd, b3)
+                log.info('done transferring')
                 all_rims.append(rim)
                 del rim
                 covered = covered | new
