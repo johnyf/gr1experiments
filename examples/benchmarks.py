@@ -412,12 +412,12 @@ def plot_single_experiment(details_file, fig_file):
     t = t - t_min
     plt.plot(t, peak_nodes, 'b--', label='Peak nodes (1)')
     # total nodes (other BDD)
-    t, total_nodes = utils.get_signal('other_total_nodes', data)
+    t, total_nodes = utils.get_signal('b3_total_nodes', data)
     t = t - t_min
     plt.plot(t, total_nodes, 'r-o', label='Total nodes (2)',
              markevery=max(int(len(t) / n_markers), 1))
     # peak nodes (other BDD)
-    t, peak_nodes = utils.get_signal('other_peak_nodes', data)
+    t, peak_nodes = utils.get_signal('b3_peak_nodes', data)
     t = t - t_min
     plt.plot(t, peak_nodes, 'r--o', label='Peak nodes (2)',
              markevery=max(int(len(t) / n_markers), 1))
@@ -435,7 +435,7 @@ def plot_single_experiment(details_file, fig_file):
     plt.plot(t, y, label='BDD 1')
     # uptime ratio (other BDD)
     ax = plt.subplot(n, 1, 2)
-    t, reordering_time = utils.get_signal('other_reordering_time', data)
+    t, reordering_time = utils.get_signal('b3_reordering_time', data)
     t_min_other = t[0]
     t_other = t - t_min_other
     y = reordering_time / t_other
