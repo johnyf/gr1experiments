@@ -422,8 +422,8 @@ def construct_streett_transducer(z, aut):
     # env lost ?
     # transducer = transducer | ~ env_action_2
     t.action['sys'] = [transducer]
-    n = len(transducer)
-    print('Transducer BDD: {n} nodes'.format(n=n))
+    n_nodes = len(transducer)
+    print('Transducer BDD: {n} nodes'.format(n=n_nodes))
     log_bdd(bdd, '')
     log_bdd(b3, 'b3_')
     log_event(make_transducer_end=True)
