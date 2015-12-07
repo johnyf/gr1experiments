@@ -29,13 +29,6 @@ def snapshot_versions():
             d_old = json.load(f)
     except IOError:
         d_old = None
-    # get SHA
-    paths = [
-        '~/github/omega']
-    d = dict()
-    for path in paths:
-        sha = git_version(path)
-        d[path] = sha
     # slugs binary version
     cmd = ['slugs', '--version']
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -44,6 +37,7 @@ def snapshot_versions():
         print(p.returncode)
         raise Exception('`slugs` not found on path')
     slugs_version = p.stdout.read().strip()
+    d = dict()
     d['slugs'] = slugs_version
     # versions of python packages
     packages = [
