@@ -60,7 +60,10 @@ def snapshot_versions():
     compare.append('slugs')
     if d_old is not None:
         for k in compare:
-            assert d[k] == d_old[k]
+            assert (
+                d[k] == d_old[k],
+                'versions differ from {cfg}'.format(
+                    cfg=CONFIG_FILE))
     # dump
     with open(CONFIG_FILE, 'w') as f:
         json.dump(d, f, indent=4)
