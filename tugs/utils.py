@@ -89,12 +89,17 @@ def load_log_file(fname):
         for line in f:
             if "'time'" not in line:
                 continue
-            # repr
-            d = eval(line)
-            split_data(d, data)
+            try:
+                d = eval(line)
+                split_data(d, data)
+            except:
+                continue
     for k, v in data.iteritems():
         for q, r in v.iteritems():
-            data[k][q] = np.array(r, dtype=float)
+            try:
+                data[k][q] = np.array(r, dtype=float)
+            except:
+                pass
     return data
 
 
