@@ -65,11 +65,11 @@ def solve_game(s, win_set_fname=None):
     log_bdd(bdd)
     if win_set_fname is None:
         z = compute_winning_set(aut)
+        dump_winning_set(z, bdd)
     else:
         z = _bdd.load(win_set_fname, bdd)
     log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
-    dump_winning_set(z, bdd)
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
     del z
