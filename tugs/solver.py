@@ -319,10 +319,8 @@ def construct_streett_transducer(z, aut):
         y = bdd.false
         yold = None
         # for strategy construction
-        covered = bdd.false
-        # transducer = bdd.false
-        all_paths = list()
-        all_rims = list()
+        covered = b3.false
+        transducer = b3.false
         while y != yold:
             log.debug('Start Y iteration')
             yold = y
@@ -356,42 +354,21 @@ def construct_streett_transducer(z, aut):
                 # in `b3`
                 log.info('transfer `paths` to `b3`')
                 paths = _bdd.copy_bdd(paths, bdd, b3)
+                new = _bdd.copy_bdd(new, bdd, b3)
                 log.info('done transferring')
-                all_paths.append(paths)
-                del paths
                 rim = new & ~ covered
-                log.info('transfer `rim` to `b3`')
-                rim = _bdd.copy_bdd(rim, bdd, b3)
-                log.info('done transferring')
-                all_rims.append(rim)
-                del rim
                 covered = covered | new
                 del new
-                # rim = new & ~ covered
-                # covered = covered | new
-                # del new
-                # rim = rim & paths
-                # del paths
-                # transducer = transducer | rim
-                # del rim
+                rim = rim & paths
+                del paths
+                transducer = transducer | rim
+                del rim
             y = good
             del good
         log.debug('Reached Y fixpoint (Y = Z)')
         assert y == z, (y, z)
         del y, yold, covered
         log_bdd(b3, 'b3_')
-        # conjoin `rim & paths`
-        res = list()
-        for k, (p, q) in enumerate(zip(all_paths, all_rims)):
-            log.debug('conjoin pair {k}'.format(k=k))
-            log_bdd(b3, name='b3_')
-            res.append(p & q)
-        del all_paths
-        del all_rims
-        del p, q
-        transducer = syntax.recurse_binary(disj, res)
-        log_bdd(b3, 'b3_')
-        log.info('done with this transducer')
         # make transducer
         goal = _bdd.copy_bdd(goal, bdd, b3)
         e = '{c} = {j}'.format(c=COUNTER, j=j)
