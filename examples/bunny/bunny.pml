@@ -1,6 +1,7 @@
 #define H 3
+#define W 2
 
-free env int(1, H - 1) xt;
+free env int(1, W) xt;
 env int(0, H) yt;
 
 assume env proctype taz(){
