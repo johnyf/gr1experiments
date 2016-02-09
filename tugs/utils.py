@@ -25,14 +25,8 @@ def git_version(path):
     return sha + ('-dirty' if dirty else '')
 
 
-def snapshot_versions():
+def snapshot_versions(check=True):
     """Log versions of software used."""
-    # existing log ?
-    try:
-        with open(CONFIG_FILE, 'r') as f:
-            d_old = json.load(f)
-    except IOError:
-        d_old = None
     # slugs binary version
     cmd = ['slugs', '--version']
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -53,6 +47,14 @@ def snapshot_versions():
     t_now = time.strftime('%Y-%b-%d-%A-%T-%Z')
     d['time'] = t_now
     d['platform'] = os.uname()
+    if not check:
+        return
+    # existing log ?
+    try:
+        with open(CONFIG_FILE, 'r') as f:
+            d_old = json.load(f)
+    except IOError:
+        d_old = None
     # check versions
     compare = list(packages)
     compare.append('slugs')
