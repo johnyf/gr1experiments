@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Dump instances for SYTN'15, in Promela and SlugsIn."""
+"""Dump instances for SYNT'15, in Promela and SlugsIn."""
 import argparse
 import pprint
 import logging
