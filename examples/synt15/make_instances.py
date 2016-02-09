@@ -9,8 +9,8 @@ from tugs import utils
 
 log = logging.getLogger(__name__)
 INPUT_FILE = 'amba_conj.pml'
-PROMELA_PATH = 'pml/synt15_{i}_masters.txt'
-SLUGSIN_PATH = 'slugsin/synt15_{i}_masters.txt'
+PROMELA_PATH = 'pml/synt15_{i}.txt'
+SLUGSIN_PATH = 'slugsin/synt15_{i}.txt'
 N = 2
 M = 17
 

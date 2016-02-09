@@ -8,8 +8,8 @@ import amba_generator
 
 
 log = logging.getLogger(__name__)
-PROMELA_PATH = 'pml/jcss12_{i}_masters.txt'
-SLUGSIN_PATH = 'slugsin/jcss12_{i}_masters.txt'
+PROMELA_PATH = 'pml/jcss12_{i}.txt'
+SLUGSIN_PATH = 'slugsin/jcss12_{i}.txt'
 N = 2
 M = 17
 
