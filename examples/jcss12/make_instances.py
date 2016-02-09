@@ -4,7 +4,7 @@ import argparse
 import pprint
 import logging
 from tugs import utils
-from . import amba_generator
+import amba_generator
 
 
 log = logging.getLogger(__name__)
