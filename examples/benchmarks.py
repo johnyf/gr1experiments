@@ -4,13 +4,14 @@ import argparse
 import datetime
 import pprint
 import logging
+import multiprocessing as mp
+import os
 import shutil
 import sys
 import time
 from dd import cudd
 from omega.logic import bitvector as bv
 from omega.symbolic import symbolic
-from openpromela import logic
 from openpromela import slugs
 import psutil
 from tugs import solver
@@ -25,112 +26,137 @@ N = 2
 M = 17
 
 
-def run_slugs(args):
+def run_parallel():
+    slugsin_path = 'synt15/slugsin/synt15_{i}_masters.txt'
+    details_path = 'synt15/runs/details_{i}.txt'
+    n_cpus = psutil.cpu_count()
+    all_cpus = set(range(n_cpus))
+    n = 44
+    m = n + n_cpus
+    group_1 = list()
+    for i in xrange(n, m):
+        slugsin_file = slugsin_path.format(i=i)
+        details_file = details_path.format(i=i)
+        group_1.append([slugsin_file, details_file])
+    n = m
+    m = n + n_cpus
+    group_2 = list()
+    for i in xrange(n, m):
+        slugsin_file = slugsin_path.format(i=i)
+        details_file = details_path.format(i=i)
+        group_2.append([slugsin_file, details_file])
+    for file_pairs in zip(group_1, group_2):
+        procs = list()
+        name = os.path.split(slugsin_file)
+        for slugsin_file, details_file in file_pairs:
+            cpu = all_cpus.pop()
+            affinity = [cpu]
+            kw = dict(slugsin_file=slugsin_file,
+                      details_file=details_file,
+                      affinity=affinity)
+            p = mp.Process(target=run_gr1x,
+                           name=name,
+                           kwargs=kw)
+            print('spawn: {f}'.format(f=slugsin_file))
+            p.start()
+            procs.append(p)
+        for p in procs:
+            p.join()
+            print('joined')
+
+
+def run_slugs(slugsin_file, strategy_file,
+              psutil_file, details_file, affinity=None):
     """Run `slugs` for a range of AMBA spec instances."""
-    n = args.min
-    m = args.max + 1
+    print('Starting: {fname}'.format(fname=slugsin_file))
     # config logging
-    level = args.debug
+    level = logging.DEBUG
     loggers = ['openpromela.slugs']
     for logname in loggers:
         log = logging.getLogger(logname)
         log.setLevel(level)
     # capture execution environment
-    utils.snapshot_versions()
+    versions = utils.snapshot_versions(check=False)
+    log.info(pprint.pformat(versions))
+    h_psutil = utils.add_logfile(psutil_file, 'openpromela.slugs')
     # run
-    psutil_file = 'psutil.txt'
-    details_file = 'details.txt'
-    for i in xrange(n, m):
-        print('starting {i} masters...'.format(i=i))
-        bdd_file = 'bdd_{i}_masters.txt'.format(i=i)
-        # log
-        h_psutil = utils.add_logfile(psutil_file, 'openpromela.slugs')
-        # run
-        t0 = time.time()
-        code = generate_code(i)
-        r = logic.synthesize(code, symbolic=True, filename=bdd_file)
-        t1 = time.time()
-        dt = datetime.timedelta(seconds=t1 - t0)
-        # close log files
-        utils.close_logfile(h_psutil, 'openpromela.slugs')
-        assert r is not None, 'NOT REALISABLE !!!'
-        print('Done with {i} masters in {dt}.'.format(i=i, dt=dt))
-        # copy log file
-        i_psutil_file = 'log_{i}_masters.txt'.format(i=i)
-        i_details_file = 'details_{i}_masters.txt'.format(i=i)
-        shutil.copy(psutil_file, i_psutil_file)
-        shutil.copy(details_file, i_details_file)
+    t0 = time.time()
+    symb = True
+    r = slugs._call_slugs(slugsin_file, symb, strategy_file)
+    t1 = time.time()
+    dt = datetime.timedelta(seconds=t1 - t0)
+    # close log files
+    utils.close_logfile(h_psutil, 'openpromela.slugs')
+    assert r is not None, 'NOT REALISABLE !!!'
+    print('Done with: {fname} in {dt}'.format(
+        fname=slugsin_file, dt=dt))
+    shutil.copy('details_file.txt', details_file)
 
 
-def run_gr1x(args):
+def run_gr1x(slugsin_file, details_file, affinity=None):
     """Run `gr1x` for a range of AMBA spec instances."""
-    n = args.min
-    m = args.max + 1
-    level = args.debug
+    print('Starting: {fname}'.format(fname=slugsin_file))
+    proc = psutil.Process()
+    print('PID: {pid}'.format(pid=proc.pid))
+    aff = proc.cpu_affinity()
+    print('Affinity before: {aff}'.format(aff=aff))
+    proc.cpu_affinity(affinity)
+    aff = proc.cpu_affinity()
+    print('Affinity after set: {aff}'.format(aff=aff))
     # capture execution environment
-    versions = utils.snapshot_versions()
+    versions = utils.snapshot_versions(check=False)
     # config log
+    level = logging.DEBUG
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
-    for i in xrange(n, m):
-        print('starting {i} masters...'.format(i=i))
-        # setup log
-        details_log = 'details_{i}_masters.txt'.format(i=i)
-        h = logging.FileHandler(details_log, mode='w')
-        h.setLevel(level)
-        log = logging.getLogger(GR1X_LOG)
-        log.addHandler(h)
-        log.info(pprint.pformat(versions))
-        # synthesize
-        code = generate_code(i)
-        t0 = time.time()
-        spec = logic.compile_spec(code)
-        aut = slugs._symbolic._bitblast(spec)
-        s = slugs._to_slugs(aut)
-        solver.solve_game(s)
-        # TODO: dump symbolic strategy
-        # TODO: model check dumped strategy
-        t1 = time.time()
-        dt = datetime.timedelta(seconds=t1 - t0)
-        print('Done synthesizing {i} masters in {dt}.'.format(
-            i=i, dt=dt))
-        # close log file
-        log = logging.getLogger(GR1X_LOG)
-        log.removeHandler(h)
-        h.close()
-        sys.stdout.flush()
+    # setup log
+    h = logging.FileHandler(details_file, mode='w')
+    h.setLevel(level)
+    log = logging.getLogger(GR1X_LOG)
+    log.addHandler(h)
+    log.info(pprint.pformat(versions))
+    # synthesize
+    with open(slugsin_file, 'r') as f:
+        s = f.read()
+    t0 = time.time()
+    solver.solve_game(s)
+    # TODO: dump symbolic strategy
+    # TODO: model check dumped strategy
+    t1 = time.time()
+    dt = datetime.timedelta(seconds=t1 - t0)
+    print('Done with: {fname} in {dt}'.format(
+        fname=slugsin_file, dt=dt))
+    # close log file
+    log = logging.getLogger(GR1X_LOG)
+    log.removeHandler(h)
+    h.close()
+    sys.stdout.flush()
 
 
-def run_gr1x_slugs_comparison(args):
+def run_gr1x_slugs_comparison(slugsin_file):
     """Check that both solvers return same winning set."""
+    print('compare for: {f}'.format(f=slugsin_file))
     slugs_winning_set_file = 'winning_set_bdd.txt'
     slugs_strategy_file = 'slugs_strategy.txt'
     gr1x_strategy_file = 'gr1x_strategy.txt'
-    n = args.min
-    m = args.max + 1
     utils.snapshot_versions()
-    for i in xrange(n, m):
-        print('start {i} masters...'.format(i=i))
-        # translate to slugsin
-        code = generate_code(i)
-        spec = logic.compile_spec(code)
-        aut = slugs._symbolic._bitblast(spec)
-        slugsin = slugs._to_slugs(aut)
-        # call gr1x
-        d = solver.parse_slugsin(slugsin)
-        bdd = cudd.BDD()
-        aut = solver.make_automaton(d, bdd)
-        z = solver.compute_winning_set(aut)
-        t = solver.construct_streett_transducer(z, aut)
-        t.bdd.dump(t.action['sys'][0], gr1x_strategy_file)
-        # call slugs
-        logic.synthesize(code, symbolic=True,
-                         filename=slugs_strategy_file)
-        # compare
-        z_ = bdd.load(slugs_winning_set_file)
-        assert z == z_, (z, z_)
-        compare_strategies(
-            slugsin, slugs_strategy_file, gr1x_strategy_file)
+    # call gr1x
+    with open('slugsin_file', 'r') as f:
+        slugsin = f.read()
+    d = solver.parse_slugsin(slugsin)
+    bdd = cudd.BDD()
+    aut = solver.make_automaton(d, bdd)
+    z = solver.compute_winning_set(aut)
+    t = solver.construct_streett_transducer(z, aut)
+    t.bdd.dump(t.action['sys'][0], gr1x_strategy_file)
+    # call slugs
+    symb = True
+    slugs._call_slugs(slugsin_file, symb, slugs_strategy_file)
+    # compare
+    z_ = bdd.load(slugs_winning_set_file)
+    assert z == z_, (z, z_)
+    compare_strategies(
+        slugsin, slugs_strategy_file, gr1x_strategy_file)
 
 
 def compare_strategies(s, slugs_file, gr1x_file):
@@ -170,30 +196,6 @@ def compare_strategies(s, slugs_file, gr1x_file):
     print('-- done comparing strategies')
 
 
-def generate_code(i):
-    # check if other users
-    users = psutil.users()
-    if len(users) > 1:
-        print('warning: other users logged in'
-              '(may start running expensive jobs).')
-    s = load_jcss12_amba_code(i)
-    return s
-
-
-def load_test():
-    fname = 'test.pml'
-    with open(fname, 'r') as f:
-        s = f.read()
-    return s
-
-
-def load_jcss12_amba_code(i):
-    fname = 'jcss12/amba_{i}.txt'.format(i=i)
-    with open(fname, 'r') as f:
-        s = f.read()
-    return s
-
-
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--min', default=N, type=int,
@@ -202,8 +204,6 @@ def main():
                    help='to this # of masters')
     p.add_argument('--debug', type=int, default=logging.ERROR,
                    help='python logging level')
-    p.add_argument('--run', default=False, action='store_true',
-                   help='synthesize')
     p.add_argument('--repeat', default=1, type=int,
                    help='multiple runs from min to max')
     p.add_argument('--solver', default='slugs', type=str,
@@ -212,18 +212,19 @@ def main():
     # multiple runs should be w/o plots
     assert args.repeat == 1 or not args.plot
     # multiple runs
-    if args.run:
-        for i in xrange(args.repeat):
-            print('run: {i}'.format(i=i))
-            if args.solver == 'slugs':
-                run_slugs(args)
-            elif args.solver == 'gr1x':
-                run_gr1x(args)
-            elif args.solver == 'compare':
-                run_gr1x_slugs_comparison(args)
-            else:
-                raise Exception(
-                    'unknown solver: {s}'.format(s=args.solver))
+    run_parallel()
+    return
+    for i in xrange(args.repeat):
+        print('run: {i}'.format(i=i))
+        if args.solver == 'slugs':
+            run_slugs(args)
+        elif args.solver == 'gr1x':
+            run_gr1x(args)
+        elif args.solver == 'compare':
+            run_gr1x_slugs_comparison(args)
+        else:
+            raise Exception(
+                'unknown solver: {s}'.format(s=args.solver))
 
 
 if __name__ == '__main__':
