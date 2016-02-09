@@ -42,9 +42,11 @@ def main():
     total_rss_str = humanize.naturalsize(total_rss)
     total_vms = sum(vms_all)
     total_vms_str = humanize.naturalsize(total_vms)
+    n = len(rss_all)
     total_memory = psutil.virtual_memory().total
     total_memory_str = humanize.naturalsize(total_memory)
     print('\n' + 60 * '-')
+    print('found {n} instances of "{p}"'.format(n=n, p=name))
     print('total RSS: {m}'.format(m=total_rss_str))
     print('total VMS: {m}'.format(m=total_vms_str))
     print('total memory: {m}'.format(m=total_memory_str))
