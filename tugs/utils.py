@@ -39,7 +39,7 @@ def snapshot_versions():
     p.wait()
     if p.returncode != 0:
         print(p.returncode)
-        raise Exception('`slugs` not found on path')
+        print('Warning: `slugs` not found on path')
     slugs_version = p.stdout.read().strip()
     d = dict()
     d['slugs'] = slugs_version
