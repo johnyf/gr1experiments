@@ -9,7 +9,6 @@ from itertools import cycle
 import pickle
 import pprint
 import logging
-import re
 import shutil
 import sys
 import time
@@ -191,7 +190,6 @@ def generate_code(i):
         print('warning: other users logged in'
               '(may start running expensive jobs).')
     s = load_jcss12_amba_code(i)
-    # s = load_test()
     return s
 
 
@@ -200,28 +198,6 @@ def load_test():
     with open(fname, 'r') as f:
         s = f.read()
     return s
-
-
-def load_synt15_amba_code(i):
-    """Form open Promela code for AMBA instance with `i` masters."""
-    fname = INPUT_FILE
-    with open(fname, 'r') as f:
-        s = f.read()
-    # set number of masters
-    j = i - 1
-    newline = '#define N {j}'.format(j=j)
-    code = re.sub('#define N.*', newline, s)
-    # add multiple weak fairness assumptions
-    code += form_progress(i)
-    return code
-
-
-def form_progress(i):
-    """Return conjunction of LTL formulae for progress."""
-    prog = ' && '.join(
-        '[]<>(request[{k}] -> (master == {k}))'.format(k=k)
-        for k in xrange(i))
-    return 'assert ltl { ' + prog + ' }'
 
 
 def load_jcss12_amba_code(i):

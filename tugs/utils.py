@@ -1,4 +1,5 @@
 """Parsing of signal logs from experiments, and version logging."""
+import datetime
 import importlib
 import json
 import logging
@@ -7,6 +8,9 @@ import subprocess
 import time
 import git
 import numpy as np
+# these should be moved to other (optional) module
+from openpromela import logic
+from openpromela import slugs
 
 
 logger = logging.getLogger(__name__)
@@ -124,3 +128,15 @@ def inspect_data(data):
         t = data[k]['time']
         v = data[k]['value']
         print(k, len(t), len(v))
+
+
+def translate_promela_to_slugsin(code):
+    """Return SlugsIn code from Promela `code`."""
+    t0 = time.time()
+    spec = logic.compile_spec(code)
+    aut = slugs._symbolic._bitblast(spec)
+    s = slugs._to_slugs(aut)
+    t1 = time.time()
+    dt = datetime.timedelta(seconds=t1 - t0)
+    print('translated Promela -> SlugsIn in {dt}.'.format(dt=dt))
+    return s
