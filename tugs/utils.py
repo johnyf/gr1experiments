@@ -138,5 +138,5 @@ def translate_promela_to_slugsin(code):
     s = slugs._to_slugs(aut)
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
-    print('translated Promela -> SlugsIn in {dt}.'.format(dt=dt))
+    logger.info('translated Promela -> SlugsIn in {dt}.'.format(dt=dt))
     return s

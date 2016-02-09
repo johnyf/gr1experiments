@@ -23,8 +23,8 @@ def dump_promela(n, m):
         promela_file = PROMELA_PATH.format(i=i)
         with open(promela_file, 'w') as f:
             f.write(code)
-        print('dumped Promela for {i} masters'.format(i=i))
         # log.info(pprint.pformat(versions))
+        log.info('dumped Promela for {i} masters'.format(i=i))
 
 
 def dump_slugsin(n, m):
@@ -36,7 +36,7 @@ def dump_slugsin(n, m):
         slugsin_file = SLUGSIN_PATH.format(i=i)
         with open(slugsin_file, 'w') as f:
             f.write(slugsin_code)
-        print('dumped SlugsIn for {i} masters'.format(i=i))
+        log.info('dumped SlugsIn for {i} masters'.format(i=i))
 
 
 def make_synt15_promela(n):
@@ -62,6 +62,15 @@ def form_progress(n):
 
 
 def main():
+    # log
+    fh = logging.FileHandler('code_generator_log.txt', mode='w')
+    log.addHandler(fh)
+    log.setLevel(logging.DEBUG)
+    # tugs log
+    log1 = logging.getLogger('tugs.utils')
+    log1.addHandler(fh)
+    log1.setLevel(logging.DEBUG)
+    # args
     p = argparse.ArgumentParser()
     p.add_argument('--min', default=N, type=int,
                    help='from this # of masters')
