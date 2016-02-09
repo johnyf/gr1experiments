@@ -27,37 +27,50 @@ M = 17
 
 
 def run_parallel():
-    slugsin_path = 'synt15/slugsin/synt15_{i}_masters.txt'
-    details_path = 'synt15/runs/details_{i}.txt'
+    problem = 'synt15'
+    i_str = '{i}'
+    slugsin_path = '{problem}/slugsin/{problem}_{i}.txt'.format(
+        problem=problem, i=i_str)
+    details_path = '{problem}/runs_slugs/details_{i}.txt'.format(
+        problem=problem, i=i_str)
+    strategy_path = '{problem}/runs_slugs/strategy.txt'.format(
+        problem=problem, i=i_str)
+    psutil_path = '{problem}/runs_slugs/psutil_{i}.txt'.format(
+        problem=problem, i=i_str)
     n_cpus = psutil.cpu_count()
-    all_cpus = set(range(n_cpus))
-    n = 44
+    n = 34
     m = n + n_cpus
     group_1 = list()
     for i in xrange(n, m):
-        slugsin_file = slugsin_path.format(i=i)
-        details_file = details_path.format(i=i)
-        group_1.append([slugsin_file, details_file])
+        d = dict(
+            slugsin_file=slugsin_path.format(i=i),
+            details_file=details_path.format(i=i),
+            strategy_file=strategy_path,
+            psutil_file=psutil_path.format(i=i))
+        group_1.append(d)
     n = m
     m = n + n_cpus
     group_2 = list()
     for i in xrange(n, m):
-        slugsin_file = slugsin_path.format(i=i)
-        details_file = details_path.format(i=i)
-        group_2.append([slugsin_file, details_file])
-    for file_pairs in zip(group_1, group_2):
+        d = dict(
+            slugsin_file=slugsin_path.format(i=i),
+            details_file=details_path.format(i=i),
+            strategy_file=strategy_path,
+            psutil_file=psutil_path.format(i=i))
+        group_2.append(d)
+    # multiple groups in parallel
+    # for file_pairs in zip(group_1, group_2):
+    # target = run_gr1x
+    target = run_slugs
+    for file_pairs in [group_1]:
         procs = list()
-        name = os.path.split(slugsin_file)
-        for slugsin_file, details_file in file_pairs:
+        all_cpus = set(range(n_cpus))
+        for d in file_pairs:
             cpu = all_cpus.pop()
             affinity = [cpu]
-            kw = dict(slugsin_file=slugsin_file,
-                      details_file=details_file,
-                      affinity=affinity)
-            p = mp.Process(target=run_gr1x,
-                           name=name,
-                           kwargs=kw)
-            print('spawn: {f}'.format(f=slugsin_file))
+            d['affinity'] = affinity
+            p = mp.Process(target=target, kwargs=d)
+            print('spawn: {f}'.format(f=d['slugsin_file']))
             p.start()
             procs.append(p)
         for p in procs:
@@ -90,7 +103,7 @@ def run_slugs(slugsin_file, strategy_file,
     assert r is not None, 'NOT REALISABLE !!!'
     print('Done with: {fname} in {dt}'.format(
         fname=slugsin_file, dt=dt))
-    shutil.copy('details_file.txt', details_file)
+    shutil.copy('details.txt', details_file)
 
 
 def run_gr1x(slugsin_file, details_file, affinity=None):
