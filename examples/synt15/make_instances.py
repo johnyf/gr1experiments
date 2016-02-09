@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Dump instances for SYTN'15, in Promela and SlugsIn."""
 import argparse
-# import pprint
+import pprint
 import logging
 import re
 from tugs import utils
@@ -17,13 +17,11 @@ M = 17
 
 def dump_promela(n, m):
     """Dump instances of Promela for SYNT'15."""
-    # versions = utils.snapshot_versions()
     for i in xrange(n, m):
         code = make_synt15_promela(i)
         promela_file = PROMELA_PATH.format(i=i)
         with open(promela_file, 'w') as f:
             f.write(code)
-        # log.info(pprint.pformat(versions))
         log.info('dumped Promela for {i} masters'.format(i=i))
 
 
@@ -70,6 +68,9 @@ def main():
     log1 = logging.getLogger('tugs.utils')
     log1.addHandler(fh)
     log1.setLevel(logging.DEBUG)
+    # record env
+    versions = utils.snapshot_versions()
+    log.info(pprint.pformat(versions))
     # args
     p = argparse.ArgumentParser()
     p.add_argument('--min', default=N, type=int,
