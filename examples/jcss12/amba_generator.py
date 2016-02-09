@@ -327,15 +327,6 @@ def generate_spec(num_masters, use_ba):
         sys_fairness += ' & ' + fairness
         ba_fairness = ''
     ###############################################
-    # dump smv
-    prefix = 'amba'
-    if use_ba:
-        post = '_merged'
-    else:
-        post = ''
-    # dump formula
-    fname = '{s}_{i}{post}.txt'.format(s=prefix, i=num_masters, post=post)
-    f = open(fname, 'w')
     ltl = [
         'assume ltl {',
         conj(env_initial, sep='\n'),
@@ -358,8 +349,7 @@ def generate_spec(num_masters, use_ba):
     s = s.replace('=', '==')
     s = s.replace('&', '&&')
     s = s.replace('|', '||')
-    f.write(s)
-    f.close()
+    return s
 
 
 def recurse_fairness(i, num_masters, master_bits, template):
@@ -376,8 +366,15 @@ def recurse_fairness(i, num_masters, master_bits, template):
 
 
 def dump_range_of_specs(n, m, use_ba):
+    name = 'jcss12_{i}_masters'
+    if use_ba:
+        name += '_merged'
+    name += '.txt'
     for i in xrange(n, m + 1):
-        generate_spec(i, use_ba)
+        pml = generate_spec(i, use_ba)
+        fname = name.format(i=i)
+        with open(fname, 'w') as f:
+            f.write(pml)
 
 
 def main():
