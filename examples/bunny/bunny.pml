@@ -1,6 +1,6 @@
 #define H 3
 
-free env int(1, 2) xt;
+free env int(1, H - 1) xt;
 env int(0, H) yt;
 
 assume env proctype taz(){
@@ -13,7 +13,7 @@ assume env proctype taz(){
 
 assume ltl { []<>(yt == 0) }
 
-sys int(0, 3) x;
+sys int(0, H) x;
 sys int(0, H) y;
 
 assert sys proctype bunny(){
@@ -30,4 +30,4 @@ assert ltl {
     [] ! ((x == xt) && (y == yt)) &&
     /* [] ! --X ((xt' == x ) && (yt' == y )) && */
     [] -X ! ((xt' == x) && (yt' == y)) &&
-    []<>((x == 3) && (y == 1)) }
+    []<>((x == H) && (y == 1)) }
