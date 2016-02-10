@@ -32,10 +32,6 @@ INIT_CACHE = 2**18
 
 # TODO:
 #
-# 2. implement `slugs` algorithm in Cython
-#
-# 3. compare 2 to `slugs`
-#
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # use a CUDD map for repeated renaming
