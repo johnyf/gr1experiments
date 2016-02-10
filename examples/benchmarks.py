@@ -98,6 +98,7 @@ def run_slugs(slugsin_file, strategy_file,
         filename=slugsin_file,
         symbolic=False,
         strategy_file=strategy_file,
+        affinity=affinity,
         logfile=details_file)
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
