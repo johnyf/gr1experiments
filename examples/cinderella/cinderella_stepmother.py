@@ -9,24 +9,25 @@ TEMPLATE = """\
 # {comment}
 
 [INPUT]
-%(inLines)s
+{inLines}
 
 [OUTPUT]
-%(outLines)s
-e:0...%(nofBucketsMinusOne)d
-
-[ENV_TRANS]
-%(stepMotherRestrictionLine)s
+{outLines}
+e:0...{nofBucketsMinusOne}
 
 [ENV_INIT]
-%(envInit)s
+{envInit}
+
+[ENV_TRANS]
+{stepMotherRestrictionLine}
+
 
 [SYS_INIT]
-%(sysInit)s
+{sysInit}
 
 [SYS_TRANS]
-%(sysTransA)s
-%(sysTransB)s
+{sysTransA}
+{sysTransB}
 
 """
 # ==================================
