@@ -27,16 +27,19 @@ M = 17
 
 
 def run_parallel():
-    problem = 'synt15'
+    problem = 'bunny'
+    output = 'runs_slugs'
+    # target = run_gr1x
+    target = run_slugs
     i_str = '{i}'
     slugsin_path = '{problem}/slugsin/{problem}_{i}.txt'.format(
         problem=problem, i=i_str)
-    details_path = '{problem}/runs_slugs/details_{i}.txt'.format(
-        problem=problem, i=i_str)
-    strategy_path = '{problem}/runs_slugs/strategy.txt'.format(
-        problem=problem, i=i_str)
-    psutil_path = '{problem}/runs_slugs/psutil_{i}.txt'.format(
-        problem=problem, i=i_str)
+    details_path = '{problem}/{output}/details_{i}.txt'.format(
+        problem=problem, output=output, i=i_str)
+    strategy_path = '{problem}/{output}/strategy.txt'.format(
+        problem=problem, output=output, i=i_str)
+    psutil_path = '{problem}/{output}/psutil_{i}.txt'.format(
+        problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count()
     n = 34
     m = n + n_cpus
@@ -60,8 +63,6 @@ def run_parallel():
         group_2.append(d)
     # multiple groups in parallel
     # for file_pairs in zip(group_1, group_2):
-    # target = run_gr1x
-    target = run_slugs
     for file_pairs in [group_1]:
         procs = list()
         all_cpus = set(range(n_cpus))
