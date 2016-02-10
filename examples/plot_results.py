@@ -79,16 +79,16 @@ def plot_trends_for_experiments(args):
         # peak nodes 0
         p = data['peak_nodes']['value'][-1]
         peak_nodes_0.append(p)
-        if 'other_reordering_time' in data:
+        if 'b3_reordering_time' in data:
             # uptime BDD 1
-            rt = data['other_reordering_time']['value'][-1]
+            rt = data['b3_reordering_time']['value'][-1]
             r = rt / t_make
             upratio_1.append(r)
             # total nodes 1
-            tn = data['other_total_nodes']['value'][-1]
+            tn = data['b3_total_nodes']['value'][-1]
             total_nodes_1.append(tn)
             # peak nodes 1
-            p = data['other_peak_nodes']['value'][-1]
+            p = data['b3_peak_nodes']['value'][-1]
             peak_nodes_1.append(p)
             bdd2 = True
         else:
