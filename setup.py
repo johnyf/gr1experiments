@@ -19,7 +19,11 @@ VERSION_TEXT = (
     "version = '{version}'\n")
 install_requires = [
     'dd >= 0.2.0',
-    'omega >= 0.0.3']
+    'humanize >= 0.5.1',
+    'natsort >= 4.0.4',
+    'omega >= 0.0.3',
+    'openpromela >= 0.0.3',
+    'psutil >= 3.4.2']
 tests_require = [
     'nose >= 1.3.4']
 
