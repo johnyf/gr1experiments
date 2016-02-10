@@ -94,8 +94,11 @@ def run_slugs(slugsin_file, strategy_file,
     h_psutil = utils.add_logfile(psutil_file, 'openpromela.slugs')
     # run
     t0 = time.time()
-    symb = True
-    r = slugs._call_slugs(slugsin_file, symb, strategy_file)
+    r = slugs._call_slugs(
+        filename=slugsin_file,
+        symbolic=False,
+        strategy_file=strategy_file,
+        logfile=details_file)
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
     # close log files
@@ -103,7 +106,6 @@ def run_slugs(slugsin_file, strategy_file,
     assert r is not None, 'NOT REALISABLE !!!'
     print('Done with: {fname} in {dt}'.format(
         fname=slugsin_file, dt=dt))
-    shutil.copy('details.txt', details_file)
 
 
 def run_gr1x(slugsin_file, details_file, affinity=None):
