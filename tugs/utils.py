@@ -4,6 +4,7 @@ import importlib
 import json
 import logging
 import os
+import pprint
 import subprocess
 import time
 import git
@@ -61,8 +62,13 @@ def snapshot_versions(check=True):
     if d_old is not None:
         for k in compare:
             assert d[k] == d_old[k], (
-                'versions differ from {cfg}'.format(
-                    cfg=CONFIG_FILE))
+                ('versions differ from {cfg}:\n\n'
+                 'NEW: {d}'
+                 '\n -----\n\n'
+                 'OLD: {d_old}').format(
+                    cfg=CONFIG_FILE,
+                    d=pprint.pformat(d),
+                    d_old=pprint.pformat(d_old)))
     # dump
     with open(CONFIG_FILE, 'w') as f:
         json.dump(d, f, indent=4)
