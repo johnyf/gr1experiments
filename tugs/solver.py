@@ -42,7 +42,8 @@ INIT_CACHE = 2**18
 
 
 @profile
-def solve_game(s, win_set_fname=None):
+def solve_game(s, load_win_set=False,
+               win_set_fname=None, strategy_fname=None):
     """Construct transducer for game in file `fname`.
 
     @param s: `str` in `slugs` syntax
@@ -57,11 +58,11 @@ def solve_game(s, win_set_fname=None):
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
     log_bdd(bdd)
-    if win_set_fname is None:
-        z = compute_winning_set(aut)
-        dump_winning_set(z, bdd)
-    else:
+    if load_win_set:
         z = _bdd.load(win_set_fname, bdd)
+    else:
+        z = compute_winning_set(aut)
+        dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
     assert z != bdd.false, 'unrealizable'
     t = construct_streett_transducer(z, aut)
@@ -69,8 +70,11 @@ def solve_game(s, win_set_fname=None):
     del z
 
 
-def dump_winning_set(z, bdd):
+def dump_winning_set(z, bdd, fname=None):
+    """Dump winning set BDD as DDDMP file."""
     log.debug('++ dump_winning_set')
+    if fname is None:
+        fname = WINNING_SET_FILE
     t0 = time.time()
     memory = 3 * GB
     b = _bdd.BDD(memory_estimate=memory)
@@ -79,7 +83,7 @@ def dump_winning_set(z, bdd):
     order = var_order(bdd)
     _bdd.reorder(b, order)
     u = _bdd.copy_bdd(z, bdd, b)
-    _bdd.dump(u, WINNING_SET_FILE, b)
+    _bdd.dump(u, fname, b)
     del u
     t1 = time.time()
     dt = t1 - t0
@@ -89,10 +93,13 @@ def dump_winning_set(z, bdd):
     log.debug('-- done dump_winning_set')
 
 
-def dump_strategy(t):
+def dump_strategy(t, fname=None):
+    """Dump strategy relation BDD as DDDMP file."""
+    if fname is None:
+        fname = STRATEGY_FILE
     t0 = time.time()
     action = t.action['sys'][0]
-    t.bdd.dump(action, STRATEGY_FILE)
+    t.bdd.dump(action, fname)
     t1 = time.time()
     dt = t1 - t0
     log.info(
