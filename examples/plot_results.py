@@ -23,7 +23,17 @@ N = 2
 M = 17
 
 
-def plot_trends_for_experiments(args):
+def plot_report():
+    paths = {
+        #'synt15/runs/': (2, 67),
+        'synt15/runs_slugs/': (2, 20),
+        #'bunny/runs/': (2, 97)
+    }
+    for path, (first, last) in paths.iteritems():
+        plot_vs_parameter(path, first, last)
+
+
+def plot_vs_parameter(path, first, last):
     """Plot time, ratios, BDD nodes over parameterized experiments.
 
       - time
@@ -32,8 +42,12 @@ def plot_trends_for_experiments(args):
       - total nodes
       - peak nodes
     """
-    n = args.min
-    m = args.max + 1
+    log_fname = '{path}details_{i}.txt'.format(
+        path=path, i='{i}')
+    fig_fname = '{path}stats.pdf'.format(path=path)
+    pickle_fname = '{path}data.pickle'.format(path=path)
+    n = first
+    m = last + 1
     fsz = 20
     tsz = 15
     n_masters = list()
@@ -46,13 +60,14 @@ def plot_trends_for_experiments(args):
     peak_nodes_0 = list()
     peak_nodes_1 = list()
     for i in xrange(n, m):
-        fname = 'details_{i}_masters.txt'.format(i=i)
+        fname = log_fname.format(i=i)
         try:
             data = utils.load_log_file(fname)
             n_masters.append(i)
             print('open "{fname}"'.format(fname=fname))
         except:
-            print('Skip: missing log file for {i} masters.'.format(i=i))
+            print('Skip: missing log file "{f}"'.format(
+                f=fname))
             continue
         # total time
         t0 = data['parse_slugsin']['time'][0]
@@ -153,28 +168,27 @@ def plot_trends_for_experiments(args):
     plt.ylabel('BDD Nodes', fontsize=fsz)
     plt.legend(loc='upper left')
     # save
-    fname = 'stats.pdf'
-    plt.savefig(fname, bbox_inches='tight')
+    plt.savefig(fig_fname, bbox_inches='tight')
     # dump
     d = dict(
         n_masters=n_masters,
         total_time=total_time,
         peak_nodes_0=peak_nodes_0,
         peak_nodes_1=peak_nodes_1)
-    with open('data.pickle', 'w') as f:
+    with open(pickle_fname, 'w') as f:
         pickle.dump(d, f)
 
 
-def plot_multiple_experiments(args):
+def plot_multiple_experiments_vs_time(args):
     n = args.min
     m = args.max + 1
     for i in xrange(n, m):
         log_fname = 'details_{i}_masters.txt'.format(i=i)
         fig_fname = 'details_{i}.pdf'.format(i=i)
-        plot_single_experiment(log_fname, fig_fname)
+        plot_single_experiment_vs_time(log_fname, fig_fname)
 
 
-def plot_single_experiment(details_file, fig_file):
+def plot_single_experiment_vs_time(details_file, fig_file):
     """Plot BDD node changes during an experiment.
 
     For each BDD manager:
@@ -260,9 +274,7 @@ def main():
     p.add_argument('--plot', action='store_true',
                    help='generate plots')
     args = p.parse_args()
-    if args.plot:
-        # plot_trends_for_experiments(args)
-        plot_multiple_experiments(args)
+    plot_report()
 
 
 if __name__ == '__main__':
