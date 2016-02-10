@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 """See what python scripts are running."""
+import datetime
 import psutil
 import humanize
 
 
 def main():
-    name = 'python'
+    name = 'slugs'
     rss_all = list()
     vms_all = list()
     for proc in psutil.process_iter():
@@ -16,6 +17,8 @@ def main():
         aff = proc.cpu_affinity()
         cpu100 = proc.cpu_percent()
         user, system = proc.cpu_times()
+        user_str = str(datetime.timedelta(seconds=user))
+        system_str = str(datetime.timedelta(seconds=system))
         rss, vms = proc.memory_info()
         rss_str = humanize.naturalsize(rss)
         vms_str = humanize.naturalsize(vms)
@@ -25,8 +28,8 @@ def main():
         info = [
             'CPU affinity: {aff}'.format(aff=aff),
             'CPU percent: {x}'.format(x=cpu100),
-            'user time: {t}'.format(t=user),
-            'system time: {t}'.format(t=system),
+            'user time: {t}'.format(t=user_str),
+            'system time: {t}'.format(t=system_str),
             'RSS: {m}'.format(m=rss_str),
             'VMS: {m}'.format(m=vms_str),
             'memory percent: {m}'.format(m=m100),
