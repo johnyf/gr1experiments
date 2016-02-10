@@ -21,6 +21,8 @@ e:0...{nofBucketsMinusOne}
 [ENV_TRANS]
 {stepMotherRestrictionLine}
 
+[ENV_LIVENESS]
+1
 
 [SYS_INIT]
 {sysInit}
@@ -28,6 +30,9 @@ e:0...{nofBucketsMinusOne}
 [SYS_TRANS]
 {sysTransA}
 {sysTransB}
+
+[SYS_LIVENESS]
+1
 
 """
 # ==================================
