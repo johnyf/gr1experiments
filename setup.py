@@ -38,7 +38,7 @@ def git_version(version):
         return ''
     sha = repo.head.commit.hexsha
     if repo.is_dirty():
-        return '.dev0+{sha}-dirty'.format(sha=sha)
+        return '.dev0+{sha}.dirty'.format(sha=sha)
     # commit is clean
     # is it release of `version` ?
     try:
