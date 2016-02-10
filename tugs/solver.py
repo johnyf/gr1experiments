@@ -64,7 +64,9 @@ def solve_game(s, load_win_set=False,
         z = compute_winning_set(aut)
         dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
-    assert z != bdd.false, 'unrealizable'
+    if z == bdd.false:
+        print('unrealizable')
+        return
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
     del z
