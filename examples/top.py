@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """See what python scripts are running."""
+import argparse
 import datetime
 import psutil
 import humanize
 
 
-def main():
-    name = 'slugs'
+def main(name):
     rss_all = list()
     vms_all = list()
     for proc in psutil.process_iter():
@@ -56,4 +56,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    p = argparse.ArgumentParser()
+    p.add_argument('name', default='python', type=str,
+                   help='program name', nargs='?')
+    args = p.parse_args()
+    main(args.name)
