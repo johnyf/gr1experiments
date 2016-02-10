@@ -52,13 +52,19 @@ def plot_vs_parameter(path, first, last):
     tsz = 15
     n_masters = list()
     total_time = list()
+    reordering_time_0 = list()
+    reordering_time_1 = list()
+    win_time = list()
     win_ratio = list()
+    win_dump_ratio = list()
+    strategy_dump_ratio = list()
     upratio_0 = list()
     upratio_1 = list()
     total_nodes_0 = list()
     total_nodes_1 = list()
     peak_nodes_0 = list()
     peak_nodes_1 = list()
+    transducer_nodes = list()
     for i in xrange(n, m):
         fname = log_fname.format(i=i)
         try:
@@ -80,14 +86,33 @@ def plot_vs_parameter(path, first, last):
         t_win = t1 - t0
         r = t_win / t
         win_ratio.append(r)
+        win_time.append(t_win)
+        # winning set dump time / total time
+        if 'dump_winning_set_start' in data:
+            t0 = data['dump_winning_set_start']['time'][0]
+            t1 = data['dump_winning_set_end']['time'][0]
+            t_dump_win = t1 - t0
+            r = t_dump_win / t
+            win_dump_ratio.append(r)
+        # strategy dump time / total time
+        if 'dump_strategy_start' in data:
+            t0 = data['dump_strategy_start']['time'][0]
+            t1 = data['dump_strategy_end']['time'][0]
+            t_dump_strategy = t1 - t0
+            r = t_dump_strategy / t
+            strategy_dump_ratio.append(r)
+        if 'transducer_nodes' in data:
+            x = data['transducer_nodes']['value'][-1]
+            transducer_nodes.append(x)
         # construction time
         t0 = data['make_transducer_start']['time'][0]
         t1 = data['make_transducer_end']['time'][0]
         t_make = t1 - t0
-        # uptime BDD 0
+        # reordering BDD 0
         rt = data['reordering_time']['value'][-1]
         r = rt / t
         upratio_0.append(r)
+        reordering_time_0.append(rt)
         # total nodes 0
         tn = data['total_nodes']['value'][-1]
         total_nodes_0.append(tn)
@@ -95,10 +120,11 @@ def plot_vs_parameter(path, first, last):
         p = data['peak_nodes']['value'][-1]
         peak_nodes_0.append(p)
         if 'b3_reordering_time' in data:
-            # uptime BDD 1
+            # reordering BDD 1
             rt = data['b3_reordering_time']['value'][-1]
             r = rt / t_make
             upratio_1.append(r)
+            reordering_time_1.append(r)
             # total nodes 1
             tn = data['b3_total_nodes']['value'][-1]
             total_nodes_1.append(tn)
@@ -111,13 +137,19 @@ def plot_vs_parameter(path, first, last):
     # np arrays
     n_masters = np.array(n_masters)
     total_time = np.array(total_time)
+    reordering_time_0 = np.array(reordering_time_0)
+    reordering_time_1 = np.array(reordering_time_1)
+    win_time = np.array(win_time)
     win_ratio = np.array(win_ratio)
+    win_dump_ratio = np.array(win_dump_ratio)
+    strategy_dump_ratio = np.array(strategy_dump_ratio)
     upratio_0 = np.array(upratio_0)
     upratio_1 = np.array(upratio_1)
     total_nodes_0 = np.array(total_nodes_0)
     total_nodes_1 = np.array(total_nodes_1)
     peak_nodes_0 = np.array(peak_nodes_0)
     peak_nodes_1 = np.array(peak_nodes_1)
+    transducer_nodes = np.array(transducer_nodes)
     # plot
     fig = plt.figure()
     fig.set_size_inches(5, 10)
@@ -126,6 +158,10 @@ def plot_vs_parameter(path, first, last):
     # times
     ax = plt.subplot(3, 1, 1)
     plt.plot(n_masters, total_time, 'b-', label='Total time')
+    plt.plot(n_masters, win_time, 'r--', label='Winning set fixpoint')
+    total_reordering_time = reordering_time_0 + reordering_time_1
+    plt.plot(n_masters, total_reordering_time, 'g-o',
+             label='Total reordering time')
     # annotate
     ax.set_yscale('log')
     ax.tick_params(labelsize=tsz)
@@ -137,10 +173,16 @@ def plot_vs_parameter(path, first, last):
     ax = plt.subplot(3, 1, 2)
     plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
     plt.plot(n_masters, upratio_0, 'b-o',
-             label='Up ratio (1)', markevery=10)
+             label='Reordering ratio (1)', markevery=10)
     if bdd2:
         plt.plot(n_masters, upratio_1, 'r--o',
-                 label='Up ratio (2)', markevery=10)
+                 label='Reordering ratio (2)', markevery=10)
+    if len(win_dump_ratio) == len(n_masters):
+        plt.plot(n_masters, win_dump_ratio, 'g-*',
+                 label='Win set dump / total time')
+    if len(strategy_dump_ratio) == len(n_masters):
+        plt.plot(n_masters, strategy_dump_ratio, 'm--*',
+                 label='Strategy dump / total time')
     # annotate
     # ax.set_yscale('log')
     ax.tick_params(labelsize=tsz)
@@ -160,6 +202,9 @@ def plot_vs_parameter(path, first, last):
                  label='Total (2)', markevery=10)
         plt.plot(n_masters, peak_nodes_1, 'r--*',
                  label='Peak (2)', markevery=10)
+    if len(transducer_nodes) == len(n_masters):
+        plt.plot(n_masters, transducer_nodes, 'g--o',
+                 label='Strategy', markevery=10)
     # annotate
     ax.set_yscale('log')
     ax.tick_params(labelsize=tsz)

@@ -78,6 +78,7 @@ def dump_winning_set(z, bdd, fname=None):
     if fname is None:
         fname = WINNING_SET_FILE
     t0 = time.time()
+    log_event(dump_winning_set_start=True)
     memory = 3 * GB
     b = _bdd.BDD(memory_estimate=memory)
     b.configure(max_memory=memory, reordering=False)
@@ -92,6 +93,7 @@ def dump_winning_set(z, bdd, fname=None):
     log.info(
         'Winning set dumped in {dt:1.2} sec'.format(
             dt=dt))
+    log_event(dump_winning_set_end=True)
     log.debug('-- done dump_winning_set')
 
 
@@ -99,6 +101,7 @@ def dump_strategy(t, fname=None):
     """Dump strategy relation BDD as DDDMP file."""
     if fname is None:
         fname = STRATEGY_FILE
+    log_event(dump_strategy_start=True)
     t0 = time.time()
     action = t.action['sys'][0]
     t.bdd.dump(action, fname)
@@ -106,6 +109,7 @@ def dump_strategy(t, fname=None):
     dt = t1 - t0
     log.info(
         'Strategy dumped in {dt:1.2} sec.'.format(dt=dt))
+    log_event(dump_strategy_end=True)
 
 
 def log_reordering(fname):
@@ -405,6 +409,7 @@ def construct_streett_transducer(z, aut):
     t.action['sys'] = [transducer]
     n_nodes = len(transducer)
     print('Transducer BDD: {n} nodes'.format(n=n_nodes))
+    log_event(transducer_nodes=n_nodes)
     log_bdd(bdd, '')
     log_bdd(b3, 'b3_')
     log_event(make_transducer_end=True)
