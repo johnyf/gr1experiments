@@ -36,8 +36,6 @@ INIT_CACHE = 2**18
 #
 # 3. compare 2 to `slugs`
 #
-# 4. add a case study
-#
 # group primed and unprimed vars
 # use efficient rename for neighbors
 # use a CUDD map for repeated renaming
