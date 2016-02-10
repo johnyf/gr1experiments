@@ -27,10 +27,11 @@ M = 17
 
 
 def run_parallel():
-    problem = 'bunny'
-    output = 'runs_slugs'
-    # target = run_gr1x
-    target = run_slugs
+    first = 0
+    problem = 'cinderella'
+    output = 'runs'
+    target = run_gr1x
+    # target = run_slugs
     i_str = '{i}'
     slugsin_path = '{problem}/slugsin/{problem}_{i}.txt'.format(
         problem=problem, i=i_str)
@@ -41,29 +42,24 @@ def run_parallel():
     psutil_path = '{problem}/{output}/psutil_{i}.txt'.format(
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count()
-    n = 34
-    m = n + n_cpus
-    group_1 = list()
-    for i in xrange(n, m):
-        d = dict(
-            slugsin_file=slugsin_path.format(i=i),
-            details_file=details_path.format(i=i),
-            strategy_file=strategy_path,
-            psutil_file=psutil_path.format(i=i))
-        group_1.append(d)
-    n = m
-    m = n + n_cpus
-    group_2 = list()
-    for i in xrange(n, m):
-        d = dict(
-            slugsin_file=slugsin_path.format(i=i),
-            details_file=details_path.format(i=i),
-            strategy_file=strategy_path,
-            psutil_file=psutil_path.format(i=i))
-        group_2.append(d)
+    n = first
+    groups = list()
+    for j in xrange(1):
+        # m = n + n_cpus
+        m = n + 9
+        group = list()
+        for i in xrange(n, m):
+            d = dict(
+                slugsin_file=slugsin_path.format(i=i),
+                details_file=details_path.format(i=i),
+                strategy_file=strategy_path,
+                psutil_file=psutil_path.format(i=i))
+            group.append(d)
+        groups.append(group)
+        n = m
     # multiple groups in parallel
     # for file_pairs in zip(group_1, group_2):
-    for file_pairs in [group_1]:
+    for file_pairs in groups:
         procs = list()
         all_cpus = set(range(n_cpus))
         for d in file_pairs:
@@ -110,7 +106,7 @@ def run_slugs(slugsin_file, strategy_file,
         fname=slugsin_file, dt=dt))
 
 
-def run_gr1x(slugsin_file, details_file, affinity=None):
+def run_gr1x(slugsin_file, details_file, affinity=None, **kw):
     """Run `gr1x` for a range of AMBA spec instances."""
     print('Starting: {fname}'.format(fname=slugsin_file))
     proc = psutil.Process()
