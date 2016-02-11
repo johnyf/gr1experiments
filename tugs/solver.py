@@ -416,6 +416,22 @@ def construct_streett_transducer(z, aut):
     # self-check
     # check_winning_region(transducer, aut, t, bdd,
     #                      other_bdd, z, 0)
+    # \A x: \E y: realizability
+    env_init = aut.init['env'][0]
+    sys_init = aut.init['sys'][0]
+    env_init = _bdd.copy_bdd(env_init, bdd, b3)
+    sys_init = _bdd.copy_bdd(sys_init, bdd, b3)
+    win_set = _bdd.copy_bdd(z, bdd, b3)
+    r = (sys_init & win_set) | ~ env_init
+    r = b3.quantify(r, aut.evars, forall=False)
+    r = b3.quantify(r, aut.uvars, forall=True)
+    if r == b3.true:
+        print('realizable for \A x: \E y')
+    elif r == b3.false:
+        print('unrealizable for \A x: \E y')
+    else:
+        raise Exception('`r` should have been constant')
+    del r
     del selector, env_action_2, transducer
     return t
 
