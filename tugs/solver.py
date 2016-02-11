@@ -385,12 +385,12 @@ def construct_streett_transducer(z, aut):
     log.info('disjoin transducers')
     if BINARY_CONJ:
         transducer = syntax.recurse_binary(disj, transducers)
+        n_remain = len(transducers)
+        assert n_remain == 0, n_remain
     else:
         transducer = syntax._linear_operator_simple(
             disj, transducers)
     log.info('done with disjunction')
-    n_remain = len(transducers)
-    assert n_remain == 0, n_remain
     # add counter limits
     # transducer = transducer & t.action['sys'][0]
     # env lost ?
