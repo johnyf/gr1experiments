@@ -64,26 +64,26 @@ def make_code(params, pml_fname):
         'free sys int(0, {b}) y{i};'.format(i=i, b=bucketCapacity)
         for i in xrange(0, nofBuckets)]
     envinit = [
-        'x{i} = 0'.format(i=i)
+        'x{i} == 0'.format(i=i)
         for i in xrange(0, nofBuckets)]
     sysinit = [
-        'y{i} = 0'.format(i=i)
+        'y{i} == 0'.format(i=i)
         for i in xrange(0, nofBuckets)]
     sys_action = [
-        "!((e<=" + str(i) + " && e+" +
-        str(cinderellaPower) + " > " + str(i) +
-        ") | (e+" + str(cinderellaPower - 1) +
-        " >= " + str(i+nofBuckets) + ")) -> y" + str(i) +
-        "' = y" + str(i) + " + x" + str(i) +
-        "'"
+        ("!((e <= {i} && e + {cinderellaPower} > {i}) "
+         "|| (e + {c1} >= {c2})) -> (y{i}' == y{i} + x{i}')").format(
+             i=i,
+             cinderellaPower=cinderellaPower,
+             c1=cinderellaPower - 1,
+             c2=i + nofBuckets)
         for i in xrange(0, nofBuckets)]
     env_action = [
-        "((e<=" + str(i) + " && e+" +
-        str(cinderellaPower) + " > " +
-        str(i) + ") | (e+" + str(cinderellaPower - 1) +
-        " >= " + str(i + nofBuckets) +
-        ")) -> y" + str(i) + "' = x" + str(i) +
-        "'"
+        ("((e <= {i} && e + {cinderellaPower} > {i}) "
+         "|| (e + {c1} >= {c2})) -> (y{i}' == x{i}')").format(
+             i=i,
+             cinderellaPower=cinderellaPower,
+             c1=cinderellaPower - 1,
+             c2=i + nofBuckets)
         for i in xrange(0, nofBuckets)]
     restrict = [
         "x{i}'".format(i=i)
