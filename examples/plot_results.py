@@ -170,7 +170,7 @@ def plot_vs_parameter(path, first, last):
     ax.set_yscale('log')
     ax.tick_params(labelsize=tsz)
     plt.grid()
-    plt.xlabel('Number of masters', fontsize=fsz)
+    plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Time (sec)', fontsize=fsz)
     plt.legend(loc='upper left')
     # ratios
@@ -192,7 +192,7 @@ def plot_vs_parameter(path, first, last):
     ax.tick_params(labelsize=tsz)
     plt.grid()
     ax.set_ylim([0, 1])
-    plt.xlabel('Number of masters', fontsize=fsz)
+    plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Ratios', fontsize=fsz)
     plt.legend(loc='upper left')
     # nodes
@@ -213,7 +213,7 @@ def plot_vs_parameter(path, first, last):
     ax.set_yscale('log')
     ax.tick_params(labelsize=tsz)
     plt.grid()
-    plt.xlabel('Number of masters', fontsize=fsz)
+    plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('BDD Nodes', fontsize=fsz)
     plt.legend(loc='upper left')
     # save
