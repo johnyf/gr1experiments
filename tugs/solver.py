@@ -66,7 +66,8 @@ def solve_game(s, load_win_set=False,
     if load_win_set:
         z = _bdd.load(win_set_fname, bdd)
     else:
-        z = compute_winning_set(aut)
+        # z = compute_winning_set(aut)
+        z = debug_compute_winning_set(aut)
         dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
     if z == bdd.false:
@@ -135,8 +136,8 @@ def parse_slugsin(s):
         SYS_INIT='sys_init',
         ENV_TRANS='env_action',
         SYS_TRANS='sys_action',
-        ENV_LIVENESS='<>[]',
-        SYS_LIVENESS='[]<>')
+        ENV_LIVENESS='env_liveness',
+        SYS_LIVENESS='sys_liveness')
     sections = {
         '[{k}]'.format(k=k): v
         for k, v in sections.iteritems()}
@@ -149,9 +150,9 @@ def parse_slugsin(s):
             store = list()
             key = sections[line]
             d[key] = store
-        else:
-            assert store is not None
-            store.append(line)
+            continue
+        assert store is not None
+        store.append(line)
     log.info('-- done parse_slugsin')
     return d
 
@@ -167,9 +168,14 @@ def make_automaton(d, bdd):
     a.vars = _init_vars(d)
     a = symbolic._bitblast(a)
     # formulae
-    sections = symbolic._make_section_map(a)
-    for section, target in sections.iteritems():
-        target.extend(d[section])
+    a.init['env'].extend(d['env_init'])
+    a.action['env'].extend(d['env_action'])
+    a.init['sys'].extend(d['sys_init'])
+    a.action['sys'].extend(d['sys_action'])
+    a.win['[]<>'].extend(d['sys_liveness'])
+    # negate, to obtain persistence
+    persistence = ('!' + u for u in d['env_liveness'])
+    a.win['<>[]'].extend(persistence)
     a.conjoin('prefix')
     # compile
     a.bdd = bdd  # use `cudd.BDD`, but fill vars
@@ -188,6 +194,55 @@ def _init_vars(d):
         for bit in d[section]:
             dvars[bit] = dict(type='bool', owner=owner)
     return dvars
+
+
+@profile
+def debug_compute_winning_set(aut):
+    """Compute winning region, w/o memoizing iterates."""
+    bdd = aut.bdd
+    env_action = aut.action['env'][0]
+    sys_action = aut.action['sys'][0]
+    bdd.dump(env_action, 'env_action_gr1x.txt')
+    bdd.dump(sys_action, 'sys_action_gr1x.txt')
+    for i, goal in enumerate(aut.win['[]<>']):
+        fname = 'goal_{i}_gr1x.txt'.format(i=i)
+        bdd.dump(goal, fname)
+    for j, excuse in enumerate(aut.win['<>[]']):
+        fname = 'assumption_{j}_gr1x.txt'.format(j=j)
+        assumption = ~ excuse
+        bdd.dump(assumption, fname)
+    z = bdd.true
+    zold = None
+    while z != zold:
+        zold = z
+        znew = bdd.true
+        for goal in aut.win['[]<>']:
+            zp = _bdd.rename(z, bdd, aut.prime)
+            live_trans = goal & zp
+            y = bdd.false
+            yold = None
+            while y != yold:
+                yold = y
+                yp = _bdd.rename(y, bdd, aut.prime)
+                live_trans = live_trans | yp
+                good = y
+                for excuse in aut.win['<>[]']:
+                    x = bdd.true
+                    xold = None
+                    while x != xold:
+                        xold = x
+                        xp = _bdd.rename(x, bdd, aut.prime)
+                        paths = xp & excuse
+                        paths = paths | live_trans
+                        x = and_exists(paths, sys_action,
+                                       aut.epvars, bdd)
+                        x = or_forall(x, ~ env_action,
+                                      aut.upvars, bdd)
+                    good = good | x
+                y = good
+            znew = znew & y
+        z = znew
+    return z
 
 
 @profile
