@@ -234,10 +234,10 @@ def debug_compute_winning_set(aut):
                         xp = _bdd.rename(x, bdd, aut.prime)
                         paths = xp & excuse
                         paths = paths | live_trans
-                        x = and_exists(paths, sys_action,
-                                       aut.epvars, bdd)
-                        x = or_forall(x, ~ env_action,
-                                      aut.upvars, bdd)
+                        x = _bdd.and_exists(paths, sys_action,
+                                            aut.epvars, bdd)
+                        x = _bdd.or_forall(x, ~ env_action,
+                                           aut.upvars, bdd)
                     good = good | x
                 y = good
             znew = znew & y
@@ -290,10 +290,10 @@ def compute_winning_set(aut, z=None):
                         if MEMOIZE_ITERATES:
                             paths = x
                             paths_memoized.append(paths)
-                        x = and_exists(x, sys_action,
-                                       aut.epvars, bdd)
-                        x = or_forall(x, ~ env_action,
-                                      aut.upvars, bdd)
+                        x = _bdd.and_exists(x, sys_action,
+                                            aut.epvars, bdd)
+                        x = _bdd.or_forall(x, ~ env_action,
+                                           aut.upvars, bdd)
                         log_loop(i, j, None, x, y, z)
                         log_bdd(bdd, '')
                     log.debug('Reached X fixpoint')
@@ -389,10 +389,10 @@ def construct_streett_transducer(z, aut):
                     x = xp & excuse
                     del xp
                     paths = x | live_trans
-                    new = and_exists(paths, sys_action,
-                                     aut.epvars, bdd)
-                    x = or_forall(new, ~ env_action,
-                                  aut.upvars, bdd)
+                    new = _bdd.and_exists(paths, sys_action,
+                                          aut.epvars, bdd)
+                    x = _bdd.or_forall(new, ~ env_action,
+                                       aut.upvars, bdd)
                     log_loop(i, j, None, x, y, z)
                     log_bdd(bdd, '')
                 log.debug('Reached X fixpoint')
@@ -626,7 +626,7 @@ def make_strategy(store, all_new, j, goal, aut):
     return transducer
 
 
-def and_exists(u, v, qvars, bdd):
+def _and_exists(u, v, qvars, bdd):
     try:
         return _bdd.and_exists(u, v, qvars, bdd)
     except:
@@ -634,7 +634,7 @@ def and_exists(u, v, qvars, bdd):
         return bdd.quantify(r, qvars, forall=False)
 
 
-def or_forall(u, v, qvars, bdd):
+def _or_forall(u, v, qvars, bdd):
     try:
         return _bdd.or_forall(u, v, qvars, bdd)
     except:
