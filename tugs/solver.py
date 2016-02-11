@@ -226,35 +226,8 @@ def compute_winning_set(aut, z=None):
                         # desired transitions
                         x = xp & excuse
                         x = x | live_trans
-                        # reordering_log.debug(repr(s))
-                        '''
-                        dvars = var_order(bdd)
-                        epvars = aut.epvars
-                        pickle_data = dict(
-                            dvars=dvars,
-                            epvars=epvars)
-                        pickle_fname = 'bug_vars.pickle'
-                        with open(pickle_fname, 'wb') as fid:
-                            pickle.dump(pickle_data,
-                                        fid, protocol=2)
-                        bdd_fname = 'bug_bdd.txt'
-                        bdd.dump(x, bdd_fname)
-                        bdd_fname = 'sys_action.txt'
-                        bdd.dump(sys_action, bdd_fname)
-                        bdd.configure(
-                            reordering=False,
-                            garbage_collection=False)
-                        log.info(bdd.configure())
-                        stats = bdd.statistics()
-                        log.info(stats)
-                        '''
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
-                        '''
-                        bdd.configure(
-                            reordering=True,
-                            garbage_collection=True)
-                        '''
                         x = or_forall(x, ~ env_action,
                                       aut.upvars, bdd)
                         log_loop(i, j, None, x, y, z)
