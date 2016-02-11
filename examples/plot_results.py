@@ -159,7 +159,10 @@ def plot_vs_parameter(path, first, last):
     ax = plt.subplot(3, 1, 1)
     plt.plot(n_masters, total_time, 'b-', label='Total time')
     plt.plot(n_masters, win_time, 'r--', label='Winning set fixpoint')
-    total_reordering_time = reordering_time_0 + reordering_time_1
+    if len(reordering_time_1):
+        total_reordering_time = reordering_time_0 + reordering_time_1
+    else:
+        total_reordering_time = reordering_time_0
     plt.plot(n_masters, total_reordering_time, 'g-o',
              label='Total reordering time')
     # annotate
