@@ -66,6 +66,8 @@ def solve_game(s, load_win_set=False,
     if load_win_set:
         z = _bdd.load(win_set_fname, bdd)
     else:
+        # z = slugs_fixpoint(aut)
+        # z = compute_winning_set_nolog(aut)
         z = compute_winning_set(aut)
         # z = debug_compute_winning_set(aut)
         dump_winning_set(z, bdd, fname=win_set_fname)
@@ -281,6 +283,62 @@ def debug_compute_winning_set(aut):
                 y = good
             znew = znew & y
         z = znew
+    return z
+
+
+def compute_winning_set_nolog(aut, z=None):
+    """Compute winning region, w/o memoizing iterates."""
+    log_event(winning_set_start=True)
+    bdd = aut.bdd
+    env_action = aut.action['env'][0]
+    sys_action = aut.action['sys'][0]
+    if z is None:
+        z = bdd.true
+    zold = None
+    while z != zold:
+        zold = z
+        # moved this
+        zp = _bdd.rename(z, bdd, aut.prime)
+        yj = list()
+        for goal in aut.win['[]<>']:
+            live_trans = goal & zp
+            y = bdd.false
+            yold = None
+            while y != yold:
+                yold = y
+                yp = _bdd.rename(y, bdd, aut.prime)
+                live_trans = live_trans | yp
+                good = y
+                for excuse in aut.win['<>[]']:
+                    x = bdd.true
+                    xold = None
+                    while x != xold:
+                        xold = x
+                        xp = _bdd.rename(x, bdd, aut.prime)
+                        x = (xp & excuse) | live_trans
+                        x = _bdd.or_forall(
+                            _bdd.and_exists(x, sys_action,
+                                            aut.epvars, bdd),
+                            ~ env_action, aut.upvars, bdd)
+                    del xold
+                    good = good | x
+                    del x
+                y = good
+                del good
+            del yold, live_trans
+            if BINARY_CONJ or DEFER_Z:
+                yj.append(y)
+            else:
+                z = z & y
+            del y, goal
+        del zp
+        if BINARY_CONJ:
+            z = syntax.recurse_binary(conj, yj)
+        elif DEFER_Z:
+            z = syntax._linear_operator_simple(conj, yj)
+    log.info('Reached Z fixpoint')
+    log_bdd(bdd, '')
+    log_event(winning_set_end=True)
     return z
 
 
