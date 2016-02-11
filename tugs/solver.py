@@ -70,7 +70,7 @@ def solve_game(s, load_win_set=False,
         dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
     if z == bdd.false:
-        print('unrealizable')
+        print('empty winning set')
         return
     t = construct_streett_transducer(z, aut)
     dump_strategy(t)
