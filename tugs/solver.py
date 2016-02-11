@@ -62,7 +62,6 @@ def solve_game(s, load_win_set=False,
         z = _bdd.load(win_set_fname, bdd)
     else:
         # z = compute_winning_set(aut)
-        print('debug')
         z = debug_compute_winning_set(aut)
         dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
@@ -195,8 +194,13 @@ def debug_compute_winning_set(aut):
     sys_action = aut.action['sys'][0]
     bdd.dump(env_action, 'env_action_gr1x.txt')
     bdd.dump(sys_action, 'sys_action_gr1x.txt')
-    bdd.dump(aut.win['[]<>'][0], 'goal_0_gr1x.txt')
-    bdd.dump(aut.win['<>[]'][0], 'assumption_0_gr1x.txt')
+    for i, goal in enumerate(aut.win['[]<>']):
+        fname = 'goal_{i}_gr1x.txt'.format(i=i)
+        bdd.dump(goal, fname)
+    for j, excuse in enumerate(aut.win['<>[]']):
+        fname = 'assumption_{j}_gr1x.txt'.format(j=j)
+        assumption = ~ excuse
+        bdd.dump(assumption, fname)
     z = bdd.true
     zold = None
     while z != zold:
