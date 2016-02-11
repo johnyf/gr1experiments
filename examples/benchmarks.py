@@ -5,8 +5,6 @@ import datetime
 import pprint
 import logging
 import multiprocessing as mp
-import os
-import shutil
 import sys
 import time
 from dd import cudd
