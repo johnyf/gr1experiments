@@ -131,8 +131,8 @@ def parse_slugsin(s):
         SYS_INIT='sys_init',
         ENV_TRANS='env_action',
         SYS_TRANS='sys_action',
-        ENV_LIVENESS='<>[]',
-        SYS_LIVENESS='[]<>')
+        ENV_LIVENESS='env_liveness',
+        SYS_LIVENESS='sys_liveness')
     sections = {
         '[{k}]'.format(k=k): v
         for k, v in sections.iteritems()}
@@ -163,9 +163,14 @@ def make_automaton(d, bdd):
     a.vars = _init_vars(d)
     a = symbolic._bitblast(a)
     # formulae
-    sections = symbolic._make_section_map(a)
-    for section, target in sections.iteritems():
-        target.extend(d[section])
+    a.init['env'].extend(d['env_init'])
+    a.action['env'].extend(d['env_action'])
+    a.init['sys'].extend(d['sys_init'])
+    a.action['sys'].extend(d['sys_action'])
+    a.win['[]<>'].extend(d['sys_liveness'])
+    # negate, to obtain persistence
+    persistence = ('!' + u for u in d['env_liveness'])
+    a.win['<>[]'].extend(persistence)
     a.conjoin('prefix')
     # compile
     a.bdd = bdd  # use `cudd.BDD`, but fill vars
