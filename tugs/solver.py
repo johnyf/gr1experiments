@@ -66,8 +66,8 @@ def solve_game(s, load_win_set=False,
     if load_win_set:
         z = _bdd.load(win_set_fname, bdd)
     else:
-        # z = compute_winning_set(aut)
-        z = debug_compute_winning_set(aut)
+        z = compute_winning_set(aut)
+        # z = debug_compute_winning_set(aut)
         dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
     if z == bdd.false:
