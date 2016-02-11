@@ -16,6 +16,7 @@ assume ltl {{
 assert ltl {{
 {sysInit}
 && []({sysTransA})
+&& []({sysTransB})
 && []<>(true)
 }}
 
