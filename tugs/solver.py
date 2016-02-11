@@ -20,12 +20,17 @@ except AttributeError:
 
 
 log = logging.getLogger(__name__)
+# algorithms
+BINARY_CONJ = True  # overrides `DEFER_Z`
+DEFER_Z = True
+TWO_MANAGERS = True
+MEMOIZE_ITERATES = False
+# constants
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
 SELECTOR = 'strat_type'
 WINNING_SET_FILE = 'winning_set'
 STRATEGY_FILE = 'tugs_strategy.dddmp'
-USE_BINARY = True
 GB = 2**30
 MAX_MEMORY = 10 * GB
 INIT_CACHE = 2**18
@@ -199,6 +204,7 @@ def compute_winning_set(aut, z=None):
     log.debug('Before z fixpoint')
     while z != zold:
         log.debug('Start Z iteration')
+        paths_memoized = list()
         # s = var_order(bdd)
         # reordering_log.debug(repr(s))
         zold = z
@@ -226,6 +232,9 @@ def compute_winning_set(aut, z=None):
                         # desired transitions
                         x = xp & excuse
                         x = x | live_trans
+                        if MEMOIZE_ITERATES:
+                            paths = x
+                            paths_memoized.append(paths)
                         x = and_exists(x, sys_action,
                                        aut.epvars, bdd)
                         x = or_forall(x, ~ env_action,
@@ -240,14 +249,16 @@ def compute_winning_set(aut, z=None):
                 del good
             log.debug('Reached Y fixpoint')
             del yold, live_trans
-            if USE_BINARY:
+            if BINARY_CONJ or DEFER_Z:
                 yj.append(y)
             else:
                 z = z & y
             del y, goal
         del zp
-        z = syntax.recurse_binary(conj, yj)
-        # z = syntax._linear_operator_simple(conj, yj)
+        if BINARY_CONJ:
+            z = syntax.recurse_binary(conj, yj)
+        elif DEFER_Z:
+            z = syntax._linear_operator_simple(conj, yj)
         # bdd.assert_consistent()
     log.info('Reached Z fixpoint')
     log_bdd(bdd, '')
@@ -260,20 +271,22 @@ def construct_streett_transducer(z, aut):
     """Return Street(1) I/O transducer."""
     log_event(make_transducer_start=True)
     # reordering_log = logging.getLogger(REORDERING_LOG)
-    # copy vars
     bdd = aut.bdd
     # one more manager
-    b3 = _bdd.BDD(memory_estimate=MAX_MEMORY)
-    b3.configure(max_memory=MAX_MEMORY)
-    _bdd.copy_vars(bdd, b3)
-    # copy var order
-    # order = var_order(bdd)
-    # _bdd.reorder(b3, order)
-    # copy actions with reordering off
+    if TWO_MANAGERS:
+        b3 = _bdd.BDD(memory_estimate=MAX_MEMORY)
+        b3.configure(max_memory=MAX_MEMORY)
+        _bdd.copy_vars(bdd, b3)
+        # copy var order
+        # order = var_order(bdd)
+        # _bdd.reorder(b3, order)
+        # copy actions with reordering off
+    else:
+        b3 = bdd
     env_action = aut.action['env'][0]
     sys_action = aut.action['sys'][0]
-    sys_action_2 = _bdd.copy_bdd(sys_action, bdd, b3)
-    env_action_2 = _bdd.copy_bdd(env_action, bdd, b3)
+    sys_action_2 = copy_bdd(sys_action, bdd, b3)
+    env_action_2 = copy_bdd(env_action, bdd, b3)
     # Compute iterates, now that we know the outer fixpoint
     log_bdd(b3, 'b3_')
     log.info('done copying actions')
@@ -334,8 +347,8 @@ def construct_streett_transducer(z, aut):
                 # strategy construction
                 # in `b3`
                 log.info('transfer `paths` to `b3`')
-                paths = _bdd.copy_bdd(paths, bdd, b3)
-                new = _bdd.copy_bdd(new, bdd, b3)
+                paths = copy_bdd(paths, bdd, b3)
+                new = copy_bdd(new, bdd, b3)
                 log.info('done transferring')
                 rim = new & ~ covered
                 covered = covered | new
@@ -351,7 +364,7 @@ def construct_streett_transducer(z, aut):
         del y, yold, covered
         log_bdd(b3, 'b3_')
         # make transducer
-        goal = _bdd.copy_bdd(goal, bdd, b3)
+        goal = copy_bdd(goal, bdd, b3)
         e = '{c} = {j}'.format(c=COUNTER, j=j)
         counter = t.add_expr(e)
         u = goal | ~ selector
@@ -370,10 +383,12 @@ def construct_streett_transducer(z, aut):
     del sys_action_2, zp
     log_bdd(b3, 'b3_')
     log.info('disjoin transducers')
-    transducer = syntax.recurse_binary(disj, transducers)
+    if BINARY_CONJ:
+        transducer = syntax.recurse_binary(disj, transducers)
+    else:
+        transducer = syntax._linear_operator_simple(
+            disj, transducers)
     log.info('done with disjunction')
-    # transducer = syntax._linear_operator_simple(
-    #   disj, transducers)
     n_remain = len(transducers)
     assert n_remain == 0, n_remain
     # add counter limits
@@ -393,9 +408,10 @@ def construct_streett_transducer(z, aut):
     # \A x: \E y: realizability
     env_init = aut.init['env'][0]
     sys_init = aut.init['sys'][0]
-    env_init = _bdd.copy_bdd(env_init, bdd, b3)
-    sys_init = _bdd.copy_bdd(sys_init, bdd, b3)
-    win_set = _bdd.copy_bdd(z, bdd, b3)
+    win_set = z
+    env_init = copy_bdd(env_init, bdd, b3)
+    sys_init = copy_bdd(sys_init, bdd, b3)
+    win_set = copy_bdd(win_set, bdd, b3)
     r = (sys_init & win_set) | ~ env_init
     r = b3.quantify(r, aut.evars, forall=False)
     r = b3.quantify(r, aut.uvars, forall=True)
@@ -408,6 +424,14 @@ def construct_streett_transducer(z, aut):
     del r
     del selector, env_action_2, transducer
     return t
+
+
+def copy_bdd(u, a, b):
+    if a is b:
+        assert not TWO_MANAGERS
+        return u
+    else:
+        return _bdd.copy_bdd(u, a, b)
 
 
 def log_event(**d):
