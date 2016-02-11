@@ -9,8 +9,8 @@ from tugs import utils
 
 log = logging.getLogger(__name__)
 INPUT_FILE = 'bunny.pml'
-PROMELA_PATH = 'pml/bunny_{i}.txt'
-SLUGSIN_PATH = 'slugsin/bunny_{i}.txt'
+PROMELA_PATH = 'pml/bunny_goals_{i}.txt'
+SLUGSIN_PATH = 'slugsin/bunny_goals_{i}.txt'
 N = 2
 M = 17
 

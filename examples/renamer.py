@@ -5,10 +5,10 @@ import shutil
 
 
 def main():
-    path = './jcss12/pml/'
+    path = './bunny_goals/slugsin/'
     for f in os.listdir(path):
         print(f)
-        newf = f.replace('_masters', '')
+        newf = f.replace('bunny_', 'bunny_goals_')
         print(newf)
         a = path + f
         b = path + newf
