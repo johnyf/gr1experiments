@@ -61,7 +61,9 @@ def solve_game(s, load_win_set=False,
     if load_win_set:
         z = _bdd.load(win_set_fname, bdd)
     else:
-        z = compute_winning_set(aut)
+        # z = compute_winning_set(aut)
+        print('debug')
+        z = debug_compute_winning_set(aut)
         dump_winning_set(z, bdd, fname=win_set_fname)
     log_bdd(bdd)
     if z == bdd.false:
@@ -183,6 +185,50 @@ def _init_vars(d):
         for bit in d[section]:
             dvars[bit] = dict(type='bool', owner=owner)
     return dvars
+
+
+@profile
+def debug_compute_winning_set(aut):
+    """Compute winning region, w/o memoizing iterates."""
+    bdd = aut.bdd
+    env_action = aut.action['env'][0]
+    sys_action = aut.action['sys'][0]
+    bdd.dump(env_action, 'env_action_gr1x.txt')
+    bdd.dump(sys_action, 'sys_action_gr1x.txt')
+    bdd.dump(aut.win['[]<>'][0], 'goal_0_gr1x.txt')
+    bdd.dump(aut.win['<>[]'][0], 'assumption_0_gr1x.txt')
+    z = bdd.true
+    zold = None
+    while z != zold:
+        zold = z
+        znew = bdd.true
+        for goal in aut.win['[]<>']:
+            zp = _bdd.rename(z, bdd, aut.prime)
+            live_trans = goal & zp
+            y = bdd.false
+            yold = None
+            while y != yold:
+                yold = y
+                yp = _bdd.rename(y, bdd, aut.prime)
+                live_trans = live_trans | yp
+                good = y
+                for excuse in aut.win['<>[]']:
+                    x = bdd.true
+                    xold = None
+                    while x != xold:
+                        xold = x
+                        xp = _bdd.rename(x, bdd, aut.prime)
+                        paths = xp & excuse
+                        paths = paths | live_trans
+                        x = and_exists(paths, sys_action,
+                                       aut.epvars, bdd)
+                        x = or_forall(x, ~ env_action,
+                                      aut.upvars, bdd)
+                    good = good | x
+                y = good
+            znew = znew & y
+        z = znew
+    return z
 
 
 @profile
