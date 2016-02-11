@@ -110,8 +110,10 @@ def run_slugs(slugsin_file, strategy_file,
         fname=slugsin_file, dt=dt))
 
 
-def run_gr1x(slugsin_file, details_file, affinity=None, **kw):
+def run_gr1x(slugsin_file, strategy_file,
+             details_file, affinity=None, **kw):
     """Run `gr1x` for a range of AMBA spec instances."""
+    win_set_file = 'winning_set'
     print('Starting: {fname}'.format(fname=slugsin_file))
     proc = psutil.Process()
     print('PID: {pid}'.format(pid=proc.pid))
@@ -136,8 +138,10 @@ def run_gr1x(slugsin_file, details_file, affinity=None, **kw):
     with open(slugsin_file, 'r') as f:
         s = f.read()
     t0 = time.time()
-    solver.solve_game(s)
-    # TODO: dump symbolic strategy
+    solver.solve_game(
+        s,
+        win_set_fname=win_set_file,
+        strategy_fname=strategy_file)
     # TODO: model check dumped strategy
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
