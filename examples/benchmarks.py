@@ -97,7 +97,7 @@ def run_slugs(slugsin_file, strategy_file,
     t0 = time.time()
     r = slugs._call_slugs(
         filename=slugsin_file,
-        symbolic=False,
+        symbolic=True,
         strategy_file=strategy_file,
         affinity=affinity,
         logfile=details_file)
