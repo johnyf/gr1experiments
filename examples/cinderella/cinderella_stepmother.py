@@ -5,7 +5,7 @@ TEMPLATE = """\
 
 {inLines}
 {outLines}
-sys int(0, {nofBucketsMinusOne}) e;
+free sys int(0, {nofBucketsMinusOne}) e;
 
 assume ltl {{
 {envInit}
@@ -57,10 +57,10 @@ def make_code(params, pml_fname):
         c=bucketCapacity,
         d=stepmotherPower)
     inlines = [
-        'env int(0, {b}) x{i};'.format(i=i, b=stepmotherPower)
+        'free env int(0, {b}) x{i};'.format(i=i, b=stepmotherPower)
         for i in xrange(0, nofBuckets)]
     outlines = [
-        'sys int(0, {b}) y{i};'.format(i=i, b=bucketCapacity)
+        'free sys int(0, {b}) y{i};'.format(i=i, b=bucketCapacity)
         for i in xrange(0, nofBuckets)]
     envinit = [
         'x{i} = 0'.format(i=i)
