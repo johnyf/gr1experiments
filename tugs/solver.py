@@ -196,7 +196,46 @@ def _init_vars(d):
     return dvars
 
 
-@profile
+def slugs_fixpoint(aut):
+    """Compute winning region, w/o memoizing iterates."""
+    log_event(winning_set_start=True)
+    bdd = aut.bdd
+    env_action = aut.action['env'][0]
+    sys_action = aut.action['sys'][0]
+    z = bdd.true
+    zold = None
+    while z != zold:
+        zold = z
+        znew = bdd.true
+        zp = _bdd.rename(z, bdd, aut.prime)
+        for goal in aut.win['[]<>']:
+            live_trans = goal & zp
+            y = bdd.false
+            yold = None
+            while y != yold:
+                yold = y
+                live_trans = live_trans | _bdd.rename(y, bdd, aut.prime)
+                good = y
+                for excuse in aut.win['<>[]']:
+                    x = bdd.true
+                    xold = None
+                    while x != xold:
+                        xold = x
+                        x = (
+                            live_trans |
+                            (_bdd.rename(x, bdd, aut.prime) & excuse))
+                        x = (x & sys_action) | ~ env_action
+                        x = bdd.quantify(x, aut.epvars, forall=False)
+                        x = bdd.quantify(x, aut.upvars, forall=True)
+                    good = good | x
+                y = good
+            z = znew & y
+    log.info('Reached Z fixpoint')
+    log_bdd(bdd, '')
+    log_event(winning_set_end=True)
+    return z
+
+
 def debug_compute_winning_set(aut):
     """Compute winning region, w/o memoizing iterates."""
     bdd = aut.bdd
