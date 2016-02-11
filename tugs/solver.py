@@ -663,21 +663,34 @@ def main():
 
 
 def command_line_wrapper():
-    """Solve game in `slugsin` file `fname`."""
+    """Solve game defined in `slugsin` file `fname`."""
     p = argparse.ArgumentParser()
-    p.add_argument('file', type=str, help='`slugsin` input')
+    p.add_argument('file', type=str,
+                   help='`slugsin` input file')
+    p.add_argument('--load_win_set', action='store_true',
+                   help='load winning set BDD from given file')
     p.add_argument('--win_set', type=str,
-                   help='winning set BDD as DDDMP file')
-    p.add_argument('--debug', type=int, help='logging level')
+                   help='dump winning set BDD to this file')
+    p.add_argument('--strategy', type=str,
+                   help='dump strategy BDD to this file')
+    p.add_argument('--debug', default=30, type=int,
+                   help='logging level')
     args = p.parse_args()
-    log.setLevel(level=args.debug)
+    # logging
+    level = args.debug
+    log.setLevel(level=level)
     h = logging.StreamHandler()
     log.addHandler(h)
+    # input
+    win_set_fname = args.win_set
+    strategy_fname = args.strategy
     fname = args.file
     with open(fname, 'r') as f:
-        s = f.read()
-    win_set_fname = args.win_set
-    solve_game(s, win_set_fname=win_set_fname)
+        slugsin = f.read()
+    solve_game(
+        slugsin,
+        win_set_fname=win_set_fname,
+        strategy_fname=strategy_fname)
 
 
 def test_indices_and_levels():
