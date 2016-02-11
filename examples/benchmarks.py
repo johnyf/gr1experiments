@@ -27,11 +27,17 @@ M = 17
 
 
 def run_parallel():
-    first = 0
-    problem = 'cinderella'
-    output = 'runs'
-    target = run_gr1x
-    # target = run_slugs
+    first = 32
+    problem = 'bunny'
+    solver = 'slugs'
+    if solver == 'slugs':
+        output = 'runs_slugs'
+        target = run_slugs
+    elif solver == 'gr1x':
+        output = 'runs'
+        target = run_gr1x
+    else:
+        raise ValueError('unknown solver "{s}"'.format(s=solver))
     i_str = '{i}'
     slugsin_path = '{problem}/slugsin/{problem}_{i}.txt'.format(
         problem=problem, i=i_str)
@@ -44,9 +50,8 @@ def run_parallel():
     n_cpus = psutil.cpu_count()
     n = first
     groups = list()
-    for j in xrange(1):
-        # m = n + n_cpus
-        m = n + 9
+    for j in xrange(2):
+        m = n + n_cpus
         group = list()
         for i in xrange(n, m):
             d = dict(
@@ -58,7 +63,6 @@ def run_parallel():
         groups.append(group)
         n = m
     # multiple groups in parallel
-    # for file_pairs in zip(group_1, group_2):
     for file_pairs in groups:
         procs = list()
         all_cpus = set(range(n_cpus))
