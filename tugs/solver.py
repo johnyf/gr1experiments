@@ -146,9 +146,9 @@ def parse_slugsin(s):
             store = list()
             key = sections[line]
             d[key] = store
-        else:
-            assert store is not None
-            store.append(line)
+            continue
+        assert store is not None
+        store.append(line)
     log.info('-- done parse_slugsin')
     return d
 
