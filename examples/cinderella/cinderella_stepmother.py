@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 """Dump discretized cinderella-stepmother games."""
+import logging
+from tugs import utils
+
+
 TEMPLATE = """\
 /* {comment} */
 
@@ -21,6 +25,9 @@ assert ltl {{
 }}
 
 """
+PROMELA_PATH = 'pml/cinderella_{i}.txt'
+SLUGSIN_PATH = 'slugsin/cinderella_{i}.txt'
+log = logging.getLogger(__name__)
 # ==================================
 # Elements in each configuration mean:
 # 1. Number of Buckets
@@ -49,7 +56,7 @@ translator = ('../../../slugs/tools/'
               'StructuredSlugsParser/compiler.py')
 
 
-def make_code(params, pml_fname):
+def dump_promela(params, pml_fname):
     (nofBuckets, cinderellaPower,
      bucketCapacity, stepmotherPower) = params
     comment = "n{a} c{b}, {c} by {d}".format(
@@ -103,11 +110,23 @@ def make_code(params, pml_fname):
         f.write(text)
 
 
+def dump_slugsin(i):
+    promela_file = PROMELA_PATH.format(i=i)
+    with open(promela_file, 'r') as f:
+        pml_code = f.read()
+    slugsin_code = utils.translate_promela_to_slugsin(pml_code)
+    slugsin_file = SLUGSIN_PATH.format(i=i)
+    with open(slugsin_file, 'w') as f:
+        f.write(slugsin_code)
+    log.info('dumped SlugsIn for {i} masters'.format(i=i))
+
+
 def conj(x):
     return '\n && '.join('(' + u + ')' for u in x)
 
 
 if __name__ == '__main__':
     for i, p in enumerate(configurations):
-        pml_fname = 'pml/cinderella_{i}.txt'.format(i=i)
-        make_code(p, pml_fname)
+        pml_fname = PROMELA_PATH.format(i=i)
+        dump_promela(p, pml_fname)
+        dump_slugsin(i)
