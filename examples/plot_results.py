@@ -25,8 +25,9 @@ M = 17
 
 def plot_report():
     paths = {
-        #'synt15/runs/': (2, 67),
-        'synt15/runs_slugs/': (2, 20),
+        #'bunny/runs/': (2, 273),
+        'bunny/runs_slugs/': (2, 63),
+        #'synt15/runs_slugs/': (2, 20),
         #'bunny/runs/': (2, 97)
     }
     for path, (first, last) in paths.iteritems():
