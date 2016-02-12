@@ -74,7 +74,7 @@ def run_parallel():
 
 def run_slugs(slugsin_file, strategy_file,
               psutil_file, details_file, affinity=None):
-    """Run `slugs` for a range of AMBA spec instances."""
+    """Run `slugs` for problem define in `slugsin_file`."""
     print('Starting: {fname}'.format(fname=slugsin_file))
     # config logging
     level = logging.DEBUG
@@ -105,7 +105,7 @@ def run_slugs(slugsin_file, strategy_file,
 
 def run_gr1x(slugsin_file, strategy_file,
              details_file, affinity=None, **kw):
-    """Run `gr1x` for a range of AMBA spec instances."""
+    """Run `gr1x` for problem define in `slugsin_file`."""
     win_set_file = 'winning_set'
     print('Starting: {fname}'.format(fname=slugsin_file))
     proc = psutil.Process()
