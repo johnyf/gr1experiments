@@ -13,7 +13,6 @@ def main(name):
         s = proc.name()
         if s != name:
             continue
-        print(s)
         aff = proc.cpu_affinity()
         cpu100 = proc.cpu_percent()
         user, system = proc.cpu_times()
@@ -55,9 +54,27 @@ def main(name):
     print('total memory: {m}'.format(m=total_memory_str))
 
 
+def kill(name):
+    if name is None:
+        print('name is None')
+        return
+    n = 0
+    for proc in psutil.process_iter():
+        s = proc.name()
+        if s != name:
+            continue
+        proc.kill()
+        n += 1
+    print('killed {n} instances of "{name}"'.format(n=n, name=name))
+
+
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('name', default='python', type=str,
                    help='program name', nargs='?')
+    p.add_argument('--kill', default=None, type=str,
+                   help='terminate all instances')
     args = p.parse_args()
     main(args.name)
+    kill(args.kill)
+
