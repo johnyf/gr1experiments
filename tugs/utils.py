@@ -28,16 +28,8 @@ def git_version(path):
 
 def snapshot_versions(check=True):
     """Log versions of software used."""
-    # slugs binary version
-    cmd = ['slugs', '--version']
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    p.wait()
-    if p.returncode != 0:
-        print(p.returncode)
-        print('Warning: `slugs` not found on path')
-    slugs_version = p.stdout.read().strip()
     d = dict()
-    d['slugs'] = slugs_version
+    d['slugs'] = slugs_version()
     # versions of python packages
     packages = [
         'dd', 'omega', 'tugs',
@@ -73,6 +65,17 @@ def snapshot_versions(check=True):
     with open(CONFIG_FILE, 'w') as f:
         json.dump(d, f, indent=4)
     return d
+
+
+def slugs_version():
+    cmd = ['slugs', '--version']
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    p.wait()
+    if p.returncode != 0:
+        print(p.returncode)
+        print('Warning: `slugs` not found on path')
+    version = p.stdout.read().strip()
+    return version
 
 
 def add_logfile(fname, logger_name):
