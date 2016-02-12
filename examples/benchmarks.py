@@ -17,11 +17,6 @@ from tugs import utils
 
 
 GR1X_LOG = 'tugs.solver'
-JSON_FILE = 'details.json'
-INPUT_FILE = 'amba_conj.pml'
-CONFIG_FILE = 'config.json'
-N = 2
-M = 17
 
 
 def run_parallel():
@@ -79,7 +74,7 @@ def run_parallel():
 
 def run_slugs(slugsin_file, strategy_file,
               psutil_file, details_file, affinity=None):
-    """Run `slugs` for a range of AMBA spec instances."""
+    """Run `slugs` for problem define in `slugsin_file`."""
     print('Starting: {fname}'.format(fname=slugsin_file))
     # config logging
     level = logging.DEBUG
@@ -110,7 +105,7 @@ def run_slugs(slugsin_file, strategy_file,
 
 def run_gr1x(slugsin_file, strategy_file,
              details_file, affinity=None, **kw):
-    """Run `gr1x` for a range of AMBA spec instances."""
+    """Run `gr1x` for problem define in `slugsin_file`."""
     win_set_file = 'winning_set'
     print('Starting: {fname}'.format(fname=slugsin_file))
     proc = psutil.Process()
@@ -217,9 +212,9 @@ def compare_strategies(s, slugs_file, gr1x_file):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--min', default=N, type=int,
+    p.add_argument('--min', default=2, type=int,
                    help='from this # of masters')
-    p.add_argument('--max', default=M, type=int,
+    p.add_argument('--max', default=2, type=int,
                    help='to this # of masters')
     p.add_argument('--debug', type=int, default=logging.ERROR,
                    help='python logging level')
