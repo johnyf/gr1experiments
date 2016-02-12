@@ -69,11 +69,20 @@ def snapshot_versions(check=True):
 
 def slugs_version():
     cmd = ['slugs', '--version']
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    try:
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    except OSError as e:
+        if e.errno == os.errno.ENOENT:
+            print('Warning: `slugs` not found on path')
+            return
+        else:
+            raise
     p.wait()
     if p.returncode != 0:
-        print(p.returncode)
-        print('Warning: `slugs` not found on path')
+        print('`{cmd}` returned {r}'.format(
+            cmd=' '.join(cmd),
+            r=p.returncode))
+        return
     version = p.stdout.read().strip()
     return version
 
