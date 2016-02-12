@@ -20,8 +20,6 @@ GR1X_LOG = 'tugs.solver'
 JSON_FILE = 'details.json'
 INPUT_FILE = 'amba_conj.pml'
 CONFIG_FILE = 'config.json'
-N = 2
-M = 17
 
 
 def run_parallel():
@@ -217,9 +215,9 @@ def compare_strategies(s, slugs_file, gr1x_file):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--min', default=N, type=int,
+    p.add_argument('--min', default=2, type=int,
                    help='from this # of masters')
-    p.add_argument('--max', default=M, type=int,
+    p.add_argument('--max', default=2, type=int,
                    help='to this # of masters')
     p.add_argument('--debug', type=int, default=logging.ERROR,
                    help='python logging level')
