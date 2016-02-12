@@ -25,9 +25,9 @@ M = 17
 
 
 def run_parallel():
-    first = 2
-    problem = 'bunny'
-    solver = 'gr1x'
+    first = 34
+    problem = 'synt15'
+    solver = 'slugs'
     if solver == 'slugs':
         output = 'runs_slugs'
         target = run_slugs
@@ -48,7 +48,7 @@ def run_parallel():
     n_cpus = psutil.cpu_count()
     n = first
     groups = list()
-    for j in xrange(10):
+    for j in xrange(3):
         m = n + n_cpus
         group = list()
         for i in xrange(n, m):
