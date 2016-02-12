@@ -17,8 +17,6 @@ from tugs import utils
 
 
 GR1X_LOG = 'tugs.solver'
-JSON_FILE = 'details.json'
-INPUT_FILE = 'amba_conj.pml'
 
 
 def run_parallel():
