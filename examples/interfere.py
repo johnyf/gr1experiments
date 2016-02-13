@@ -57,17 +57,17 @@ def run_gr1x(slugsin_file, strategy_file,
     win_set_file = 'winning_set'
     proc = psutil.Process()
     # proc.cpu_affinity(affinity)
-    # capture execution environment
-    versions = utils.snapshot_versions(check=False)
-    # config log
+    # log verbosity
     level = logging.DEBUG
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
-    # setup log
+    # dump log
     h = logging.FileHandler(details_file, mode='w')
     h.setLevel(level)
     log = logging.getLogger(GR1X_LOG)
     log.addHandler(h)
+    # capture execution environment
+    versions = utils.snapshot_versions(check=False)
     log.info(pprint.pformat(versions))
     # synthesize
     with open(slugsin_file, 'r') as f:
@@ -102,6 +102,7 @@ def plot_saturation():
     n_cpus = psutil.cpu_count(logical=True)
     cpus = range(1, n_cpus + 1)
     for n in cpus:
+        print('load data of {n} CPUs'.format(n=n))
         times = list()
         for cpu in xrange(n):
             fname = details_file.format(n=n, cpu=cpu)
