@@ -110,7 +110,7 @@ def run_gr1x(slugsin_file, strategy_file,
     proc = psutil.Process()
     proc.cpu_affinity(affinity)
     # log verbosity
-    level = logging.DEBUG
+    level = logging.INFO
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
     # dump log
