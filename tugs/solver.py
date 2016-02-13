@@ -238,7 +238,7 @@ def slugs_fixpoint(aut):
                 y = good
             z = znew & y
     log.info('Reached Z fixpoint')
-    log_bdd(bdd, '')
+    log_bdd(bdd, level=20)
     log_event(winning_set_end=True)
     return z
 
@@ -342,7 +342,7 @@ def compute_winning_set_nolog(aut, z=None):
         elif DEFER_Z:
             z = syntax._linear_operator_simple(conj, yj)
     log.info('Reached Z fixpoint')
-    log_bdd(bdd, '')
+    log_bdd(bdd, level=20)
     log_event(winning_set_end=True)
     return z
 
@@ -419,7 +419,7 @@ def compute_winning_set(aut, z=None):
             z = syntax._linear_operator_simple(conj, yj)
         # bdd.assert_consistent()
     log.info('Reached Z fixpoint')
-    log_bdd(bdd, '')
+    log_bdd(bdd, level=20)
     log_event(winning_set_end=True)
     return z
 
@@ -448,7 +448,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
     sys_action_2 = copy_bdd(sys_action, bdd, b3)
     env_action_2 = copy_bdd(env_action, bdd, b3)
     # Compute iterates, now that we know the outer fixpoint
-    log_bdd(b3, 'b3_')
+    log_bdd(b3, name='b3_', level=20)
     log.info('done copying actions')
     zp = _bdd.rename(z, bdd, aut.prime)
     # transducer automaton
@@ -542,7 +542,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
         # reordering_log.debug(repr(s))
         del transducer
     del sys_action_2, zp
-    log_bdd(b3, 'b3_')
+    log_bdd(b3, name='b3_', level=20)
     log.info('disjoin transducers')
     if BINARY_CONJ:
         transducer = syntax.recurse_binary(disj, transducers)
@@ -560,8 +560,8 @@ def construct_streett_transducer(z, aut, max_memory=None):
     n_nodes = len(transducer)
     print('Transducer BDD: {n} nodes'.format(n=n_nodes))
     log_event(transducer_nodes=n_nodes)
-    log_bdd(bdd, '')
-    log_bdd(b3, 'b3_')
+    log_bdd(bdd, level=20)
+    log_bdd(b3, name='b3_', level=20)
     log_event(make_transducer_end=True)
     # self-check
     # check_winning_region(transducer, aut, t, bdd,
