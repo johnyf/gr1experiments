@@ -112,7 +112,10 @@ def plot_saturation():
             t = t1 - t0
             times.append(t)
         total_time[n] = times
-        plt.plot([n] * len(times), times)
+        plt.plot([n] * len(times), times, 'bo')
+    plt.xlabel('number of logical cores used')
+    plt.ylabel('Time (sec)')
+    plt.grid(True)
     plt.savefig(fig_fname, bbox_inches='tight')
 
 
