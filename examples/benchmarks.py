@@ -42,7 +42,6 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(physical=True)
     n = first
-    groups = list()
     for j in xrange(3):
         m = n + n_cpus
         group = list()
@@ -53,23 +52,19 @@ def run_parallel():
                 strategy_file=strategy_path,
                 psutil_file=psutil_path.format(i=i))
             group.append(d)
-        groups.append(group)
         n = m
-    # multiple groups in parallel
-    for file_pairs in groups:
         procs = list()
-        all_cpus = set(range(n_cpus))
-        for d in file_pairs:
-            cpu = all_cpus.pop()
-            affinity = [cpu]
-            d['affinity'] = affinity
+        all_cpus = xrange(n_cpus)
+        for d, cpu in zip(group, all_cpus):
+            d['affinity'] = [cpu]
             p = mp.Process(target=target, kwargs=d)
-            print('spawn: {f}'.format(f=d['slugsin_file']))
-            p.start()
             procs.append(p)
         for p in procs:
+            print('spawn: {f}'.format(f=d['slugsin_file']))
+            p.start()
+        for p in procs:
             p.join()
-            print('joined')
+        print('all joined')
 
 
 def run_slugs(slugsin_file, strategy_file,
