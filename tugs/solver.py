@@ -466,7 +466,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
     # b3.configure(max_vars=max_vars)
     log.info(b3.configure())
     for j, goal in enumerate(aut.win['[]<>']):
-        log.info('Goal: {j}'.format(j=j))
+        log.debug('Goal: {j}'.format(j=j))
         log_bdd(bdd, '')
         # for fixpoint
         live_trans = goal & zp
