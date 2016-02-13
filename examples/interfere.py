@@ -14,6 +14,7 @@ mpl.use('Agg')
 from matplotlib import pyplot as plt
 
 
+GB = 2**30
 GR1X_LOG = 'tugs.solver'
 
 
@@ -76,7 +77,7 @@ def run_gr1x(slugsin_file, strategy_file,
         s,
         win_set_fname=win_set_file,
         strategy_fname=strategy_file,
-        max_memory=1 * 2**30)
+        max_memory=1 * GB)
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
     print('Done with: {fname} in {dt}'.format(
