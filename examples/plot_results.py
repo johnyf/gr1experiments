@@ -30,7 +30,7 @@ def plot_report():
         #'bunny_goals/runs/': (2, 32),
         #'bunny_goals/runs_slugs/': (2, 33),
         #'synt15/runs_slugs/': (2, 49),
-        'synt15/runs/': (2, 105),
+        'synt15/runs/': (2, 65),
         #'bunny/runs/': (2, 97)
     }
     for path, (first, last) in paths.iteritems():
@@ -182,7 +182,8 @@ def plot_vs_parameter(path, first, last):
     plt.grid()
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Time (sec)', fontsize=fsz)
-    plt.legend(loc='upper left')
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
     # ratios
     ax = plt.subplot(3, 1, 2)
     plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
@@ -205,7 +206,8 @@ def plot_vs_parameter(path, first, last):
     ax.set_ylim([0, 1])
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Ratios', fontsize=fsz)
-    plt.legend(loc='upper left')
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
     # nodes
     ax = plt.subplot(3, 1, 3)
     if bdd0:
@@ -227,7 +229,8 @@ def plot_vs_parameter(path, first, last):
     plt.grid()
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('BDD Nodes', fontsize=fsz)
-    plt.legend(loc='upper left')
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
     # save
     plt.savefig(fig_fname, bbox_inches='tight')
     # dump
