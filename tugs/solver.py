@@ -23,8 +23,8 @@ log = logging.getLogger(__name__)
 # algorithms
 BINARY_CONJ = True  # overrides `DEFER_Z`
 DEFER_Z = True
-TWO_MANAGERS = False
-MEMOIZE_ITERATES = False
+TWO_MANAGERS = True
+MEMOIZE_ITERATES = True
 # constants
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
