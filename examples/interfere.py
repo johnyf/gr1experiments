@@ -56,7 +56,7 @@ def run_gr1x(slugsin_file, strategy_file,
     """Run concurrent instances, increasing their number."""
     win_set_file = 'winning_set'
     proc = psutil.Process()
-    # proc.cpu_affinity(affinity)
+    proc.cpu_affinity(affinity)
     # log verbosity
     level = logging.DEBUG
     log = logging.getLogger(GR1X_LOG)
