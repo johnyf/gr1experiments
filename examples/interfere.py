@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Measure interference between multiple concurrent solver instances."""
+"""Measure interference among concurrent solver instances."""
 import datetime
 import pprint
 import logging
@@ -20,6 +20,7 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
+    """Measure the effect on runtime of multiple instances."""
     problem = 'synt15'
     output = 'runs_testing'
     target = run_gr1x
@@ -53,6 +54,7 @@ def run_parallel():
 
 def run_gr1x(slugsin_file, strategy_file,
              details_file, affinity=None, **kw):
+    """Run concurrent instances, increasing their number."""
     win_set_file = 'winning_set'
     proc = psutil.Process()
     # proc.cpu_affinity(affinity)
@@ -89,6 +91,7 @@ def run_gr1x(slugsin_file, strategy_file,
 
 
 def plot_saturation():
+    """Plot time versus number of processors active."""
     fig_fname = 'cpu_saturation.pdf'
     problem = 'synt15'
     output = 'runs_testing'
