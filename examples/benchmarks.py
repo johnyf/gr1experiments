@@ -40,7 +40,7 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     psutil_path = '{problem}/{output}/psutil_{i}.txt'.format(
         problem=problem, output=output, i=i_str)
-    n_cpus = psutil.cpu_count()
+    n_cpus = psutil.cpu_count(physical=True)
     n = first
     groups = list()
     for j in xrange(3):
