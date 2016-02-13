@@ -7,6 +7,8 @@ import humanize
 
 
 def main(name):
+    me = psutil.Process()
+    mypid = me.pid
     rss_all = list()
     vms_all = list()
     zombies = 0
@@ -17,6 +19,9 @@ def main(name):
         if proc.status() == psutil.STATUS_ZOMBIE:
             zombies += 1
             continue
+        pid = proc.pid
+        if pid == mypid:
+            continue
         aff = proc.cpu_affinity()
         cpu100 = proc.cpu_percent()
         user, system = proc.cpu_times()
@@ -26,7 +31,6 @@ def main(name):
         rss_str = humanize.naturalsize(rss)
         vms_str = humanize.naturalsize(vms)
         m100 = proc.memory_percent()
-        pid = proc.pid
         ppid = proc.ppid()
         info = [
             'CPU affinity: {aff}'.format(aff=aff),
