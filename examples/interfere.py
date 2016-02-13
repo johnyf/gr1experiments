@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Measure interference among concurrent solver instances."""
+import argparse
 import datetime
 import pprint
 import logging
@@ -118,5 +119,10 @@ def plot_saturation():
 
 
 if __name__ == '__main__':
-    # run_parallel()
+    p = argparse.ArgumentParser()
+    p.add_argument('--run', action='store_true',
+                   help='run instances and log measurements')
+    args = p.parse_args()
+    if args.run:
+        run_parallel()
     plot_saturation()
