@@ -396,8 +396,9 @@ def compute_winning_set(aut, z=None):
                                             aut.epvars, bdd)
                         x = _bdd.or_forall(x, ~ env_action,
                                            aut.upvars, bdd)
-                        log_loop(i, j, None, x, y, z)
-                        log_bdd(bdd, '')
+                        if log.getEffectiveLevel() <= logging.DEBUG:
+                            log_loop(i, j, None, x, y, z)
+                            log_bdd(bdd, '')
                     log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -497,8 +498,9 @@ def construct_streett_transducer(z, aut, max_memory=None):
                                           aut.epvars, bdd)
                     x = _bdd.or_forall(new, ~ env_action,
                                        aut.upvars, bdd)
-                    log_loop(i, j, None, x, y, z)
-                    log_bdd(bdd, '')
+                    if log.getEffectiveLevel() <= logging.DEBUG:
+                        log_loop(i, j, None, x, y, z)
+                        log_bdd(bdd, '')
                 log.debug('Reached X fixpoint')
                 del xold, excuse
                 good = good | x
@@ -606,7 +608,7 @@ def log_event(**d):
 
 
 def log_loop(i, j, transducer, x, y, z):
-    if log.getEffectiveLevel() > logging.INFO:
+    if log.getEffectiveLevel() > logging.DEBUG:
         return
     if transducer is not None:
         transducer_nodes = len(transducer)
