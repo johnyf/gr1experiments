@@ -60,7 +60,7 @@ def run_gr1x(slugsin_file, strategy_file,
     proc = psutil.Process()
     proc.cpu_affinity(affinity)
     # log verbosity
-    level = logging.ERROR
+    level = logging.INFO
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
     # dump log
@@ -68,19 +68,17 @@ def run_gr1x(slugsin_file, strategy_file,
     log.addHandler(h)
     # capture execution environment
     versions = utils.snapshot_versions(check=False)
-    log.error(pprint.pformat(versions))
+    log.info(pprint.pformat(versions))
     # synthesize
     with open(slugsin_file, 'r') as f:
         s = f.read()
     t0 = time.time()
-    log.error(dict(time=t0, parse_slugsin=True))
     solver.solve_game(
         s,
         win_set_fname=win_set_file,
         strategy_fname=strategy_file,
         max_memory=1 * GB)
     t1 = time.time()
-    log.error(dict(time=t1, make_transducer_end=True))
     dt = datetime.timedelta(seconds=t1 - t0)
     print('Done with: {fname} in {dt}'.format(
         fname=slugsin_file, dt=dt))
