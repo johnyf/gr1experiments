@@ -63,8 +63,6 @@ def run_gr1x(slugsin_file, strategy_file,
     log.setLevel(level)
     # dump log
     h = logging.FileHandler(details_file, mode='w')
-    h.setLevel(level)
-    log = logging.getLogger(GR1X_LOG)
     log.addHandler(h)
     # capture execution environment
     versions = utils.snapshot_versions(check=False)
