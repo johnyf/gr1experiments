@@ -9,9 +9,13 @@ import humanize
 def main(name):
     rss_all = list()
     vms_all = list()
+    zombies = 0
     for proc in psutil.process_iter():
         s = proc.name()
         if s != name:
+            continue
+        if proc.status() == psutil.STATUS_ZOMBIE:
+            zombies += 1
             continue
         aff = proc.cpu_affinity()
         cpu100 = proc.cpu_percent()
@@ -48,7 +52,8 @@ def main(name):
     total_memory = psutil.virtual_memory().total
     total_memory_str = humanize.naturalsize(total_memory)
     print('\n' + 60 * '-')
-    print('found {n} instances of "{p}"'.format(n=n, p=name))
+    print('found {n} active instances of "{p}"'.format(n=n, p=name))
+    print('zombies {z}'.format(z=zombies))
     print('total RSS: {m}'.format(m=total_rss_str))
     print('total VMS: {m}'.format(m=total_vms_str))
     print('total memory: {m}'.format(m=total_memory_str))
