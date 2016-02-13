@@ -29,8 +29,8 @@ def plot_report():
         #'bunny/runs_slugs/': (2, 63),
         #'bunny_goals/runs/': (2, 32),
         #'bunny_goals/runs_slugs/': (2, 33),
-        #'synt15/runs_slugs/': (2, 33),
-        'synt15/runs/': (2, 65),
+        #'synt15/runs_slugs/': (2, 49),
+        'synt15/runs/': (2, 105),
         #'bunny/runs/': (2, 97)
     }
     for path, (first, last) in paths.iteritems():
