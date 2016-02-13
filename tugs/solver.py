@@ -32,7 +32,8 @@ SELECTOR = 'strat_type'
 WINNING_SET_FILE = 'winning_set'
 STRATEGY_FILE = 'tugs_strategy.dddmp'
 GB = 2**30
-MAX_MEMORY = 10 * GB
+MAX_MEMORY_GB = 10
+MAX_MEMORY = MAX_MEMORY_GB * GB
 INIT_CACHE = 2**18
 
 # TODO:
@@ -48,17 +49,21 @@ INIT_CACHE = 2**18
 
 @profile
 def solve_game(s, load_win_set=False,
-               win_set_fname=None, strategy_fname=None):
+               win_set_fname=None, strategy_fname=None,
+               max_memory=None):
     """Construct transducer for game in file `fname`.
 
     @param s: `str` in `slugs` syntax
     """
+    log.info('++ solver game')
+    if max_memory is None:
+        max_memory = MAX_MEMORY
     d = parse_slugsin(s)
     bdd = _bdd.BDD(
-        memory_estimate=MAX_MEMORY,
+        memory_estimate=max_memory,
         initial_cache_size=INIT_CACHE)
     bdd.configure(
-        max_memory=MAX_MEMORY,
+        max_memory=max_memory,
         max_growth=1.2)
     log.info(bdd.configure())
     aut = make_automaton(d, bdd)
@@ -75,7 +80,7 @@ def solve_game(s, load_win_set=False,
     if z == bdd.false:
         print('empty winning set')
         return
-    t = construct_streett_transducer(z, aut)
+    t = construct_streett_transducer(z, aut, max_memory=max_memory)
     dump_strategy(t)
     del z
 
@@ -419,15 +424,17 @@ def compute_winning_set(aut, z=None):
 
 
 @profile
-def construct_streett_transducer(z, aut):
+def construct_streett_transducer(z, aut, max_memory=None):
     """Return Street(1) I/O transducer."""
     log_event(make_transducer_start=True)
+    if max_memory is None:
+        max_memory = MAX_MEMORY
     # reordering_log = logging.getLogger(REORDERING_LOG)
     bdd = aut.bdd
     # one more manager
     if TWO_MANAGERS:
-        b3 = _bdd.BDD(memory_estimate=MAX_MEMORY)
-        b3.configure(max_memory=MAX_MEMORY)
+        b3 = _bdd.BDD(memory_estimate=max_memory)
+        b3.configure(max_memory=max_memory)
         _bdd.copy_vars(bdd, b3)
         # copy var order
         # order = var_order(bdd)
@@ -825,6 +832,8 @@ def command_line_wrapper(args=None):
                    help='dump strategy BDD to this file')
     p.add_argument('--debug', default=30, type=int,
                    help='logging level')
+    p.add_argument('--max_memory', default=MAX_MEMORY_GB, type=int,
+                   help='(hard) upper bound on memory, in GB')
     args = p.parse_args(args=args)
     # logging
     level = args.debug
@@ -835,12 +844,14 @@ def command_line_wrapper(args=None):
     win_set_fname = args.win_set
     strategy_fname = args.strategy
     fname = args.file
+    max_memory = args.max_memory * GB
     with open(fname, 'r') as f:
         slugsin = f.read()
     solve_game(
         slugsin,
         win_set_fname=win_set_fname,
-        strategy_fname=strategy_fname)
+        strategy_fname=strategy_fname,
+        max_memory=max_memory)
 
 
 def test_indices_and_levels():
