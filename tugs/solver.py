@@ -367,7 +367,7 @@ def compute_winning_set(aut, z=None):
         zold = z
         yj = list()
         for j, goal in enumerate(aut.win['[]<>']):
-            log.info('Goal: {j}'.format(j=j))
+            log.debug('Goal: {j}'.format(j=j))
             # log.info(bdd)
             zp = _bdd.rename(z, bdd, aut.prime)
             live_trans = goal & zp
@@ -505,10 +505,10 @@ def construct_streett_transducer(z, aut, max_memory=None):
                 del x
                 # strategy construction
                 # in `b3`
-                log.info('transfer `paths` to `b3`')
+                log.debug('transfer `paths` to `b3`')
                 paths = copy_bdd(paths, bdd, b3)
                 new = copy_bdd(new, bdd, b3)
-                log.info('done transferring')
+                log.debug('done transferring')
                 rim = new & ~ covered
                 covered = covered | new
                 del new
