@@ -81,7 +81,7 @@ def solve_game(s, load_win_set=False,
         print('empty winning set')
         return
     t = construct_streett_transducer(z, aut, max_memory=max_memory)
-    dump_strategy(t)
+    dump_strategy(t, fname=strategy_fname)
     del z
 
 
