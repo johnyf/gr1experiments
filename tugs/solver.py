@@ -626,8 +626,13 @@ def log_loop(i, j, transducer, x, y, z):
     log.debug(dlog)
 
 
-def log_bdd(bdd, name=''):
-    if log.getEffectiveLevel() > logging.INFO:
+def log_bdd(bdd, name='', level=10):
+    """Log statistics for given BDD manager.
+
+    If logger has effective level `<= level`,
+    then skip logging.
+    """
+    if log.getEffectiveLevel() > level:
         return
     # `psutil` used as in `openpromela.slugsin`
     pid = os.getpid()
