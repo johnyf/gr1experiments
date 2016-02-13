@@ -20,7 +20,8 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
-    """Measure the effect on runtime of multiple instances."""
+    """Run concurrent instances, increasing their number."""
+    print('run increasingly larger groups of instances.')
     problem = 'synt15'
     output = 'runs_testing'
     target = run_gr1x
@@ -54,7 +55,7 @@ def run_parallel():
 
 def run_gr1x(slugsin_file, strategy_file,
              details_file, affinity=None, **kw):
-    """Run concurrent instances, increasing their number."""
+    """Run `gr1x` instance with given affinity."""
     win_set_file = 'winning_set'
     proc = psutil.Process()
     proc.cpu_affinity(affinity)
@@ -90,6 +91,7 @@ def run_gr1x(slugsin_file, strategy_file,
 
 def plot_saturation():
     """Plot time versus number of processors active."""
+    print('plot saturating effect')
     fig_fname = 'cpu_saturation.pdf'
     problem = 'synt15'
     output = 'runs_testing'
