@@ -112,17 +112,22 @@ def plot_vs_parameter(path, first, last):
         t0 = data['make_transducer_start']['time'][0]
         t1 = data['make_transducer_end']['time'][0]
         t_make = t1 - t0
-        # reordering BDD 0
-        rt = data['reordering_time']['value'][-1]
-        r = rt / t
-        upratio_0.append(r)
-        reordering_time_0.append(rt)
-        # total nodes 0
-        tn = data['total_nodes']['value'][-1]
-        total_nodes_0.append(tn)
-        # peak nodes 0
-        p = data['peak_nodes']['value'][-1]
-        peak_nodes_0.append(p)
+        if 'reordering_time' in data:
+            # reordering BDD 0
+            rt = data['reordering_time']['value'][-1]
+            r = rt / t
+            upratio_0.append(r)
+            reordering_time_0.append(rt)
+            # total nodes 0
+            tn = data['total_nodes']['value'][-1]
+            total_nodes_0.append(tn)
+            # peak nodes 0
+            p = data['peak_nodes']['value'][-1]
+            peak_nodes_0.append(p)
+            bdd0 = True
+        else:
+            print('Warning: no BDD manager 0')
+            bdd0 = False
         if 'b3_reordering_time' in data:
             # reordering BDD 1
             rt = data['b3_reordering_time']['value'][-1]
@@ -135,9 +140,10 @@ def plot_vs_parameter(path, first, last):
             # peak nodes 1
             p = data['b3_peak_nodes']['value'][-1]
             peak_nodes_1.append(p)
-            bdd2 = True
+            bdd1 = True
         else:
-            bdd2 = False
+            print('Warning: no BDD manager 1')
+            bdd1 = False
     # np arrays
     n_masters = np.array(n_masters)
     total_time = np.array(total_time)
@@ -167,8 +173,9 @@ def plot_vs_parameter(path, first, last):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
         total_reordering_time = reordering_time_0
-    plt.plot(n_masters, total_reordering_time, 'g-o',
-             label='Total reordering time')
+    if bdd0:
+        plt.plot(n_masters, total_reordering_time, 'g-o',
+                 label='Total reordering time')
     # annotate
     ax.set_yscale('log')
     ax.tick_params(labelsize=tsz)
@@ -179,9 +186,10 @@ def plot_vs_parameter(path, first, last):
     # ratios
     ax = plt.subplot(3, 1, 2)
     plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
-    plt.plot(n_masters, upratio_0, 'b-o',
-             label='Reordering ratio (1)', markevery=10)
-    if bdd2:
+    if bdd0:
+        plt.plot(n_masters, upratio_0, 'b-o',
+                 label='Reordering ratio (1)', markevery=10)
+    if bdd1:
         plt.plot(n_masters, upratio_1, 'r--o',
                  label='Reordering ratio (2)', markevery=10)
     if len(win_dump_ratio) == len(n_masters):
@@ -200,11 +208,12 @@ def plot_vs_parameter(path, first, last):
     plt.legend(loc='upper left')
     # nodes
     ax = plt.subplot(3, 1, 3)
-    plt.plot(n_masters, total_nodes_0, 'b-+',
-             label='Total (1)', markevery=10)
-    plt.plot(n_masters, peak_nodes_0, 'b-*',
-             label='Peak (1)', markevery=10)
-    if bdd2:
+    if bdd0:
+        plt.plot(n_masters, total_nodes_0, 'b-+',
+                 label='Total (1)', markevery=10)
+        plt.plot(n_masters, peak_nodes_0, 'b-*',
+                 label='Peak (1)', markevery=10)
+    if bdd1:
         plt.plot(n_masters, total_nodes_1, 'r--+',
                  label='Total (2)', markevery=10)
         plt.plot(n_masters, peak_nodes_1, 'r--*',
