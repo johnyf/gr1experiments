@@ -812,7 +812,7 @@ def main():
     command_line_wrapper(input_fname)
 
 
-def command_line_wrapper():
+def command_line_wrapper(args=None):
     """Solve game defined in `slugsin` file `fname`."""
     p = argparse.ArgumentParser()
     p.add_argument('file', type=str,
@@ -825,7 +825,7 @@ def command_line_wrapper():
                    help='dump strategy BDD to this file')
     p.add_argument('--debug', default=30, type=int,
                    help='logging level')
-    args = p.parse_args()
+    args = p.parse_args(args=args)
     # logging
     level = args.debug
     log.setLevel(level=level)
