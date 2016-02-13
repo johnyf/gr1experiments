@@ -107,25 +107,17 @@ def run_gr1x(slugsin_file, strategy_file,
              details_file, affinity=None, **kw):
     """Run `gr1x` for problem define in `slugsin_file`."""
     win_set_file = 'winning_set'
-    print('Starting: {fname}'.format(fname=slugsin_file))
     proc = psutil.Process()
-    print('PID: {pid}'.format(pid=proc.pid))
-    aff = proc.cpu_affinity()
-    print('Affinity before: {aff}'.format(aff=aff))
     proc.cpu_affinity(affinity)
-    aff = proc.cpu_affinity()
-    print('Affinity after set: {aff}'.format(aff=aff))
-    # capture execution environment
-    versions = utils.snapshot_versions(check=False)
-    # config log
+    # log verbosity
     level = logging.DEBUG
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
-    # setup log
+    # dump log
     h = logging.FileHandler(details_file, mode='w')
-    h.setLevel(level)
-    log = logging.getLogger(GR1X_LOG)
     log.addHandler(h)
+    # log versions
+    versions = utils.snapshot_versions(check=False)
     log.info(pprint.pformat(versions))
     # synthesize
     with open(slugsin_file, 'r') as f:
@@ -135,13 +127,11 @@ def run_gr1x(slugsin_file, strategy_file,
         s,
         win_set_fname=win_set_file,
         strategy_fname=strategy_file)
-    # TODO: model check dumped strategy
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
     print('Done with: {fname} in {dt}'.format(
         fname=slugsin_file, dt=dt))
     # close log file
-    log = logging.getLogger(GR1X_LOG)
     log.removeHandler(h)
     h.close()
     sys.stdout.flush()
