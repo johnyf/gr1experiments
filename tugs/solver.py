@@ -651,7 +651,7 @@ def log_bdd(bdd, name=''):
         name + 'n_reorderings': n_reorderings,
         name + 'total_nodes': len(bdd),
         name + 'peak_nodes': peak_nodes}
-    log.debug(dlog)
+    log.info(dlog)
 
 
 def check_winning_region(transducer, aut, t, bdd,
