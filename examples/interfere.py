@@ -63,9 +63,6 @@ def run_gr1x(slugsin_file, strategy_file,
     level = logging.ERROR
     log = logging.getLogger(GR1X_LOG)
     log.setLevel(level)
-    level = logging.DEBUG
-    log = logging.getLogger(__name__)
-    log.setLevel(level)
     # dump log
     h = logging.FileHandler(details_file, mode='w')
     log.addHandler(h)
