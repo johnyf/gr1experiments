@@ -41,7 +41,7 @@ def snapshot_versions(check=True):
     d['time'] = t_now
     d['platform'] = os.uname()
     if not check:
-        return
+        return d
     # existing log ?
     try:
         with open(CONFIG_FILE, 'r') as f:
