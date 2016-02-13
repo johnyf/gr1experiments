@@ -10,8 +10,6 @@ import psutil
 from tugs import solver
 from tugs import utils
 import matplotlib as mpl
-from matplotlib import verbose
-verbose.set_level('debug')
 mpl.use('Agg')
 from matplotlib import pyplot as plt
 
