@@ -398,7 +398,7 @@ def compute_winning_set(aut, z=None):
                                            aut.upvars, bdd)
                         if log.getEffectiveLevel() <= logging.DEBUG:
                             log_loop(i, j, None, x, y, z)
-                            log_bdd(bdd, '')
+                            log_bdd(bdd)
                     log.debug('Reached X fixpoint')
                     del xold
                     good = good | x
@@ -467,7 +467,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
     log.info(b3.configure())
     for j, goal in enumerate(aut.win['[]<>']):
         log.debug('Goal: {j}'.format(j=j))
-        log_bdd(bdd, '')
+        log_bdd(bdd)
         # for fixpoint
         live_trans = goal & zp
         y = bdd.false
@@ -500,7 +500,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
                                        aut.upvars, bdd)
                     if log.getEffectiveLevel() <= logging.DEBUG:
                         log_loop(i, j, None, x, y, z)
-                        log_bdd(bdd, '')
+                        log_bdd(bdd)
                 log.debug('Reached X fixpoint')
                 del xold, excuse
                 good = good | x
@@ -523,7 +523,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
         log.debug('Reached Y fixpoint (Y = Z)')
         assert y == z, (y, z)
         del y, yold, covered
-        log_bdd(b3, 'b3_')
+        log_bdd(b3, name='b3_')
         # make transducer
         goal = copy_bdd(goal, bdd, b3)
         e = '{c} = {j}'.format(c=COUNTER, j=j)
