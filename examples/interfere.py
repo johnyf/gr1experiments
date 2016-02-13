@@ -30,9 +30,9 @@ def run_parallel():
     strategy_file = '{problem}/{output}/strategy.txt'.format(
         problem=problem, output=output)
     n_cpus = psutil.cpu_count(logical=False)
-    print('{n_cpus} physical CPUs')
+    print('{n_cpus} physical CPUs'.format(n_cpus=n_cpus))
     n_cpus = psutil.cpu_count(logical=True)
-    print('{n_cpus} logical CPUs')
+    print('{n_cpus} logical CPUs'.format(n_cpus=n_cpus))
     for n in xrange(1, n_cpus + 1):
         print('trying {n} CPUs'.format(n=n))
         procs = list()
