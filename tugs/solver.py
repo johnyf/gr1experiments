@@ -621,7 +621,7 @@ def log_loop(i, j, transducer, x, y, z):
         x_nodes=len(x),
         y_nodes=len(y),
         z_nodes=len(z))
-    log.info(dlog)
+    log.debug(dlog)
 
 
 def log_bdd(bdd, name=''):
@@ -649,7 +649,7 @@ def log_bdd(bdd, name=''):
         name + 'n_reorderings': n_reorderings,
         name + 'total_nodes': len(bdd),
         name + 'peak_nodes': peak_nodes}
-    log.info(dlog)
+    log.debug(dlog)
 
 
 def check_winning_region(transducer, aut, t, bdd,
