@@ -21,7 +21,7 @@ except AttributeError:
 
 log = logging.getLogger(__name__)
 # algorithms
-BINARY_CONJ = True  # overrides `DEFER_Z`
+BINARY_CONJ = False  # overrides `DEFER_Z`
 DEFER_Z = True
 TWO_MANAGERS = True
 MEMOIZE_ITERATES = False
