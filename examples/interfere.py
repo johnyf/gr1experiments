@@ -85,7 +85,6 @@ def run_gr1x(slugsin_file, strategy_file,
     print('Done with: {fname} in {dt}'.format(
         fname=slugsin_file, dt=dt))
     # close log file
-    log = logging.getLogger(GR1X_LOG)
     log.removeHandler(h)
     h.close()
     sys.stdout.flush()
