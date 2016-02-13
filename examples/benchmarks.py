@@ -44,6 +44,7 @@ def run_parallel():
     n = first
     for j in xrange(8):
         m = n + n_cpus
+        print('spawn {n} to {m}'.format(n=n, m=m))
         group = list()
         for i in xrange(n, m):
             d = dict(
@@ -60,7 +61,6 @@ def run_parallel():
             p = mp.Process(target=target, kwargs=d)
             procs.append(p)
         for p in procs:
-            print('spawn: {f}'.format(f=d['slugsin_file']))
             p.start()
         for p in procs:
             p.join()
