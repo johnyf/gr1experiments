@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 BINARY_CONJ = True  # overrides `DEFER_Z`
 DEFER_Z = True
 TWO_MANAGERS = True
-MEMOIZE_ITERATES = True
+MEMOIZE_ITERATES = False
 # constants
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
