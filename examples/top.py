@@ -68,8 +68,11 @@ def kill(name):
         print('name is None')
         return
     n = 0
+    me = psutil.Process()
     for proc in psutil.process_iter():
         s = proc.name()
+        if proc.pid == me.pid:
+            continue
         if s != name:
             continue
         proc.kill()
@@ -86,4 +89,3 @@ if __name__ == '__main__':
     args = p.parse_args()
     main(args.name)
     kill(args.kill)
-
