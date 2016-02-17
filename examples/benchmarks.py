@@ -20,11 +20,11 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
-    first = 34
-    problem = 'bunny_many_goals'
+    first = 2
+    problem = 'synt15'
     solver = 'slugs'
     if solver == 'slugs':
-        output = 'runs_slugs'
+        output = 'runs_slugs_browne'
         target = run_slugs
     elif solver == 'gr1x':
         output = 'runs'
@@ -41,22 +41,29 @@ def run_parallel():
     psutil_path = '{problem}/{output}/psutil_{i}.txt'.format(
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
+    # all_cpus = range(n_cpus)
+    all_cpus = [3]
+    concurrent = 1
+    repetitions = 50
+    final = first + concurrent * repetitions
+    print('will run from {first} to {final}'.format(
+        first=first, final=final))
+    assert concurrent <= n_cpus, (concurrent, n_cpus)
     n = first
-    for j in xrange(2):
-        m = n + n_cpus
+    for j in xrange(repetitions):
+        m = n + concurrent
         print('spawn {n} to {m}'.format(n=n, m=m))
-        group = list()
+        jobs = list()
         for i in xrange(n, m):
             d = dict(
                 slugsin_file=slugsin_path.format(i=i),
                 details_file=details_path.format(i=i),
                 strategy_file=strategy_path,
                 psutil_file=psutil_path.format(i=i))
-            group.append(d)
+            jobs.append(d)
         n = m
         procs = list()
-        all_cpus = xrange(n_cpus)
-        for d, cpu in zip(group, all_cpus):
+        for d, cpu in zip(jobs, all_cpus):
             d['affinity'] = [cpu]
             p = mp.Process(target=target, kwargs=d)
             procs.append(p)
