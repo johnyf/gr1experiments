@@ -53,9 +53,9 @@ def make_promela(n):
 
 def form_progress(n):
     """Return conjunction of LTL formulae for progress."""
-    g0 = ('[]<>((x == {k}) && (y == 0))'.format(k=k)
+    g0 = ('[]<>((x == 0) && (y == {k}))'.format(k=k)
           for k in xrange(n))
-    g1 = ('[]<>((x == 0) && (y == {k}))'.format(k=k)
+    g1 = ('[]<>((x == {n}) && (y == {k}))'.format(k=k, n=n)
           for k in xrange(n))
     c = itertools.chain(g0, g1)
     prog = ' && '.join(c)
