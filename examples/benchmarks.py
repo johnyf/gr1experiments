@@ -52,7 +52,7 @@ def run_parallel():
     n = first
     for j in xrange(repetitions):
         m = n + concurrent
-        print('spawn {n} to {m}'.format(n=n, m=m))
+        print('spawn {n} to {last}'.format(n=n, last=m - 1))
         jobs = list()
         for i in xrange(n, m):
             d = dict(
