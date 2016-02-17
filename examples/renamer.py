@@ -10,8 +10,8 @@ def main():
         print(f)
         newf = f.replace('bunny_', 'bunny_goals_')
         print(newf)
-        a = path + f
-        b = path + newf
+        a = os.path.join(path, f)
+        b = os.path.join(path, newf)
         shutil.move(a, b)
 
 
