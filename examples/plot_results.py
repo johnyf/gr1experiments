@@ -164,6 +164,7 @@ def plot_comparison(paths):
     for k, path in paths.iteritems():
         fname = 'data.pickle'.format(path=path)
         pickle_fname = os.path.join(path, fname)
+        print('open "{f}"'.format(f=pickle_fname))
         with open(pickle_fname, 'r') as f:
             measurements[k] = pickle.load(f)
     # plot
@@ -177,6 +178,7 @@ def plot_comparison(paths):
     for (k, d), style in zip(measurements.iteritems(), styles):
         plot_single_experiment_vs_parameter(d, k, style)
     # save
+    print('save "{f}"'.format(f=fig_fname))
     plt.savefig(fig_fname, bbox_inches='tight')
 
 
