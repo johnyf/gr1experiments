@@ -841,7 +841,13 @@ def command_line_wrapper(args=None):
                    help='logging level')
     p.add_argument('--max_memory', default=MAX_MEMORY_GB, type=int,
                    help='(hard) upper bound on memory, in GB')
+    p.add_argument('--cpu', type=int,
+                   help='attach self to this logical CPU id')
     args = p.parse_args(args=args)
+    # pin to CPU
+    affinity = [args.cpu]
+    proc = psutil.Process()
+    proc.cpu_affinity(affinity)
     # logging
     level = args.debug
     log.setLevel(level=level)
