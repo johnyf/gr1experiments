@@ -140,6 +140,7 @@ def plot_vs_parameter(path, first, last, repickle=False):
     plt.ylabel('Ratios', fontsize=fsz)
     leg = plt.legend(loc='upper left', fancybox=True)
     leg.get_frame().set_alpha(0.5)
+    #
     # nodes
     ax = plt.subplot(3, 1, 3)
     if len(total_nodes_0) == len(n_masters):
@@ -176,8 +177,14 @@ def plot_comparison(paths):
       - total nodes
       - peak nodes
     """
+    assert len(paths) >= 2, paths
+    data_paths = dict(paths)
+    if 'numerator' in data_paths:
+        data_paths.pop('numerator')
+    else:
+        paths['numerator'] = next(iter(paths))
     measurements = dict()
-    for k, path in paths.iteritems():
+    for k, path in data_paths.iteritems():
         fname = 'data.pickle'.format(path=path)
         pickle_fname = os.path.join(path, fname)
         print('open "{f}"'.format(f=pickle_fname))
@@ -187,15 +194,43 @@ def plot_comparison(paths):
     head, _ = os.path.split(path)
     fig_fname = os.path.join(head, 'comparison.pdf')
     fig = plt.figure()
-    fig.set_size_inches(5, 10)
+    fig.set_size_inches(5, 12.5)
     plt.clf()
     plt.subplots_adjust(hspace=0.3)
     styles = ['b-', 'r--']
     for (k, d), style in zip(measurements.iteritems(), styles):
         plot_single_experiment_vs_parameter(d, k, style)
+    plot_total_time_ratio(measurements, paths, data_paths)
     # save
     print('save "{f}"'.format(f=fig_fname))
     plt.savefig(fig_fname, bbox_inches='tight')
+
+
+def plot_total_time_ratio(measurements, paths, data_paths):
+    assert len(measurements) == 2, measurements
+    ax = plt.subplot(5, 1, 5)
+    ax.set_yscale('log')
+    end = min(len(d['n_masters'])
+              for d in measurements.itervalues())
+    n_masters = xrange(2, end)
+    numerator = paths['numerator']
+    denominator = set(data_paths)
+    denominator.remove(numerator)
+    (denominator,) = denominator
+    y = (
+        measurements[numerator]['total_time'][2:end] /
+        measurements[denominator]['total_time'][2:end])
+    plt.plot(n_masters, y, 'b-')
+    plt.plot([2, end], [1.0, 1.0], 'g--')
+    # annotate
+    fsz = 12
+    tsz = 12
+    ax.tick_params(labelsize=tsz)
+    plt.grid(True)
+    plt.xlabel('Parameter', fontsize=fsz)
+    title = 'Ratio of total time\n({a} / {b})'.format(
+        a=numerator, b=denominator)
+    plt.ylabel(title, fontsize=fsz)
 
 
 def plot_single_experiment_vs_parameter(measurements, name, style):
@@ -212,7 +247,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     peak_nodes_1 = measurements['peak_nodes_1']
     #
     # total time
-    ax = plt.subplot(4, 1, 1)
+    ax = plt.subplot(5, 1, 1)
     plt.plot(n_masters, total_time, style, label=name)
     # annotate
     ax.set_yscale('log')
@@ -224,7 +259,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # reordering time
-    ax = plt.subplot(4, 1, 2)
+    ax = plt.subplot(5, 1, 2)
     if len(reordering_time_1):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
@@ -242,7 +277,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
-    ax = plt.subplot(4, 1, 3)
+    ax = plt.subplot(5, 1, 3)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, peak_nodes_0, style + 'o',
                  label='{name} (1)'.format(name=name),
@@ -261,7 +296,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
-    ax = plt.subplot(4, 1, 4)
+    ax = plt.subplot(5, 1, 4)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, total_nodes_0, style,
                  label='{name} (1)'.format(name=name),
