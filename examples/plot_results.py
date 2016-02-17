@@ -135,6 +135,42 @@ def plot_vs_parameter(path, first, last, repickle=False):
     plt.savefig(fig_fname, bbox_inches='tight')
 
 
+def plot_comparison_report():
+    paths = dict(
+        new='bunny_many_goals/runs',
+        slugs='bunny_many_goals/runs_slugs')
+    plot_comparison(paths)
+
+
+def plot_comparison(paths):
+    """Plot time, ratios, BDD nodes over parameterized experiments.
+
+      - time
+      - winning set computation / total time
+      - reordering / total time
+      - total nodes
+      - peak nodes
+    """
+    measurements = dict()
+    for k, path in paths.iteritems():
+        fname = 'data.pickle'.format(path=path)
+        pickle_fname = os.path.join(path, fname)
+        with open(pickle_fname, 'r') as f:
+            measurements[k] = pickle.load(f)
+    # plot
+    head, _ = os.path.split(path)
+    fig_fname = os.path.join(head, 'comparison.pdf')
+    fig = plt.figure()
+    fig.set_size_inches(5, 10)
+    plt.clf()
+    plt.subplots_adjust(hspace=0.3)
+    styles = ['b-', 'r--']
+    for (k, d), style in zip(measurements.iteritems(), styles):
+        plot_single_experiment_vs_parameter(d, k, style)
+    # save
+    plt.savefig(fig_fname, bbox_inches='tight')
+
+
 def plot_single_experiment_vs_parameter(measurements, name, style):
     fsz = 12
     tsz = 12
@@ -410,7 +446,12 @@ def plot_single_experiment_vs_time(details_file, fig_file):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
+    p.add_argument('--compare', action='store_true',
+                   help='plot comparison of two directories')
     p.add_argument('--repickle', action='store_true',
                    help='ignore older pickled data')
     args = p.parse_args()
-    plot_report(args.repickle)
+    if args.compare:
+        plot_comparison_report()
+    else:
+        plot_report(args.repickle)
