@@ -4,7 +4,6 @@ import argparse
 from itertools import cycle
 import os
 import pickle
-import logging
 import matplotlib as mpl
 mpl.use('Agg')
 from matplotlib import pyplot as plt
@@ -16,12 +15,6 @@ mpl.rc('xtick', labelsize=7)
 mpl.rc('ytick', labelsize=7)
 mpl.rc('font', size=7)
 col_gen = cycle('bgrcmk')
-GR1X_LOG = 'tugs.solver'
-JSON_FILE = 'details.json'
-INPUT_FILE = 'amba_conj.pml'
-CONFIG_FILE = 'config.json'
-N = 2
-M = 17
 
 
 def plot_report(repickle):
@@ -417,20 +410,6 @@ def plot_single_experiment_vs_time(details_file, fig_file):
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser()
-    p.add_argument('--min', default=N, type=int,
-                   help='from this # of masters')
-    p.add_argument('--max', default=M, type=int,
-                   help='to this # of masters')
-    p.add_argument('--debug', type=int, default=logging.ERROR,
-                   help='python logging level')
-    p.add_argument('--run', default=False, action='store_true',
-                   help='synthesize')
-    p.add_argument('--repeat', default=1, type=int,
-                   help='multiple runs from min to max')
-    p.add_argument('--solver', default='slugs', type=str,
-                   choices=['slugs', 'gr1x', 'compare'])
-    p.add_argument('--plot', action='store_true',
-                   help='generate plots')
     p.add_argument('--repickle', action='store_true',
                    help='ignore older pickled data')
     args = p.parse_args()
