@@ -20,9 +20,9 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
-    first = 2
-    problem = 'synt15'
-    solver = 'gr1x'
+    first = 34
+    problem = 'bunny_many_goals'
+    solver = 'slugs'
     if solver == 'slugs':
         output = 'runs_slugs'
         target = run_slugs
@@ -42,7 +42,7 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
     n = first
-    for j in xrange(8):
+    for j in xrange(2):
         m = n + n_cpus
         print('spawn {n} to {m}'.format(n=n, m=m))
         group = list()

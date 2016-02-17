@@ -146,8 +146,11 @@ def plot_vs_parameter(path, first, last, repickle=False):
 
 def plot_comparison_report():
     paths = dict(
-        new='bunny_many_goals/runs',
-        slugs='bunny_many_goals/runs_slugs')
+        # new='bunny_many_goals/runs',
+        # slugs='bunny_many_goals/runs_slugs'
+        new='synt15/runs_gr1x_logging_info',
+        memoize='synt15/runs_gr1x_memoize',
+    )
     plot_comparison(paths)
 
 
