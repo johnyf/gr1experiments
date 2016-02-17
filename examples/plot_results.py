@@ -23,10 +23,10 @@ def plot_report(repickle):
         # 'bunny/runs_slugs/': (2, 63),
         # 'bunny_goals/runs/': (2, 32),
         # 'bunny_goals/runs_slugs/': (2, 33),
-        #'bunny_many_goals/runs/': (2, 49),
-        'bunny_many_goals/runs_slugs/': (2, 41),
+        # 'bunny_many_goals/runs/': (2, 49),
+        # 'bunny_many_goals/runs_slugs/': (2, 41),
         # 'synt15/runs_slugs/': (2, 49),
-        # 'synt15/runs/': (2, 65),
+        'synt15/runs/': (2, 50),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
