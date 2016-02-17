@@ -97,10 +97,13 @@ def plot_vs_parameter(path, first, last, repickle=False):
     fig.set_size_inches(5, 10)
     plt.clf()
     plt.subplots_adjust(hspace=0.3)
+    #
     # times
     ax = plt.subplot(3, 1, 1)
     plt.plot(n_masters, total_time, 'b-', label='Total time')
-    plt.plot(n_masters, win_time, 'r--', label='Winning set fixpoint')
+    if len(win_time) == len(n_masters):
+        plt.plot(n_masters, win_time, 'r--',
+                 label='Winning set fixpoint')
     if len(reordering_time_1):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
@@ -116,9 +119,11 @@ def plot_vs_parameter(path, first, last, repickle=False):
     plt.ylabel('Time (sec)', fontsize=fsz)
     leg = plt.legend(loc='upper left', fancybox=True)
     leg.get_frame().set_alpha(0.5)
+    #
     # ratios
     ax = plt.subplot(3, 1, 2)
-    plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
+    if len(win_ratio) == len(n_masters):
+        plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
     if len(upratio_0) == len(n_masters):
         plt.plot(n_masters, upratio_0, 'b-o',
                  label='Reordering ratio (1)', markevery=10)
@@ -374,12 +379,13 @@ def collect_measurements(data, measurements):
     t = t1 - t0
     measurements['total_time'].append(t)
     # winning set / total time
-    t0 = data['winning_set_start']['time'][0]
-    t1 = data['winning_set_end']['time'][0]
-    t_win = t1 - t0
-    r = t_win / t
-    measurements['win_ratio'].append(r)
-    measurements['win_time'].append(t_win)
+    if 'winning_set_start' in data:
+        t0 = data['winning_set_start']['time'][0]
+        t1 = data['winning_set_end']['time'][0]
+        t_win = t1 - t0
+        r = t_win / t
+        measurements['win_ratio'].append(r)
+        measurements['win_time'].append(t_win)
     # winning set dump time / total time
     if 'dump_winning_set_start' in data:
         t0 = data['dump_winning_set_start']['time'][0]
