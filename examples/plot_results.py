@@ -2,6 +2,7 @@
 """Analyze logs and plot results."""
 import argparse
 from itertools import cycle
+import os
 import pickle
 import logging
 import matplotlib as mpl
@@ -23,7 +24,7 @@ N = 2
 M = 17
 
 
-def plot_report():
+def plot_report(repickle):
     paths = {
         #'bunny/runs/': (2, 65),
         #'bunny/runs_slugs/': (2, 63),
@@ -34,10 +35,10 @@ def plot_report():
         #'bunny/runs/': (2, 97)
     }
     for path, (first, last) in paths.iteritems():
-        plot_vs_parameter(path, first, last)
+        plot_vs_parameter(path, first, last, repickle=repickle)
 
 
-def plot_vs_parameter(path, first, last):
+def plot_vs_parameter(path, first, last, repickle=False):
     """Plot time, ratios, BDD nodes over parameterized experiments.
 
       - time
@@ -46,121 +47,27 @@ def plot_vs_parameter(path, first, last):
       - total nodes
       - peak nodes
     """
-    log_fname = '{path}details_{i}.txt'.format(
-        path=path, i='{i}')
+    measurements = pickle_results(path, first, last, repickle)
+    # expand
+    n_masters = measurements['n_masters']
+    total_time = measurements['total_time']
+    reordering_time_0 = measurements['reordering_time_0']
+    reordering_time_1 = measurements['reordering_time_1']
+    win_time = measurements['win_time']
+    win_ratio = measurements['win_ratio']
+    win_dump_ratio = measurements['win_dump_ratio']
+    strategy_dump_ratio = measurements['strategy_dump_ratio']
+    upratio_0 = measurements['upratio_0']
+    upratio_1 = measurements['upratio_1']
+    total_nodes_0 = measurements['total_nodes_0']
+    total_nodes_1 = measurements['total_nodes_1']
+    peak_nodes_0 = measurements['peak_nodes_0']
+    peak_nodes_1 = measurements['peak_nodes_1']
+    transducer_nodes = measurements['transducer_nodes']
+    # plot
     fig_fname = '{path}stats.pdf'.format(path=path)
-    pickle_fname = '{path}data.pickle'.format(path=path)
-    n = first
-    m = last + 1
     fsz = 20
     tsz = 15
-    n_masters = list()
-    total_time = list()
-    reordering_time_0 = list()
-    reordering_time_1 = list()
-    win_time = list()
-    win_ratio = list()
-    win_dump_ratio = list()
-    strategy_dump_ratio = list()
-    upratio_0 = list()
-    upratio_1 = list()
-    total_nodes_0 = list()
-    total_nodes_1 = list()
-    peak_nodes_0 = list()
-    peak_nodes_1 = list()
-    transducer_nodes = list()
-    for i in xrange(n, m):
-        fname = log_fname.format(i=i)
-        try:
-            data = utils.load_log_file(fname)
-            n_masters.append(i)
-            print('open "{fname}"'.format(fname=fname))
-        except:
-            print('Skip: missing log file "{f}"'.format(
-                f=fname))
-            continue
-        # total time
-        t0 = data['parse_slugsin']['time'][0]
-        t1 = data['make_transducer_end']['time'][0]
-        t = t1 - t0
-        total_time.append(t)
-        # winning set / total time
-        t0 = data['winning_set_start']['time'][0]
-        t1 = data['winning_set_end']['time'][0]
-        t_win = t1 - t0
-        r = t_win / t
-        win_ratio.append(r)
-        win_time.append(t_win)
-        # winning set dump time / total time
-        if 'dump_winning_set_start' in data:
-            t0 = data['dump_winning_set_start']['time'][0]
-            t1 = data['dump_winning_set_end']['time'][0]
-            t_dump_win = t1 - t0
-            r = t_dump_win / t
-            win_dump_ratio.append(r)
-        # strategy dump time / total time
-        if 'dump_strategy_start' in data:
-            t0 = data['dump_strategy_start']['time'][0]
-            t1 = data['dump_strategy_end']['time'][0]
-            t_dump_strategy = t1 - t0
-            r = t_dump_strategy / t
-            strategy_dump_ratio.append(r)
-        if 'transducer_nodes' in data:
-            x = data['transducer_nodes']['value'][-1]
-            transducer_nodes.append(x)
-        # construction time
-        t0 = data['make_transducer_start']['time'][0]
-        t1 = data['make_transducer_end']['time'][0]
-        t_make = t1 - t0
-        if 'reordering_time' in data:
-            # reordering BDD 0
-            rt = data['reordering_time']['value'][-1]
-            r = rt / t
-            upratio_0.append(r)
-            reordering_time_0.append(rt)
-            # total nodes 0
-            tn = data['total_nodes']['value'][-1]
-            total_nodes_0.append(tn)
-            # peak nodes 0
-            p = data['peak_nodes']['value'][-1]
-            peak_nodes_0.append(p)
-            bdd0 = True
-        else:
-            print('Warning: no BDD manager 0')
-            bdd0 = False
-        if 'b3_reordering_time' in data:
-            # reordering BDD 1
-            rt = data['b3_reordering_time']['value'][-1]
-            r = rt / t_make
-            upratio_1.append(r)
-            reordering_time_1.append(r)
-            # total nodes 1
-            tn = data['b3_total_nodes']['value'][-1]
-            total_nodes_1.append(tn)
-            # peak nodes 1
-            p = data['b3_peak_nodes']['value'][-1]
-            peak_nodes_1.append(p)
-            bdd1 = True
-        else:
-            print('Warning: no BDD manager 1')
-            bdd1 = False
-    # np arrays
-    n_masters = np.array(n_masters)
-    total_time = np.array(total_time)
-    reordering_time_0 = np.array(reordering_time_0)
-    reordering_time_1 = np.array(reordering_time_1)
-    win_time = np.array(win_time)
-    win_ratio = np.array(win_ratio)
-    win_dump_ratio = np.array(win_dump_ratio)
-    strategy_dump_ratio = np.array(strategy_dump_ratio)
-    upratio_0 = np.array(upratio_0)
-    upratio_1 = np.array(upratio_1)
-    total_nodes_0 = np.array(total_nodes_0)
-    total_nodes_1 = np.array(total_nodes_1)
-    peak_nodes_0 = np.array(peak_nodes_0)
-    peak_nodes_1 = np.array(peak_nodes_1)
-    transducer_nodes = np.array(transducer_nodes)
-    # plot
     fig = plt.figure()
     fig.set_size_inches(5, 10)
     plt.clf()
@@ -173,7 +80,7 @@ def plot_vs_parameter(path, first, last):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
         total_reordering_time = reordering_time_0
-    if bdd0:
+    if len(total_reordering_time) == len(n_masters):
         plt.plot(n_masters, total_reordering_time, 'g-o',
                  label='Total reordering time')
     # annotate
@@ -187,10 +94,10 @@ def plot_vs_parameter(path, first, last):
     # ratios
     ax = plt.subplot(3, 1, 2)
     plt.plot(n_masters, win_ratio, 'b-.', label='Win / total time')
-    if bdd0:
+    if len(upratio_0) == len(n_masters):
         plt.plot(n_masters, upratio_0, 'b-o',
                  label='Reordering ratio (1)', markevery=10)
-    if bdd1:
+    if len(upratio_1) == len(n_masters):
         plt.plot(n_masters, upratio_1, 'r--o',
                  label='Reordering ratio (2)', markevery=10)
     if len(win_dump_ratio) == len(n_masters):
@@ -210,12 +117,12 @@ def plot_vs_parameter(path, first, last):
     leg.get_frame().set_alpha(0.5)
     # nodes
     ax = plt.subplot(3, 1, 3)
-    if bdd0:
+    if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, total_nodes_0, 'b-+',
                  label='Total (1)', markevery=10)
         plt.plot(n_masters, peak_nodes_0, 'b-*',
                  label='Peak (1)', markevery=10)
-    if bdd1:
+    if len(total_nodes_1) == len(n_masters):
         plt.plot(n_masters, total_nodes_1, 'r--+',
                  label='Total (2)', markevery=10)
         plt.plot(n_masters, peak_nodes_1, 'r--*',
@@ -233,14 +140,201 @@ def plot_vs_parameter(path, first, last):
     leg.get_frame().set_alpha(0.5)
     # save
     plt.savefig(fig_fname, bbox_inches='tight')
+
+
+def plot_single_experiment_vs_parameter(measurements, name, style):
+    fsz = 12
+    tsz = 12
+    # expand
+    n_masters = measurements['n_masters']
+    total_time = measurements['total_time']
+    reordering_time_0 = measurements['reordering_time_0']
+    reordering_time_1 = measurements['reordering_time_1']
+    total_nodes_0 = measurements['total_nodes_0']
+    total_nodes_1 = measurements['total_nodes_1']
+    peak_nodes_0 = measurements['peak_nodes_0']
+    peak_nodes_1 = measurements['peak_nodes_1']
+    #
+    # total time
+    ax = plt.subplot(4, 1, 1)
+    plt.plot(n_masters, total_time, style, label=name)
+    # annotate
+    ax.set_yscale('log')
+    ax.tick_params(labelsize=tsz)
+    plt.grid(True)
+    plt.xlabel('Parameter', fontsize=fsz)
+    plt.ylabel('Total time (sec)', fontsize=fsz)
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    #
+    # reordering time
+    ax = plt.subplot(4, 1, 2)
+    if len(reordering_time_1):
+        total_reordering_time = reordering_time_0 + reordering_time_1
+    else:
+        total_reordering_time = reordering_time_0
+    if len(total_reordering_time) == len(n_masters):
+        plt.plot(n_masters, total_reordering_time, style,
+                 label=name)
+    # annotate
+    ax.set_yscale('log')
+    ax.tick_params(labelsize=tsz)
+    plt.grid(True)
+    plt.xlabel('Parameter', fontsize=fsz)
+    plt.ylabel('Total reordering time (sec)', fontsize=fsz)
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    #
+    # peak BDD nodes
+    ax = plt.subplot(4, 1, 3)
+    if len(total_nodes_0) == len(n_masters):
+        plt.plot(n_masters, peak_nodes_0, style + 'o',
+                 label='{name} (1)'.format(name=name),
+                 markevery=10)
+    if len(total_nodes_1) == len(n_masters):
+        plt.plot(n_masters, peak_nodes_1, style,
+                 label='{name} (2)'.format(name=name),
+                 markevery=10)
+    # annotate
+    ax.set_yscale('log')
+    ax.tick_params(labelsize=tsz)
+    plt.grid(True)
+    plt.xlabel('Parameter', fontsize=fsz)
+    plt.ylabel('Peak BDD Nodes', fontsize=fsz)
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    #
+    # peak BDD nodes
+    ax = plt.subplot(4, 1, 4)
+    if len(total_nodes_0) == len(n_masters):
+        plt.plot(n_masters, total_nodes_0, style,
+                 label='{name} (1)'.format(name=name),
+                 markevery=10)
+    if len(total_nodes_1) == len(n_masters):
+        plt.plot(n_masters, total_nodes_1, style + 'o',
+                 label='{name} (2)'.format(name=name),
+                 markevery=10)
+    # annotate
+    ax.set_yscale('log')
+    ax.tick_params(labelsize=tsz)
+    plt.grid(True)
+    plt.xlabel('Parameter', fontsize=fsz)
+    plt.ylabel('Total BDD Nodes', fontsize=fsz)
+    leg = plt.legend(loc='upper left', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+
+
+def pickle_results(path, first, last, repickle):
+    """Dump to pickle file all measurements from a directory."""
+    log_fname = '{path}details_{i}.txt'.format(
+        path=path, i='{i}')
+    pickle_fname = '{path}data.pickle'.format(path=path)
+    with open(pickle_fname, 'r') as f:
+        measurements = pickle.load(f)
+    if not repickle:
+        print('found pickled data')
+        return measurements
+    measurements = dict(
+        n_masters=list(),
+        total_time=list(),
+        reordering_time_0=list(),
+        reordering_time_1=list(),
+        win_time=list(),
+        win_ratio=list(),
+        win_dump_ratio=list(),
+        strategy_dump_ratio=list(),
+        upratio_0=list(),
+        upratio_1=list(),
+        total_nodes_0=list(),
+        total_nodes_1=list(),
+        peak_nodes_0=list(),
+        peak_nodes_1=list(),
+        transducer_nodes=list())
+    n = first
+    m = last + 1
+    for i in xrange(n, m):
+        fname = log_fname.format(i=i)
+        try:
+            data = utils.load_log_file(fname)
+            print('open "{fname}"'.format(fname=fname))
+        except:
+            print('Skip: missing log file "{f}"'.format(
+                f=fname))
+            continue
+        collect_measurements(data, measurements)
+        measurements['n_masters'].append(i)
+    # np arrays
+    for k, v in measurements.iteritems():
+        measurements[k] = np.array(v)
     # dump
-    d = dict(
-        n_masters=n_masters,
-        total_time=total_time,
-        peak_nodes_0=peak_nodes_0,
-        peak_nodes_1=peak_nodes_1)
     with open(pickle_fname, 'w') as f:
-        pickle.dump(d, f)
+        pickle.dump(measurements, f)
+    return measurements
+
+
+def collect_measurements(data, measurements):
+    """Collect measurements from `data`."""
+    # total time
+    t0 = data['parse_slugsin']['time'][0]
+    t1 = data['make_transducer_end']['time'][0]
+    t = t1 - t0
+    measurements['total_time'].append(t)
+    # winning set / total time
+    t0 = data['winning_set_start']['time'][0]
+    t1 = data['winning_set_end']['time'][0]
+    t_win = t1 - t0
+    r = t_win / t
+    measurements['win_ratio'].append(r)
+    measurements['win_time'].append(t_win)
+    # winning set dump time / total time
+    if 'dump_winning_set_start' in data:
+        t0 = data['dump_winning_set_start']['time'][0]
+        t1 = data['dump_winning_set_end']['time'][0]
+        t_dump_win = t1 - t0
+        r = t_dump_win / t
+        measurements['win_dump_ratio'].append(r)
+    # strategy dump time / total time
+    if 'dump_strategy_start' in data:
+        t0 = data['dump_strategy_start']['time'][0]
+        t1 = data['dump_strategy_end']['time'][0]
+        t_dump_strategy = t1 - t0
+        r = t_dump_strategy / t
+        measurements['strategy_dump_ratio'].append(r)
+    if 'transducer_nodes' in data:
+        x = data['transducer_nodes']['value'][-1]
+        measurements['transducer_nodes'].append(x)
+    # construction time
+    t0 = data['make_transducer_start']['time'][0]
+    t1 = data['make_transducer_end']['time'][0]
+    t_make = t1 - t0
+    if 'reordering_time' in data:
+        # reordering BDD 0
+        rt = data['reordering_time']['value'][-1]
+        r = rt / t
+        measurements['upratio_0'].append(r)
+        measurements['reordering_time_0'].append(rt)
+        # total nodes 0
+        tn = data['total_nodes']['value'][-1]
+        measurements['total_nodes_0'].append(tn)
+        # peak nodes 0
+        p = data['peak_nodes']['value'][-1]
+        measurements['peak_nodes_0'].append(p)
+    else:
+        print('Warning: no BDD manager 0')
+    if 'b3_reordering_time' in data:
+        # reordering BDD 1
+        rt = data['b3_reordering_time']['value'][-1]
+        r = rt / t_make
+        measurements['upratio_1'].append(r)
+        measurements['reordering_time_1'].append(rt)
+        # total nodes 1
+        tn = data['b3_total_nodes']['value'][-1]
+        measurements['total_nodes_1'].append(tn)
+        # peak nodes 1
+        p = data['b3_peak_nodes']['value'][-1]
+        measurements['peak_nodes_1'].append(p)
+    else:
+        print('Warning: no BDD manager 1')
 
 
 def plot_multiple_experiments_vs_time(args):
@@ -321,7 +415,7 @@ def plot_single_experiment_vs_time(details_file, fig_file):
     plt.savefig(fig_file, bbox_inches='tight')
 
 
-def main():
+if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--min', default=N, type=int,
                    help='from this # of masters')
@@ -337,9 +431,7 @@ def main():
                    choices=['slugs', 'gr1x', 'compare'])
     p.add_argument('--plot', action='store_true',
                    help='generate plots')
+    p.add_argument('--repickle', action='store_true',
+                   help='ignore older pickled data')
     args = p.parse_args()
-    plot_report()
-
-
-if __name__ == '__main__':
-    main()
+    plot_report(args.repickle)
