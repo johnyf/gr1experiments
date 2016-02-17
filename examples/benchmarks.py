@@ -78,6 +78,7 @@ def run_slugs(slugsin_file, strategy_file,
               psutil_file, details_file, affinity=None):
     """Run `slugs` for problem define in `slugsin_file`."""
     print('Starting: {fname}'.format(fname=slugsin_file))
+    other_options = ['--fixedPointRecycling']
     # config logging
     level = logging.DEBUG
     loggers = ['openpromela.slugs']
@@ -95,7 +96,8 @@ def run_slugs(slugsin_file, strategy_file,
         symbolic=True,
         strategy_file=strategy_file,
         affinity=affinity,
-        logfile=details_file)
+        logfile=details_file,
+        other_options=other_options)
     t1 = time.time()
     dt = datetime.timedelta(seconds=t1 - t0)
     # close log files
