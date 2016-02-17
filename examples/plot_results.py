@@ -285,9 +285,12 @@ def pickle_results(path, first, last, repickle):
     log_fname = '{path}details_{i}.txt'.format(
         path=path, i='{i}')
     pickle_fname = '{path}data.pickle'.format(path=path)
-    with open(pickle_fname, 'r') as f:
-        measurements = pickle.load(f)
-    if not repickle:
+    try:
+        with open(pickle_fname, 'r') as f:
+            measurements = pickle.load(f)
+    except IOError:
+        measurements = None
+    if measurements and not repickle:
         print('found pickled data')
         return measurements
     measurements = dict(
