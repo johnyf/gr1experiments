@@ -40,6 +40,29 @@ def plot_report(repickle):
         plot_vs_parameter(path, first, last, repickle=repickle)
 
 
+def plot_comparison_report():
+    paths = dict(
+        # new='bunny_many_goals/runs',
+        # slugs='bunny_many_goals/runs_slugs'
+        #
+        # new='synt15/runs_gr1x_logging_info',
+        # memoize='synt15/runs_gr1x_memoize',
+        #
+        # new='synt15/runs_gr1x_logging_info',
+        # one_manager='synt15/runs_gr1x_one_manager',
+        #
+        # new='synt15/runs_gr1x_logging_info',
+        # linear_conj='synt15/runs_gr1x_linear_conj',
+        #
+        new='synt15/runs_gr1x_logging_info',
+        no_defer='synt15/runs',
+        #
+        # new='synt15/runs_gr1x_logging_info',
+        # slugs='synt15/runs_slugs',
+    )
+    plot_comparison(paths)
+
+
 def plot_vs_parameter(path, first, last, repickle=False):
     """Plot time, ratios, BDD nodes over parameterized experiments.
 
@@ -142,16 +165,6 @@ def plot_vs_parameter(path, first, last, repickle=False):
     leg.get_frame().set_alpha(0.5)
     # save
     plt.savefig(fig_fname, bbox_inches='tight')
-
-
-def plot_comparison_report():
-    paths = dict(
-        # new='bunny_many_goals/runs',
-        # slugs='bunny_many_goals/runs_slugs'
-        new='synt15/runs_gr1x_logging_info',
-        memoize='synt15/runs_gr1x_memoize',
-    )
-    plot_comparison(paths)
 
 
 def plot_comparison(paths):
