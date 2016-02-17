@@ -16,17 +16,26 @@ def scan_directory():
                 file_path = os.path.join(root, f)
                 file_path = os.path.abspath(file_path)
                 data = utils.load_log_file(file_path)
-                if 'dump_strategy_end' in data:
+                if 'make_transducer_end' in data:
                     continue
                 # still running or killed
                 incomplete_files.append(file_path)
-    open_files = find_file_pids(incomplete_files)
-    for f in open_files:
+    open_files_by = find_file_pids(incomplete_files)
+    for f, name, pid in open_files_by:
+        print(f, name, pid)
         print_progress(f)
+        print('\n')
+    open_files = [f for f, _, _ in open_files_by]
+    dead_files = [
+        f for f in incomplete_files
+        if f not in open_files]
+    print('dead files:')
+    for f in dead_files:
+        print(f)
 
 
 def find_file_pids(files):
-    open_files = list()
+    open_files_by = list()
     for p in psutil.process_iter():
         try:
             flist = p.open_files()
@@ -39,21 +48,18 @@ def find_file_pids(files):
         for path, _ in flist:
             if path not in files:
                 continue
-            print(pid, name, path)
-            open_files.append(path)
-    assert all(f in files for f in open_files), (
-        files, open_files)
-    return open_files
+            open_files_by.append((path, name, pid))
+    return open_files_by
 
 
 def print_progress(f):
     data = utils.load_log_file(f)
     if 'winning_set_start' in data:
-        print('\nstarted win set')
+        print('started win set')
         t0 = data['winning_set_start']['time'][0]
         date = datetime.datetime.fromtimestamp(t0)
         s = date.strftime('%Y-%m-%d %H:%M:%S')
-        print('win set end at: {s}'.format(s=s))
+        print('win set start at: {s}'.format(s=s))
     if 'winning_set_end' in data:
         print('finished win set')
         t1 = data['winning_set_end']['time'][0]
