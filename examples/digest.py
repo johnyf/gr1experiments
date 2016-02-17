@@ -7,7 +7,7 @@ from tugs import utils
 
 
 def scan_directory():
-    path = './bunny_many_goals/runs_slugs'
+    path = './synt15/runs'
     logname = 'details_'
     incomplete_files = list()
     for root, dirs, files in os.walk(path):

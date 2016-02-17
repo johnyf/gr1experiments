@@ -24,9 +24,11 @@ def plot_report(repickle):
         # 'bunny_goals/runs/': (2, 32),
         # 'bunny_goals/runs_slugs/': (2, 33),
         # 'bunny_many_goals/runs/': (2, 49),
-        # 'bunny_many_goals/runs_slugs/': (2, 41),
+        # 'bunny_many_goals/runs_slugs/': (2, 49),
         # 'synt15/runs_slugs/': (2, 49),
-        'synt15/runs/': (2, 50),
+        # 'synt15/runs_slugs_browne/': (2, 41),
+        #
+        'synt15/runs/': (2, 158),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
@@ -42,11 +44,13 @@ def plot_report(repickle):
 
 def plot_comparison_report():
     paths = dict(
-        # new='bunny_many_goals/runs',
-        # slugs='bunny_many_goals/runs_slugs'
+        new='bunny_many_goals/runs',
+        slugs='bunny_many_goals/runs_slugs',
+        numerator='slugs',
         #
         # new='synt15/runs_gr1x_logging_info',
         # memoize='synt15/runs_gr1x_memoize',
+        # numerator='memoize',
         #
         # new='synt15/runs_gr1x_logging_info',
         # one_manager='synt15/runs_gr1x_one_manager',
@@ -54,11 +58,16 @@ def plot_comparison_report():
         # new='synt15/runs_gr1x_logging_info',
         # linear_conj='synt15/runs_gr1x_linear_conj',
         #
-        new='synt15/runs_gr1x_logging_info',
-        no_defer='synt15/runs',
+        # new='synt15/runs_gr1x_logging_info',
+        # no_defer='synt15/runs',
+        # numerator='no_defer',
         #
         # new='synt15/runs_gr1x_logging_info',
         # slugs='synt15/runs_slugs',
+        #
+        # slugs='synt15/runs_slugs',
+        # slugs_browne='synt15/runs_slugs_browne',
+        # numerator='slugs_browne',
     )
     plot_comparison(paths)
 
