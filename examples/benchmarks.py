@@ -41,10 +41,10 @@ def run_parallel():
     psutil_path = '{problem}/{output}/psutil_{i}.txt'.format(
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
-    # all_cpus = range(n_cpus)
-    all_cpus = [0, 1, 2, 4, 5, 6, 7]
+    all_cpus = range(n_cpus)
+    # all_cpus = [0, 1, 2, 3]
     concurrent = len(all_cpus)
-    repetitions = 5
+    repetitions = 2
     final = first + concurrent * repetitions
     print('will run from {first} to {final}'.format(
         first=first, final=final))
