@@ -28,7 +28,7 @@ def plot_report(repickle):
         # 'synt15/runs_slugs/': (2, 49),
         # 'synt15/runs_slugs_browne/': (2, 41),
         #
-        'synt15/runs/': (2, 158),
+        # 'synt15/runs/': (2, 158),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
@@ -37,6 +37,8 @@ def plot_report(repickle):
         # 'synt15/runs_gr1x_memoize/': (2, 65),
         # 'synt15/runs_gr1x_one_manager/': (2, 65),
         # 'bunny/runs/': (2, 97)
+        'cinderella/runs': (0, 10),
+        'cinderella/runs_slugs': (0, 8)
     }
     for path, (first, last) in paths.iteritems():
         plot_vs_parameter(path, first, last, repickle=repickle)
@@ -44,9 +46,9 @@ def plot_report(repickle):
 
 def plot_comparison_report():
     paths = dict(
-        new='bunny_many_goals/runs',
-        slugs='bunny_many_goals/runs_slugs',
-        numerator='slugs',
+        # new='bunny_many_goals/runs',
+        # slugs='bunny_many_goals/runs_slugs',
+        # numerator='slugs',
         #
         # new='synt15/runs_gr1x_logging_info',
         # memoize='synt15/runs_gr1x_memoize',
@@ -68,6 +70,10 @@ def plot_comparison_report():
         # slugs='synt15/runs_slugs',
         # slugs_browne='synt15/runs_slugs_browne',
         # numerator='slugs_browne',
+        #
+        new='cinderella/runs',
+        slugs='cinderella/runs_slugs',
+        numerator='slugs'
     )
     plot_comparison(paths)
 
