@@ -99,7 +99,7 @@ def plot_vs_parameter(path, first, last, repickle=False):
     peak_nodes_1 = measurements['peak_nodes_1']
     transducer_nodes = measurements['transducer_nodes']
     # plot
-    fig_fname = '{path}stats.pdf'.format(path=path)
+    fig_fname = os.path.join(path, 'stats.pdf')
     fsz = 20
     tsz = 15
     fig = plt.figure()
@@ -331,9 +331,10 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
 
 def pickle_results(path, first, last, repickle):
     """Dump to pickle file all measurements from a directory."""
-    log_fname = '{path}details_{i}.txt'.format(
-        path=path, i='{i}')
-    pickle_fname = '{path}data.pickle'.format(path=path)
+    fname = 'details_{i}.txt'.format(i='{i}')
+    log_fname = os.path.join(path, fname)
+    fname = 'data.pickle'
+    pickle_fname = os.path.join(path, fname)
     try:
         with open(pickle_fname, 'r') as f:
             measurements = pickle.load(f)
