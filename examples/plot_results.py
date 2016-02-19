@@ -385,7 +385,13 @@ def collect_measurements(data, measurements):
     """Collect measurements from `data`."""
     # total time
     t0 = data['parse_slugsin']['time'][0]
-    t1 = data['make_transducer_end']['time'][0]
+    # realizable ? (slugs only, gr1x always makes strategy)
+    if 'make_transducer_end' in data:
+        t1 = data['make_transducer_end']['time'][0]
+    elif 'winning_set_end' in data:
+        t1 = data['winning_set_end']['time'][0]
+    else:
+        raise Exception('Winning set unfinished!')
     t = t1 - t0
     measurements['total_time'].append(t)
     # winning set / total time
@@ -414,9 +420,11 @@ def collect_measurements(data, measurements):
         x = data['transducer_nodes']['value'][-1]
         measurements['transducer_nodes'].append(x)
     # construction time
-    t0 = data['make_transducer_start']['time'][0]
-    t1 = data['make_transducer_end']['time'][0]
-    t_make = t1 - t0
+    # realizable (slugs) ?
+    if 'make_transducer_start' in data:
+        t0 = data['make_transducer_start']['time'][0]
+        t1 = data['make_transducer_end']['time'][0]
+        t_make = t1 - t0
     if 'reordering_time' in data:
         # reordering BDD 0
         rt = data['reordering_time']['value'][-1]
