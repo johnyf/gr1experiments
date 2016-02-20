@@ -1,0 +1,60 @@
+{'dd': '0.2.1',
+ 'omega': '0.0.6.dev0+547b3d0f389792f72c7c73a0990e582a5a9a3ae6',
+ 'openpromela': '0.0.3.dev0+79bdd6916ae911032c5f070060f4bba5adb48627',
+ 'platform': ('Linux',
+              'lambda',
+              '3.13.0-61-generic',
+              '#100-Ubuntu SMP Wed Jul 29 11:21:34 UTC 2015',
+              'x86_64'),
+ 'promela': '0.0.1',
+ 'slugs': 'reorder-10-g050d0a6',
+ 'time': '2016-Feb-13-Saturday-02:33:47-PST',
+ 'tugs': '0.1.1.dev0+e37edc872c5a85fc4688f677840c029af04ec6f4'}
+++ solver game
+
+{'parse_slugsin': True, 'time': 1455359627.725202}
+2016-02-13 02:33:47
+-- done parse_slugsin
+{'max_vars': 1000, 'loose_up_to': 67108864, 'max_growth': 1.2, 'max_cache_hard': 4294967295, 'garbage_collection': True, 'max_memory': 10737418240L, 'max_swaps': 2000000, 'reordering': True, 'min_hit': 30, 'max_cache_soft': 1024}
+
+{'make_automaton': True, 'time': 1455359627.911091}
+2016-02-13 02:33:47
+
+{'winning_set_start': True, 'time': 1455359628.82528}
+2016-02-13 02:33:48
+Reached Z fixpoint
+{'time': 1455359659.69411, 'total_nodes': 2583, 'peak_nodes': 2518208, 'reordering_time': 1.358, 'n_reorderings': 11, 'vms': '587.5 MB', 'rss': '256.1 MB'}
+
+{'winning_set_end': True, 'time': 1455359659.818051}
+2016-02-13 02:34:19
+
+{'dump_winning_set_start': True, 'time': 1455359659.818359}
+2016-02-13 02:34:19
+Winning set dumped in 0.017 sec
+
+{'dump_winning_set_end': True, 'time': 1455359659.835841}
+2016-02-13 02:34:19
+
+{'make_transducer_start': True, 'time': 1455359659.836162}
+2016-02-13 02:34:19
+{'b3_n_reorderings': 7, 'b3_reordering_time': 0.08, 'b3_total_nodes': 2348, 'time': 1455359659.965755, 'vms': '763.8 MB', 'b3_peak_nodes': 6132, 'rss': '264.9 MB'}
+done copying actions
+{'max_vars': 1000, 'loose_up_to': 67108864, 'max_growth': 1.2, 'max_cache_hard': 4294967295, 'garbage_collection': True, 'max_memory': 10737418240L, 'max_swaps': 2000000, 'reordering': True, 'min_hit': 30, 'max_cache_soft': 144384}
+{'b3_n_reorderings': 17, 'b3_reordering_time': 5.061, 'b3_total_nodes': 100014, 'time': 1455359669.041319, 'vms': '792.9 MB', 'b3_peak_nodes': 397558, 'rss': '293.9 MB'}
+disjoin transducers
+done with disjunction
+
+{'transducer_nodes': 72446, 'time': 1455359676.14682}
+2016-02-13 02:34:36
+{'time': 1455359676.1663, 'total_nodes': 2583, 'peak_nodes': 2560110, 'reordering_time': 1.358, 'n_reorderings': 11, 'vms': '792.9 MB', 'rss': '293.9 MB'}
+{'b3_n_reorderings': 19, 'b3_reordering_time': 12.062, 'b3_total_nodes': 72663, 'time': 1455359676.191749, 'vms': '792.9 MB', 'b3_peak_nodes': 397558, 'rss': '293.9 MB'}
+
+{'time': 1455359676.194371, 'make_transducer_end': True}
+2016-02-13 02:34:36
+
+{'dump_strategy_start': True, 'time': 1455359676.1955}
+2016-02-13 02:34:36
+Strategy dumped in 0.084 sec.
+
+{'dump_strategy_end': True, 'time': 1455359676.279965}
+2016-02-13 02:34:36

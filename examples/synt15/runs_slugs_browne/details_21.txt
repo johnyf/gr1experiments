@@ -1,0 +1,7 @@
+{'parse_slugsin': True, 'time': 1455698642.297514}
+{'end_parsing': True, 'time': 1455698642.483176}
+starting strategy synthesis.
+{'make_transducer_start': True, 'time': 1455698721.501814}
+done writing DDDMP file.
+{'peak_nodes': 588880, 'reordering_time': 79.886, 'total_nodes': 222401, 'time': 1455698736.517520}
+{'make_transducer_end': True, 'time': 1455698736.517520}

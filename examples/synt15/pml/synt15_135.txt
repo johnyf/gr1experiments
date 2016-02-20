@@ -1,0 +1,153 @@
+/*
+ * ARM AMBA AHB case study.
+ *
+ * Adapted from [2] as described in [1].
+ *
+ *
+ * References
+ * ==========
+ *
+ * [1] Ioannis Filippidis and Richard M. Murray
+ *     "Revisiting the AMBA AHB bus case study"
+ *     California Institute of Technology, 2015
+ *     http://resolver.caltech.edu/CaltechCDSTR:2015.004
+ *
+ * [2] Roderick Bloem, Barbara Jobstmann, Nir Piterman,
+ *     Amir Pnueli, Yaniv Sa'ar
+ *     "Synthesis of reactive(1) designs"
+ *     Journal of computer and system sciences
+ *     Vol.78, No.3, pp.911--938, 2012
+ */
+
+#define N 134
+#define SINGLE 0
+#define BURST4 1
+#define INCR 2
+
+
+/* variables of masters and slaves */
+/* A4: initial condition */
+free env bool ready = false;
+free env int(0, 2) burst;
+free env bool request[N + 1] = false;
+free env bool grantee_lockreq = false;
+free env bool master_lockreq = false;
+
+/* arbiter variables */
+/* G11: sys initial condition */
+free bool start = true;
+free bool decide = true;
+free bool lock = false;
+free bool lockmemo;
+free int(0, N) master = 0;
+free int(0, N) grant;
+
+/* A2: slaves must progress with receiving data */
+assume ltl { []<> ready }
+
+/* A3: dropped, weakening the assumptions */
+
+/* A1: if current master is granted locked access,
+ * then it must progress by withdrawing the lock request.
+ */
+assume env proctype withdraw_lock(){
+	progress:
+	do
+	:: lock;
+		do
+		:: ! master_lockreq'; break
+		:: true /* wait */
+		od
+	:: else
+	od
+}
+
+
+assert ltl {
+	[](
+		/* G1: new access starts only when slave is ready */
+		(start' -> ready)
+		/* G4,5: current master and lock updated
+		 * only when communicating slave signals
+		 * that it completed receiving data.
+		 */
+		&& (ready -> ((master' == grant) && (lock' <-> lockmemo')))
+		/* G6: current master and locking may change only
+		 * when an access starts, and remain invariant otherwise
+		 */
+		&& (! start' -> (
+			(master' == master) &&
+			(lock' <-> lock)))
+		/* G7: when deciding, remember if the requestor
+		 * requested also locking.
+		 * when implementing the circuit, store
+		 * previous lock requests:
+		 * grantee_lockreq' = (--X lockreq)[grant]
+		 */
+		&& ((--X decide) -> (lockmemo' <-> grantee_lockreq'))
+		/* G8: current grantee and locking memo
+		 * remain invariant while not deciding.
+		 */
+		&& ( (! decide) -> (grant' == grant) )
+		&& ( (! --X decide) -> (lockmemo' <-> lockmemo) )
+		/* G10: only a requestor can become grantee */
+		&& ((grant' == grant) || (grant' == 0) || request[grant'])
+	)
+}
+
+/* all properties must hold synchronously */
+sync{
+
+/* G9: weak fairness */
+/*
+assert sys proctype fairness(){
+	int(0, N) count;
+	do
+	:: (! request[count] || (master == count));
+		if
+		:: (count < N) && (count' == count + 1)
+		:: (count == N) && (count' == 0);
+			progress: skip
+		fi
+	:: else
+	od
+}
+*/
+
+/* G2: if locked access of unspecified length starts,
+ * then locking shall be withdrawn before starting
+ * another access.
+ */
+assert sys proctype maintain_lock(){
+	do
+	:: (lock && start && (burst == INCR));
+		do
+		:: (! start && ! master_lockreq'); break
+		:: ! start
+		od
+	:: else
+	od
+}
+
+/* G3: for a BURST4 access,
+ * count the "ready" time steps.
+ */
+assert sys proctype count_burst(){
+	int(0, 3) count;
+	do
+	:: (start && lock &&
+		(burst == BURST4) &&
+		(!ready || (count' == 1)) &&
+		(ready || (count' == 0)) );
+		do
+		:: (! start && ! ready)
+		:: (! start && ready && (count < 3) &&
+			(count' == count + 1))
+		:: (! start && ready && (count >= 3)); break
+		od
+	:: else
+	od
+}
+
+}
+assert ltl { []<>(request[0] -> (master == 0)) && []<>(request[1] -> (master == 1)) && []<>(request[2] -> (master == 2)) && []<>(request[3] -> (master == 3)) && []<>(request[4] -> (master == 4)) && []<>(request[5] -> (master == 5)) && []<>(request[6] -> (master == 6)) && []<>(request[7] -> (master == 7)) && []<>(request[8] -> (master == 8)) && []<>(request[9] -> (master == 9)) && []<>(request[10] -> (master == 10)) && []<>(request[11] -> (master == 11)) && []<>(request[12] -> (master == 12)) && []<>(request[13] -> (master == 13)) && []<>(request[14] -> (master == 14)) && []<>(request[15] -> (master == 15)) && []<>(request[16] -> (master == 16)) && []<>(request[17] -> (master == 17)) && []<>(request[18] -> (master == 18)) && []<>(request[19] -> (master == 19)) && []<>(request[20] -> (master == 20)) && []<>(request[21] -> (master == 21)) && []<>(request[22] -> (master == 22)) && []<>(request[23] -> (master == 23)) && []<>(request[24] -> (master == 24)) && []<>(request[25] -> (master == 25)) && []<>(request[26] -> (master == 26)) && []<>(request[27] -> (master == 27)) && []<>(request[28] -> (master == 28)) && []<>(request[29] -> (master == 29)) && []<>(request[30] -> (master == 30)) && []<>(request[31] -> (master == 31)) && []<>(request[32] -> (master == 32)) && []<>(request[33] -> (master == 33)) && []<>(request[34] -> (master == 34)) && []<>(request[35] -> (master == 35)) && []<>(request[36] -> (master == 36)) && []<>(request[37] -> (master == 37)) && []<>(request[38] -> (master == 38)) && []<>(request[39] -> (master == 39)) && []<>(request[40] -> (master == 40)) && []<>(request[41] -> (master == 41)) && []<>(request[42] -> (master == 42)) && []<>(request[43] -> (master == 43)) && []<>(request[44] -> (master == 44)) && []<>(request[45] -> (master == 45)) && []<>(request[46] -> (master == 46)) && []<>(request[47] -> (master == 47)) && []<>(request[48] -> (master == 48)) && []<>(request[49] -> (master == 49)) && []<>(request[50] -> (master == 50)) && []<>(request[51] -> (master == 51)) && []<>(request[52] -> (master == 52)) && []<>(request[53] -> (master == 53)) && []<>(request[54] -> (master == 54)) && []<>(request[55] -> (master == 55)) && []<>(request[56] -> (master == 56)) && []<>(request[57] -> (master == 57)) && []<>(request[58] -> (master == 58)) && []<>(request[59] -> (master == 59)) && []<>(request[60] -> (master == 60)) && []<>(request[61] -> (master == 61)) && []<>(request[62] -> (master == 62)) && []<>(request[63] -> (master == 63)) && []<>(request[64] -> (master == 64)) && []<>(request[65] -> (master == 65)) && []<>(request[66] -> (master == 66)) && []<>(request[67] -> (master == 67)) && []<>(request[68] -> (master == 68)) && []<>(request[69] -> (master == 69)) && []<>(request[70] -> (master == 70)) && []<>(request[71] -> (master == 71)) && []<>(request[72] -> (master == 72)) && []<>(request[73] -> (master == 73)) && []<>(request[74] -> (master == 74)) && []<>(request[75] -> (master == 75)) && []<>(request[76] -> (master == 76)) && []<>(request[77] -> (master == 77)) && []<>(request[78] -> (master == 78)) && []<>(request[79] -> (master == 79)) && []<>(request[80] -> (master == 80)) && []<>(request[81] -> (master == 81)) && []<>(request[82] -> (master == 82)) && []<>(request[83] -> (master == 83)) && []<>(request[84] -> (master == 84)) && []<>(request[85] -> (master == 85)) && []<>(request[86] -> (master == 86)) && []<>(request[87] -> (master == 87)) && []<>(request[88] -> (master == 88)) && []<>(request[89] -> (master == 89)) && []<>(request[90] -> (master == 90)) && []<>(request[91] -> (master == 91)) && []<>(request[92] -> (master == 92)) && []<>(request[93] -> (master == 93)) && []<>(request[94] -> (master == 94)) && []<>(request[95] -> (master == 95)) && []<>(request[96] -> (master == 96)) && []<>(request[97] -> (master == 97)) && []<>(request[98] -> (master == 98)) && []<>(request[99] -> (master == 99)) && []<>(request[100] -> (master == 100)) && []<>(request[101] -> (master == 101)) && []<>(request[102] -> (master == 102)) && []<>(request[103] -> (master == 103)) && []<>(request[104] -> (master == 104)) && []<>(request[105] -> (master == 105)) && []<>(request[106] -> (master == 106)) && []<>(request[107] -> (master == 107)) && []<>(request[108] -> (master == 108)) && []<>(request[109] -> (master == 109)) && []<>(request[110] -> (master == 110)) && []<>(request[111] -> (master == 111)) && []<>(request[112] -> (master == 112)) && []<>(request[113] -> (master == 113)) && []<>(request[114] -> (master == 114)) && []<>(request[115] -> (master == 115)) && []<>(request[116] -> (master == 116)) && []<>(request[117] -> (master == 117)) && []<>(request[118] -> (master == 118)) && []<>(request[119] -> (master == 119)) && []<>(request[120] -> (master == 120)) && []<>(request[121] -> (master == 121)) && []<>(request[122] -> (master == 122)) && []<>(request[123] -> (master == 123)) && []<>(request[124] -> (master == 124)) && []<>(request[125] -> (master == 125)) && []<>(request[126] -> (master == 126)) && []<>(request[127] -> (master == 127)) && []<>(request[128] -> (master == 128)) && []<>(request[129] -> (master == 129)) && []<>(request[130] -> (master == 130)) && []<>(request[131] -> (master == 131)) && []<>(request[132] -> (master == 132)) && []<>(request[133] -> (master == 133)) && []<>(request[134] -> (master == 134)) }
