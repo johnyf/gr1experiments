@@ -1,0 +1,12 @@
+{'parse_slugsin': True, 'time': 1455929111.993912}
+{'end_parsing': True, 'time': 1455929114.900877}
+{'winning_set_start': True, 'time': 1455929114.902208}
+starting fixed point computation
+{'peak_nodes': 21256948, 'reordering_time': 11867.560, 'total_nodes': 14480807, 'time': 1455941671.961014}
+Completed fixed point computation (realizability)
+{'winning_set_end': True, 'time': 1455941671.961045}
+starting strategy synthesis.
+{'make_transducer_start': True, 'time': 1455941671.961324}
+done writing DDDMP file.
+{'peak_nodes': 28367470, 'reordering_time': 17925.918, 'total_nodes': 22166492, 'time': 1455947807.686946}
+{'make_transducer_end': True, 'time': 1455947807.686946}
