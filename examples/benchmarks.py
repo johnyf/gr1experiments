@@ -42,9 +42,9 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
     # all_cpus = range(n_cpus)
-    all_cpus = [0, 2, 3, 4, 5, 6, 7]
+    all_cpus = [0]
     concurrent = len(all_cpus)
-    repetitions = 3
+    repetitions = 29
     final = first + concurrent * repetitions
     print('will run from {first} to {final}'.format(
         first=first, final=final))
