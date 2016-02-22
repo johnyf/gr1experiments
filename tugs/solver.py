@@ -369,7 +369,7 @@ def compute_winning_set(aut, z=None):
         for j, goal in enumerate(aut.win['[]<>']):
             log.debug('Goal: {j}'.format(j=j))
             # log.info(bdd)
-            zp = _bdd.rename(z, bdd, aut.prime)
+            zp = _bdd.rename(zold, bdd, aut.prime)
             live_trans = goal & zp
             y = bdd.false
             yold = None
