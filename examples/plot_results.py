@@ -28,7 +28,7 @@ def plot_report(repickle):
         # 'synt15/runs_slugs/': (2, 49),
         # 'synt15/runs_slugs_browne/': (2, 41),
         #
-        'synt15/runs/': (2, 115 ),
+        'synt15/runs/': (2, 101),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
@@ -80,9 +80,19 @@ def plot_comparison_report():
             fname='comparison_gr1x_slugs.pdf'),
         dict(
             new='synt15/runs_gr1x_logging_info',
-            no_defer_no_fdbk='synt15/runs_no_defer_no_fdbk',
+            no_defer_no_fdbk='synt15/runs_gr1x_no_defer_no_fdbk',
             numerator='no_defer_no_fdbk',
             fname='comparison_no_defer_no_fdbk.pdf'),
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            no_defer_no_fdbk_xz='synt15/runs_gr1x_no_defer_no_fdbk_xz',
+            numerator='no_defer_no_fdbk_xz',
+            fname='comparison_no_defer_no_fdbk_xz.pdf'),
+        dict(
+            no_defer_no_fdbk='synt15/runs_gr1x_no_defer_no_fdbk',
+            no_defer_no_fdbk_xz='synt15/runs_gr1x_no_defer_no_fdbk_xz',
+            numerator='no_defer_no_fdbk_xz',
+            fname='comparison_no_defer_no_fdbk_vs_xz.pdf'),
         dict(
             slugs='synt15/runs_slugs',
             slugs_browne='synt15/runs_slugs_browne',

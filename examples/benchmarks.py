@@ -20,7 +20,7 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
-    first = 102
+    first = 2
     problem = 'synt15'
     solver = 'gr1x'
     if solver == 'slugs':
@@ -44,7 +44,7 @@ def run_parallel():
     # all_cpus = range(n_cpus)
     all_cpus = [1, 2, 3, 4, 5]
     concurrent = len(all_cpus)
-    repetitions = 10
+    repetitions = 20
     final = first + concurrent * repetitions
     print('will run from {first} to {final}'.format(
         first=first, final=final))
