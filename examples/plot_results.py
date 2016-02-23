@@ -237,18 +237,25 @@ def plot_total_time_ratio(measurements, paths, data_paths):
     assert len(measurements) == 2, measurements
     ax = plt.subplot(5, 1, 5)
     ax.set_yscale('log')
-    end = min(len(d['n_masters'])
-              for d in measurements.itervalues())
-    n_masters = xrange(2, end)
     numerator = paths['numerator']
     denominator = set(data_paths)
     denominator.remove(numerator)
     (denominator,) = denominator
-    y = (
-        measurements[numerator]['total_time'][2:end] /
-        measurements[denominator]['total_time'][2:end])
-    plt.plot(n_masters, y, 'b-')
-    plt.plot([2, end], [1.0, 1.0], 'g--')
+    param_num = measurements[numerator]['n_masters']
+    param_den = measurements[denominator]['n_masters']
+    time_num = measurements[numerator]['total_time']
+    time_den = measurements[denominator]['total_time']
+    common = set(param_num).intersection(param_den)
+    param = [k for k in param_num if k in common]
+    time_num = [v for k, v in zip(param_num, time_num)
+                if k in common]
+    time_den = [v for k, v in zip(param_den, time_den)
+                if k in common]
+    time_num = np.array(time_num)
+    time_den = np.array(time_den)
+    y = time_num / time_den
+    plt.plot(param, y, 'b-')
+    plt.plot([param[0], param[-1]], [1.0, 1.0], 'g--')
     # annotate
     fsz = 12
     tsz = 12
