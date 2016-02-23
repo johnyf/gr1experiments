@@ -25,6 +25,7 @@ BINARY_CONJ = False  # overrides `DEFER_Z`
 DEFER_Z = False
 TWO_MANAGERS = True
 MEMOIZE_ITERATES = False
+FEEDBACK = False
 # constants
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
@@ -378,7 +379,10 @@ def compute_winning_set(aut, z=None):
                 live_trans = live_trans | yp
                 or_x = y
                 for i, excuse in enumerate(aut.win['<>[]']):
-                    x = bdd.true
+                    if FEEDBACK:
+                        x = z
+                    else:
+                        x = zold
                     xold = None
                     while x != xold:
                         log.debug('Start X iteration')
@@ -480,7 +484,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
             live_trans = live_trans | yp
             or_x = y
             for i, excuse in enumerate(aut.win['<>[]']):
-                x = bdd.true
+                x = z
                 xold = None
                 paths = None
                 new = None
