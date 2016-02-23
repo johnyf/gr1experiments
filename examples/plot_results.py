@@ -223,22 +223,36 @@ def plot_comparison(paths):
       - peak nodes
     """
     assert len(paths) >= 2, paths
+    # paths
     data_paths = dict(paths)
     if 'numerator' in data_paths:
         data_paths.pop('numerator')
         data_paths.pop('fname')
     else:
         paths['numerator'] = next(iter(paths))
+    # file up to date ?
+    path = next(data_paths.itervalues())
+    head, _ = os.path.split(path)
+    fig_fname = os.path.join(head, paths['fname'])
+    fig_time = os.path.getmtime(fig_fname)
+    # load
     measurements = dict()
+    fname = 'data.pickle'
+    older = True
+    for path in data_paths.itervalues():
+        t = os.path.getmtime(path)
+        if t > fig_time:
+            older = False
+            break
+    if older:
+        print('skip "{f}"'.format(f=fig_fname))
+        return
     for k, path in data_paths.iteritems():
-        fname = 'data.pickle'.format(path=path)
         pickle_fname = os.path.join(path, fname)
         print('open "{f}"'.format(f=pickle_fname))
         with open(pickle_fname, 'r') as f:
             measurements[k] = pickle.load(f)
     # plot
-    head, _ = os.path.split(path)
-    fig_fname = os.path.join(head, paths['fname'])
     fig = plt.figure()
     fig.set_size_inches(5, 12.5)
     plt.clf()
