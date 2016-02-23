@@ -26,6 +26,7 @@ DEFER_Z = False
 TWO_MANAGERS = True
 MEMOIZE_ITERATES = False
 FEEDBACK = False
+TIGHT = True
 # constants
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
@@ -414,8 +415,10 @@ def compute_winning_set(aut, z=None):
             del yold, live_trans
             if BINARY_CONJ or DEFER_Z:
                 yj.append(y)
-            else:
+            elif TIGHT:
                 z = z & y
+            else:
+                z = y
             del y, goal
         del zp
         if BINARY_CONJ:
