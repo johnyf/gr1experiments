@@ -20,9 +20,9 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
-    first = 2
-    problem = 'jcss12'
-    solver = 'slugs'
+    first = 102
+    problem = 'synt15'
+    solver = 'gr1x'
     if solver == 'slugs':
         output = 'runs_slugs'
         target = run_slugs
@@ -42,9 +42,9 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
     # all_cpus = range(n_cpus)
-    all_cpus = [0]
+    all_cpus = [1, 2, 3, 4, 5]
     concurrent = len(all_cpus)
-    repetitions = 29
+    repetitions = 10
     final = first + concurrent * repetitions
     print('will run from {first} to {final}'.format(
         first=first, final=final))

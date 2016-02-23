@@ -28,7 +28,7 @@ def plot_report(repickle):
         # 'synt15/runs_slugs/': (2, 49),
         # 'synt15/runs_slugs_browne/': (2, 41),
         #
-        # 'synt15/runs/': (2, 158),
+        'synt15/runs/': (2, 115 ),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
@@ -41,7 +41,7 @@ def plot_report(repickle):
         # 'cinderella/runs_slugs': (0, 8)
         # 'jcss12/runs': (2, 25),
         # 'jcss12/runs_gr1x_no_defer': (2, 25),
-        'jcss12/runs_slugs': (2, 15)
+        # 'jcss12/runs_slugs': (2, 16)
     }
     for path, (first, last) in paths.iteritems():
         plot_vs_parameter(path, first, last, repickle=repickle)
