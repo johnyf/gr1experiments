@@ -428,6 +428,7 @@ def collect_measurements(data, measurements):
     if 'make_transducer_end' in data:
         t1 = data['make_transducer_end']['time'][0]
     elif 'winning_set_end' in data:
+        print('Warning: unrealizable found')
         t1 = data['winning_set_end']['time'][0]
     else:
         raise Exception('Winning set unfinished!')
