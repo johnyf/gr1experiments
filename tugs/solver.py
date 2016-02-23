@@ -364,11 +364,14 @@ def compute_winning_set(aut, z=None):
         log.debug('Start Z iteration')
         paths_memoized = list()
         zold = z
+        if not FEEDBACK:
+            zp = _bdd.rename(zold, bdd, aut.prime)
         yj = list()
         for j, goal in enumerate(aut.win['[]<>']):
             log.debug('Goal: {j}'.format(j=j))
             # log.info(bdd)
-            zp = _bdd.rename(zold, bdd, aut.prime)
+            if FEEDBACK:
+                zp = _bdd.rename(z, bdd, aut.prime)
             live_trans = goal & zp
             y = bdd.false
             yold = None
