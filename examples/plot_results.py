@@ -221,7 +221,7 @@ def plot_comparison(paths):
     head, _ = os.path.split(path)
     fig_fname = os.path.join(head, 'comparison.pdf')
     fig = plt.figure()
-    fig.set_size_inches(7, 5)
+    fig.set_size_inches(5, 12.5)
     plt.clf()
     plt.subplots_adjust(hspace=0.3, wspace=0.6)
     styles = ['b-', 'r--']
@@ -235,7 +235,7 @@ def plot_comparison(paths):
 
 def plot_total_time_ratio(measurements, paths, data_paths):
     assert len(measurements) == 2, measurements
-    ax = plt.subplot(2, 2, 2)
+    ax = plt.subplot(5, 1, 5)
     ax.set_yscale('log')
     end = min(len(d['n_masters'])
               for d in measurements.itervalues())
@@ -274,7 +274,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     peak_nodes_1 = measurements['peak_nodes_1']
     #
     # total time
-    ax = plt.subplot(2, 2, 1)
+    ax = plt.subplot(5, 1, 1)
     plt.plot(n_masters, total_time, style, label=name)
     # annotate
     ax.set_yscale('log')
@@ -286,7 +286,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # reordering time
-    ax = plt.subplot(2, 2, 3)
+    ax = plt.subplot(5, 1, 2)
     if len(reordering_time_1):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
@@ -304,7 +304,6 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
-    '''
     ax = plt.subplot(5, 1, 3)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, peak_nodes_0, style + 'o',
@@ -322,10 +321,9 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     plt.ylabel('Peak BDD Nodes', fontsize=fsz)
     leg = plt.legend(loc='upper left', fancybox=True)
     leg.get_frame().set_alpha(0.5)
-    '''
     #
     # peak BDD nodes
-    ax = plt.subplot(2, 2, 4)
+    ax = plt.subplot(5, 1, 4)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, total_nodes_0, style,
                  label='{name} (1)'.format(name=name),
