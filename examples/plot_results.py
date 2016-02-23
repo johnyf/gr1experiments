@@ -80,7 +80,7 @@ def plot_comparison_report():
             fname='comparison_gr1x_slugs.pdf'),
         dict(
             new='synt15/runs_gr1x_logging_info',
-            no_defer_no_fdbk='synt15/runs',
+            no_defer_no_fdbk='synt15/runs_no_defer_no_fdbk',
             numerator='no_defer_no_fdbk',
             fname='comparison_no_defer_no_fdbk.pdf'),
         dict(
