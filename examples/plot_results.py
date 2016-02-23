@@ -48,41 +48,59 @@ def plot_report(repickle):
 
 
 def plot_comparison_report():
-    paths = dict(
-        new='bunny_many_goals/runs',
-        slugs='bunny_many_goals/runs_slugs',
-        numerator='slugs',
-        #
-        # new='synt15/runs_gr1x_logging_info',
-        # memoize='synt15/runs_gr1x_memoize',
-        # numerator='memoize',
-        #
-        # new='synt15/runs_gr1x_logging_info',
-        # one_manager='synt15/runs_gr1x_one_manager',
-        #
-        # new='synt15/runs_gr1x_logging_info',
-        # linear_conj='synt15/runs_gr1x_linear_conj',
-        #
-        # new='synt15/runs_gr1x_logging_info',
-        # no_defer='synt15/runs',
-        # numerator='no_defer',
-        #
-        # new='synt15/runs_gr1x_logging_info',
-        # slugs='synt15/runs_slugs',
-        #
-        # slugs='synt15/runs_slugs',
-        # slugs_browne='synt15/runs_slugs_browne',
-        # numerator='slugs_browne',
-        #
-        # new='jcss12/runs',
-        # slugs='jcss12/runs_slugs',
+    pairs = [
+        # new='bunny_many_goals/runs',
+        # slugs='bunny_many_goals/runs_slugs',
         # numerator='slugs',
         #
-        # new='cinderella/runs',
-        # slugs='cinderella/runs_slugs',
-        # numerator='slugs'
-    )
-    plot_comparison(paths)
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            memoize='synt15/runs_gr1x_memoize',
+            numerator='memoize',
+            fname='comparison_memoize.pdf'),
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            one_manager='synt15/runs_gr1x_one_manager',
+            numerator='one_manager',
+            fname='comparison_one_manager.pdf'),
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            linear_conj='synt15/runs_gr1x_linear_conj',
+            numerator='linear_conj',
+            fname='comparison_linear_conj.pdf'),
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            no_defer='synt15/runs_gr1x_no_defer',
+            numerator='no_defer',
+            fname='comparison_no_defer.pdf'),
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            slugs='synt15/runs_slugs',
+            numerator='slugs',
+            fname='comparison_gr1x_slugs.pdf'),
+        dict(
+            new='synt15/runs_gr1x_logging_info',
+            no_defer_no_fdbk='synt15/runs',
+            numerator='no_defer_no_fdbk',
+            fname='comparison_no_defer_no_fdbk.pdf'),
+        dict(
+            slugs='synt15/runs_slugs',
+            slugs_browne='synt15/runs_slugs_browne',
+            numerator='slugs_browne',
+            fname='comparison_slugs_browne.pdf'),
+        dict(
+            new='jcss12/runs',
+            slugs='jcss12/runs_slugs',
+            numerator='slugs',
+            fname='comparison_gr1x_slugs.pdf'),
+        dict(
+            new='cinderella/runs',
+            slugs='cinderella/runs_slugs',
+            numerator='slugs',
+            fname='comparison_gr1x_slugs.pdf')
+    ]
+    for p in pairs:
+        plot_comparison(p)
 
 
 def plot_vs_parameter(path, first, last, repickle=False):
@@ -208,6 +226,7 @@ def plot_comparison(paths):
     data_paths = dict(paths)
     if 'numerator' in data_paths:
         data_paths.pop('numerator')
+        data_paths.pop('fname')
     else:
         paths['numerator'] = next(iter(paths))
     measurements = dict()
@@ -219,7 +238,7 @@ def plot_comparison(paths):
             measurements[k] = pickle.load(f)
     # plot
     head, _ = os.path.split(path)
-    fig_fname = os.path.join(head, 'comparison.pdf')
+    fig_fname = os.path.join(head, paths['fname'])
     fig = plt.figure()
     fig.set_size_inches(5, 12.5)
     plt.clf()
