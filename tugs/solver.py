@@ -378,7 +378,7 @@ def compute_winning_set(aut, z=None):
                 yold = y
                 yp = _bdd.rename(y, bdd, aut.prime)
                 live_trans = live_trans | yp
-                good = y
+                or_x = y
                 for i, excuse in enumerate(aut.win['<>[]']):
                     x = bdd.true
                     xold = None
@@ -401,10 +401,10 @@ def compute_winning_set(aut, z=None):
                             log_bdd(bdd)
                     log.debug('Reached X fixpoint')
                     del xold
-                    good = good | x
+                    or_x = or_x | x
                     del x
-                y = good
-                del good
+                y = or_x
+                del or_x
             log.debug('Reached Y fixpoint')
             del yold, live_trans
             if BINARY_CONJ or DEFER_Z:
@@ -480,7 +480,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
             yold = y
             yp = _bdd.rename(y, bdd, aut.prime)
             live_trans = live_trans | yp
-            good = y
+            or_x = y
             for i, excuse in enumerate(aut.win['<>[]']):
                 x = bdd.true
                 xold = None
@@ -503,7 +503,7 @@ def construct_streett_transducer(z, aut, max_memory=None):
                         log_bdd(bdd)
                 log.debug('Reached X fixpoint')
                 del xold, excuse
-                good = good | x
+                or_x = or_x | x
                 del x
                 # strategy construction
                 # in `b3`
@@ -518,8 +518,8 @@ def construct_streett_transducer(z, aut, max_memory=None):
                 del paths
                 transducer = transducer | rim
                 del rim
-            y = good
-            del good
+            y = or_x
+            del or_x
         log.debug('Reached Y fixpoint (Y = Z)')
         assert y == z, (y, z)
         del y, yold, covered
