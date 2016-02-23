@@ -362,8 +362,6 @@ def compute_winning_set(aut, z=None):
     while z != zold:
         log.debug('Start Z iteration')
         paths_memoized = list()
-        # s = var_order(bdd)
-        # reordering_log.debug(repr(s))
         zold = z
         yj = list()
         for j, goal in enumerate(aut.win['[]<>']):
