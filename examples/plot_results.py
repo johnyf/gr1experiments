@@ -234,7 +234,10 @@ def plot_comparison(paths):
     path = next(data_paths.itervalues())
     head, _ = os.path.split(path)
     fig_fname = os.path.join(head, paths['fname'])
-    fig_time = os.path.getmtime(fig_fname)
+    try:
+        fig_time = os.path.getmtime(fig_fname)
+    except OSError:
+        fig_time = 0
     # load
     measurements = dict()
     fname = 'data.pickle'
