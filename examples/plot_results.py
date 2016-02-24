@@ -301,8 +301,12 @@ def plot_comparison(paths, ignore):
     fig.set_size_inches(10, 5)
     plt.clf()
     plt.subplots_adjust(hspace=0.3, wspace=0.3)
-    styles = ['b-', 'r--']
-    for (k, d), style in zip(measurements.iteritems(), styles):
+    # styles = ['b-', 'r--']
+    for k, d in measurements.iteritems():
+        if k == paths['numerator']:
+            style = 'b-'
+        else:
+            style = 'r--'
         plot_single_experiment_vs_parameter(d, k, style)
     # plot_total_time_ratio(measurements, paths, data_paths)
     # save
