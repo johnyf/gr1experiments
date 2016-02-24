@@ -52,7 +52,7 @@ INIT_CACHE = 2**18
 @profile
 def solve_game(s, load_win_set=False,
                win_set_fname=None, strategy_fname=None,
-               max_memory=None):
+               max_memory=None, only_win=False):
     """Construct transducer for game in file `fname`.
 
     @param s: `str` in `slugs` syntax
@@ -81,6 +81,9 @@ def solve_game(s, load_win_set=False,
     log_bdd(bdd)
     if z == bdd.false:
         print('empty winning set')
+        return
+    if only_win:
+        print('only winning states computed')
         return
     t = construct_streett_transducer(z, aut, max_memory=max_memory)
     dump_strategy(t, fname=strategy_fname)
@@ -851,6 +854,8 @@ def command_line_wrapper(args=None):
                    help='(hard) upper bound on memory, in GB')
     p.add_argument('--cpu', type=int,
                    help='attach self to this logical CPU id')
+    p.add_argument('--only_win', action='store_true',
+                   help='only compute winning states')
     args = p.parse_args(args=args)
     # pin to CPU
     affinity = [args.cpu]
@@ -866,13 +871,15 @@ def command_line_wrapper(args=None):
     strategy_fname = args.strategy
     fname = args.file
     max_memory = args.max_memory * GB
+    only_win = args.only_win
     with open(fname, 'r') as f:
         slugsin = f.read()
     solve_game(
         slugsin,
         win_set_fname=win_set_fname,
         strategy_fname=strategy_fname,
-        max_memory=max_memory)
+        max_memory=max_memory,
+        only_win=only_win)
 
 
 def test_indices_and_levels():
