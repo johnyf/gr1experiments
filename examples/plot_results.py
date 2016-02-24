@@ -28,7 +28,7 @@ def plot_report(repickle):
         # 'synt15/runs_slugs/': (2, 49),
         # 'synt15/runs_slugs_browne/': (2, 41),
         #
-        'synt15/runs/': (2, 101),
+        # 'synt15/runs/': (2, 101),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
@@ -39,7 +39,7 @@ def plot_report(repickle):
         # 'bunny/runs/': (2, 97)
         # 'cinderella/runs': (0, 10),
         # 'cinderella/runs_slugs': (0, 8)
-        # 'jcss12/runs': (2, 25),
+        'jcss12/runs': (2, 22),
         # 'jcss12/runs_gr1x_no_defer': (2, 25),
         # 'jcss12/runs_slugs': (2, 16)
     }
@@ -94,20 +94,50 @@ def plot_comparison_report(ignore=False):
             numerator='no_defer_no_fdbk_xz',
             fname='comparison_no_defer_no_fdbk_vs_xz.pdf'),
         dict(
+            new='synt15/runs_gr1x_logging_info',
+            fdbk_no_tight='synt15/runs_gr1x_fdbk_no_tight',
+            numerator='fdbk_no_tight',
+            fname='comparison_fdbk_no_tight.pdf'),
+        dict(
+            tight='synt15/runs_gr1x_no_defer_no_fdbk_xz',
+            no_tight='synt15/runs_gr1x_fdbk_no_tight',
+            numerator='no_tight',
+            fname='comparison_fdbk_no_vs_tight.pdf'),
+        dict(
             slugs='synt15/runs_slugs',
             slugs_browne='synt15/runs_slugs_browne',
             numerator='slugs_browne',
             fname='comparison_slugs_browne.pdf'),
         dict(
-            new='jcss12/runs',
-            slugs='jcss12/runs_slugs',
+            no_defer='jcss12/runs_gr1x_no_defer',
+            slugs='jcss12/runs_slugs_1',
             numerator='slugs',
-            fname='comparison_gr1x_slugs.pdf'),
+            fname='comparison_no_defer_slugs.pdf'),
         dict(
-            new='cinderella/runs',
-            slugs='cinderella/runs_slugs',
+            binary='jcss12/runs_gr1x_defer_binary',
+            slugs='jcss12/runs_slugs_1',
             numerator='slugs',
-            fname='comparison_gr1x_slugs.pdf')
+            fname='comparison_binary_slugs.pdf'),
+        dict(
+            fdbk_no_tight='jcss12/runs',
+            slugs='jcss12/runs_slugs_1',
+            numerator='slugs',
+            fname='comparison_fdbk_no_tight_slugs.pdf'),
+        dict(
+            defer_binary='jcss12/runs_gr1x_defer_binary',
+            fdbk_no_tight='jcss12/runs',
+            numerator='fdbk_no_tight',
+            fname='comparison_fdbk_no_tight.pdf'),
+        dict(
+            defer_binary='jcss12/runs_gr1x_defer_binary',
+            no_defer='jcss12/runs_gr1x_no_defer',
+            numerator='no_defer',
+            fname='comparison_no_defer.pdf'),
+        # dict(
+        #     new='cinderella/runs',
+        #     slugs='cinderella/runs_slugs',
+        #     numerator='slugs',
+        #     fname='comparison_gr1x_slugs.pdf')
     ]
     for p in pairs:
         plot_comparison(p, ignore)

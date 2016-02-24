@@ -21,7 +21,7 @@ GR1X_LOG = 'tugs.solver'
 
 def run_parallel():
     first = 2
-    problem = 'synt15'
+    problem = 'bunny_many_goals'
     solver = 'gr1x'
     if solver == 'slugs':
         output = 'runs_slugs'
@@ -42,9 +42,9 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
     # all_cpus = range(n_cpus)
-    all_cpus = [1, 2, 3, 4, 5]
+    all_cpus = [0, 1, 3, 4, 5, 6, 7]
     concurrent = len(all_cpus)
-    repetitions = 20
+    repetitions = 5
     final = first + concurrent * repetitions
     print('will run from {first} to {final}'.format(
         first=first, final=final))
