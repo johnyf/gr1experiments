@@ -47,7 +47,7 @@ def plot_report(repickle):
         plot_vs_parameter(path, first, last, repickle=repickle)
 
 
-def plot_comparison_report():
+def plot_comparison_report(ignore=False):
     pairs = [
         # new='bunny_many_goals/runs',
         # slugs='bunny_many_goals/runs_slugs',
@@ -110,7 +110,7 @@ def plot_comparison_report():
             fname='comparison_gr1x_slugs.pdf')
     ]
     for p in pairs:
-        plot_comparison(p)
+        plot_comparison(p, ignore)
 
 
 def plot_vs_parameter(path, first, last, repickle=False):
@@ -223,7 +223,7 @@ def plot_vs_parameter(path, first, last, repickle=False):
     plt.savefig(fig_fname, bbox_inches='tight')
 
 
-def plot_comparison(paths):
+def plot_comparison(paths, ignore):
     """Plot time, ratios, BDD nodes over parameterized experiments.
 
       - time
@@ -257,8 +257,8 @@ def plot_comparison(paths):
         if t > fig_time:
             older = False
             break
-    if older:
-        print('skip "{f}"'.format(f=fig_fname))
+    if older and not ignore:
+        print('skip "{f}"\n'.format(f=fig_fname))
         return
     for k, path in data_paths.iteritems():
         pickle_fname = os.path.join(path, fname)
@@ -606,8 +606,10 @@ if __name__ == '__main__':
                    help='plot comparison of two directories')
     p.add_argument('--repickle', action='store_true',
                    help='ignore older pickled data')
+    p.add_argument('--ignore', action='store_true',
+                   help='ignore older comparison PDF files')
     args = p.parse_args()
     if args.compare:
-        plot_comparison_report()
+        plot_comparison_report(args.ignore)
     else:
         plot_report(args.repickle)
