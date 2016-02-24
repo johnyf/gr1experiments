@@ -276,7 +276,7 @@ def plot_comparison(paths, ignore):
         plot_single_experiment_vs_parameter(d, k, style)
     # plot_total_time_ratio(measurements, paths, data_paths)
     # save
-    print('save "{f}"'.format(f=fig_fname))
+    print('save "{f}"\n'.format(f=fig_fname))
     plt.savefig(fig_fname, bbox_inches='tight')
 
 
