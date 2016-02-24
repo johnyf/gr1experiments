@@ -411,7 +411,8 @@ def compute_winning_set(aut, z=None):
                     del x
                     if MEMOIZE_ITERATES:
                         paths_memoized.append(
-                            (xp & excuse) | live_trans)
+                            ((xp & excuse) | live_trans) &
+                            sys_action)
                 y = or_x
                 del or_x
             log.debug('Reached Y fixpoint')
