@@ -6,8 +6,15 @@ import psutil
 from tugs import utils
 
 
-def scan_directory():
-    path = './bunny_many_goals/runs'
+def scan():
+    paths = [
+        './genbuf/runs',
+        './genbuf/runs_slugs']
+    for path in paths:
+        scan_directory(path)
+
+
+def scan_directory(path):
     logname = 'details_'
     incomplete_files = list()
     for root, dirs, files in os.walk(path):
@@ -75,4 +82,4 @@ def print_progress(f):
 
 
 if __name__ == '__main__':
-    scan_directory()
+    scan()
