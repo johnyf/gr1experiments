@@ -374,7 +374,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # reordering time
-    ax = plt.subplot(2, 2, 2)
+    ax = plt.subplot(2, 2, 3)
     if len(reordering_time_1):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
@@ -392,7 +392,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
-    ax = plt.subplot(2, 2, 3)
+    ax = plt.subplot(2, 2, 2)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, peak_nodes_0, style + 'o',
                  label='{name} (1)'.format(name=name),
