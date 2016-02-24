@@ -253,6 +253,7 @@ def plot_comparison(paths, ignore):
     fname = 'data.pickle'
     older = True
     for path in data_paths.itervalues():
+        path = os.path.join(path, fname)
         t = os.path.getmtime(path)
         if t > fig_time:
             older = False
