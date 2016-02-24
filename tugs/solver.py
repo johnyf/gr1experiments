@@ -25,8 +25,8 @@ BINARY_CONJ = False  # overrides `DEFER_Z`
 DEFER_Z = False
 TWO_MANAGERS = True
 MEMOIZE_ITERATES = True
-FEEDBACK = True
-TIGHT = False
+FEEDBACK = False
+TIGHT = True
 # constants
 REORDERING_LOG = 'reorder'
 COUNTER = '_jx_b'
