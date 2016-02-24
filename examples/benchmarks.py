@@ -81,15 +81,12 @@ def run_slugs(slugsin_file, strategy_file,
     # other_options = ['--fixedPointRecycling']
     other_options = list()
     # config logging
-    level = logging.DEBUG
-    loggers = ['openpromela.slugs']
-    for logname in loggers:
-        log = logging.getLogger(logname)
-        log.setLevel(level)
+    h_psutil = utils.add_logfile(psutil_file, 'openpromela.slugs')
+    log = logging.getLogger('openpromela.slugs')
+    log.setLevel('DEBUG')
     # capture execution environment
     versions = utils.snapshot_versions(check=False)
     log.info(pprint.pformat(versions))
-    h_psutil = utils.add_logfile(psutil_file, 'openpromela.slugs')
     # run
     t0 = time.time()
     r = slugs._call_slugs(
