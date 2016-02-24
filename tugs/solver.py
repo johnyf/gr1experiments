@@ -852,7 +852,7 @@ def command_line_wrapper(args=None):
                    help='logging level')
     p.add_argument('--max_memory', default=MAX_MEMORY_GB, type=int,
                    help='(hard) upper bound on memory, in GB')
-    p.add_argument('--cpu', type=int,
+    p.add_argument('--cpu', default=0, type=int,
                    help='attach self to this logical CPU id')
     p.add_argument('--only_win', action='store_true',
                    help='only compute winning states')
