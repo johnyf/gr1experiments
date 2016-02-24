@@ -398,9 +398,6 @@ def compute_winning_set(aut, z=None):
                         # desired transitions
                         x = xp & excuse
                         x = x | live_trans
-                        if MEMOIZE_ITERATES:
-                            paths = x
-                            paths_memoized.append(paths)
                         x = _bdd.and_exists(x, sys_action,
                                             aut.epvars, bdd)
                         x = _bdd.or_forall(x, ~ env_action,
@@ -412,6 +409,9 @@ def compute_winning_set(aut, z=None):
                     del xold
                     or_x = or_x | x
                     del x
+                    if MEMOIZE_ITERATES:
+                        paths_memoized.append(
+                            (xp & excuse) | live_trans)
                 y = or_x
                 del or_x
             log.debug('Reached Y fixpoint')
