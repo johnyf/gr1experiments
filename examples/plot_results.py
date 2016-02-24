@@ -268,9 +268,9 @@ def plot_comparison(paths, ignore):
             measurements[k] = pickle.load(f)
     # plot
     fig = plt.figure()
-    fig.set_size_inches(5, 12.5)
+    fig.set_size_inches(10, 5)
     plt.clf()
-    plt.subplots_adjust(hspace=0.3, wspace=0.6)
+    plt.subplots_adjust(hspace=0.3, wspace=0.3)
     styles = ['b-', 'r--']
     for (k, d), style in zip(measurements.iteritems(), styles):
         plot_single_experiment_vs_parameter(d, k, style)
@@ -328,7 +328,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     peak_nodes_1 = measurements['peak_nodes_1']
     #
     # total time
-    ax = plt.subplot(5, 1, 1)
+    ax = plt.subplot(2, 2, 1)
     plt.plot(n_masters, total_time, style, label=name)
     # annotate
     ax.set_yscale('log')
@@ -340,7 +340,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # reordering time
-    ax = plt.subplot(5, 1, 2)
+    ax = plt.subplot(2, 2, 2)
     if len(reordering_time_1):
         total_reordering_time = reordering_time_0 + reordering_time_1
     else:
@@ -358,7 +358,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
-    ax = plt.subplot(5, 1, 3)
+    ax = plt.subplot(2, 2, 3)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, peak_nodes_0, style + 'o',
                  label='{name} (1)'.format(name=name),
@@ -377,7 +377,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
-    ax = plt.subplot(5, 1, 4)
+    ax = plt.subplot(2, 2, 4)
     if len(total_nodes_0) == len(n_masters):
         plt.plot(n_masters, total_nodes_0, style,
                  label='{name} (1)'.format(name=name),
