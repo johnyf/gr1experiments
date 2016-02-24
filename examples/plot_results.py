@@ -39,9 +39,11 @@ def plot_report(repickle):
         # 'bunny/runs/': (2, 97)
         # 'cinderella/runs': (0, 10),
         # 'cinderella/runs_slugs': (0, 8)
-        'jcss12/runs': (2, 22),
+        # 'jcss12/runs': (2, 22),
         # 'jcss12/runs_gr1x_no_defer': (2, 25),
-        # 'jcss12/runs_slugs': (2, 16)
+        # 'jcss12/runs_slugs': (2, 16),
+        'genbuf/runs': (2, 90),
+        'genbuf/runs_slugs': (2, 63),
     }
     for path, (first, last) in paths.iteritems():
         plot_vs_parameter(path, first, last, repickle=repickle)
@@ -133,6 +135,11 @@ def plot_comparison_report(ignore=False):
             no_defer='jcss12/runs_gr1x_no_defer',
             numerator='no_defer',
             fname='comparison_no_defer.pdf'),
+        dict(
+            fdbk_no_tight='genbuf/runs',
+            slugs='genbuf/runs_slugs',
+            numerator='fdbk_no_tight',
+            fname='comparison_fdbk_no_tight_vs_slugs.pdf'),
         # dict(
         #     new='cinderella/runs',
         #     slugs='cinderella/runs_slugs',

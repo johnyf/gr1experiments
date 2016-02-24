@@ -20,7 +20,7 @@ GR1X_LOG = 'tugs.solver'
 
 
 def run_parallel():
-    first = 44
+    first = 48
     problem = 'genbuf'
     solver = 'slugs'
     if solver == 'slugs':
@@ -42,9 +42,9 @@ def run_parallel():
         problem=problem, output=output, i=i_str)
     n_cpus = psutil.cpu_count(logical=False)
     # all_cpus = range(n_cpus)
-    all_cpus = [0, 1, 2, 3]
+    all_cpus = [2]
     concurrent = len(all_cpus)
-    repetitions = 3
+    repetitions = 50
     final = first + concurrent * repetitions
     print('will run from {first} to {final}'.format(
         first=first, final=final))
