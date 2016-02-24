@@ -336,7 +336,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     plt.grid(True)
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Total time\n(sec)', fontsize=fsz)
-    leg = plt.legend(loc='upper left', fancybox=True)
+    leg = plt.legend(loc='best', fancybox=True)
     leg.get_frame().set_alpha(0.5)
     #
     # reordering time
@@ -354,7 +354,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     plt.grid(True)
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Total reordering time\n(sec)', fontsize=fsz)
-    leg = plt.legend(loc='upper left', fancybox=True)
+    leg = plt.legend(loc='best', fancybox=True)
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
@@ -373,7 +373,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     plt.grid(True)
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Peak BDD Nodes', fontsize=fsz)
-    leg = plt.legend(loc='upper left', fancybox=True)
+    leg = plt.legend(loc='best', fancybox=True)
     leg.get_frame().set_alpha(0.5)
     #
     # peak BDD nodes
@@ -392,7 +392,7 @@ def plot_single_experiment_vs_parameter(measurements, name, style):
     plt.grid(True)
     plt.xlabel('Parameter', fontsize=fsz)
     plt.ylabel('Total BDD Nodes', fontsize=fsz)
-    leg = plt.legend(loc='upper left', fancybox=True)
+    leg = plt.legend(loc='best', fancybox=True)
     leg.get_frame().set_alpha(0.5)
 
 
