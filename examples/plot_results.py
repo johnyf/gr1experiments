@@ -28,7 +28,7 @@ def plot_report(repickle):
         # 'synt15/runs_slugs/': (2, 49),
         # 'synt15/runs_slugs_browne/': (2, 41),
         #
-        # 'synt15/runs/': (2, 101),
+        'synt15/runs/': (2, 60),
         #
         # 'synt15/runs_gr1x_linear_conj/': (2, 65),
         # 'synt15/runs_gr1x_logging_debug/': (2, 80),
@@ -42,8 +42,9 @@ def plot_report(repickle):
         # 'jcss12/runs': (2, 22),
         # 'jcss12/runs_gr1x_no_defer': (2, 25),
         # 'jcss12/runs_slugs': (2, 16),
-        'genbuf/runs': (2, 90),
-        'genbuf/runs_slugs': (2, 63),
+        #
+        # 'genbuf/runs': (2, 90),
+        # 'genbuf/runs_slugs': (2, 63),
     }
     for path, (first, last) in paths.iteritems():
         plot_vs_parameter(path, first, last, repickle=repickle)
@@ -56,8 +57,8 @@ def plot_comparison_report(ignore=False):
         # numerator='slugs',
         #
         dict(
-            new='synt15/runs_gr1x_logging_info',
-            memoize='synt15/runs_gr1x_memoize',
+            new='synt15/runs_gr1x_fdbk_no_tight',
+            memoize='synt15/runs',
             numerator='memoize',
             fname='comparison_memoize.pdf'),
         dict(
