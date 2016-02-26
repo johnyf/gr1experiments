@@ -1,0 +1,249 @@
+[INPUT]
+StoB_REQ0
+StoB_REQ1
+StoB_REQ2
+StoB_REQ3
+StoB_REQ4
+RtoB_ACK0
+RtoB_ACK1
+FULL
+EMPTY
+###############################################
+###############################################
+# Output variable definition
+# Output variable definition
+###############################################
+###############################################
+
+[OUTPUT]
+BtoS_ACK0
+BtoS_ACK1
+BtoS_ACK2
+BtoS_ACK3
+BtoS_ACK4
+BtoR_REQ0
+BtoR_REQ1
+stateG7_0
+stateG7_1
+ENQ
+DEQ
+stateG12
+SLC0
+SLC1
+SLC2
+###############################################
+###############################################
+# Environment specification
+# Environment specification
+###############################################
+###############################################
+
+[ENV_TRANS]
+| ! & StoB_REQ0 ! BtoS_ACK0 StoB_REQ0'
+# A1
+| ! BtoS_ACK0 ! StoB_REQ0'
+# A1
+| ! & StoB_REQ1 ! BtoS_ACK1 StoB_REQ1'
+# A1
+| ! BtoS_ACK1 ! StoB_REQ1'
+# A1
+| ! & StoB_REQ2 ! BtoS_ACK2 StoB_REQ2'
+# A1
+| ! BtoS_ACK2 ! StoB_REQ2'
+# A1
+| ! & StoB_REQ3 ! BtoS_ACK3 StoB_REQ3'
+# A1
+| ! BtoS_ACK3 ! StoB_REQ3'
+# A1
+| ! & StoB_REQ4 ! BtoS_ACK4 StoB_REQ4'
+# A1
+| ! BtoS_ACK4 ! StoB_REQ4'
+# A1
+| ! ! BtoR_REQ0 ! RtoB_ACK0'
+# A3
+| ! & BtoR_REQ0 RtoB_ACK0 RtoB_ACK0'
+# A4
+| ! ! BtoR_REQ1 ! RtoB_ACK1'
+# A3
+| ! & BtoR_REQ1 RtoB_ACK1 RtoB_ACK1'
+# A4
+| ! & ENQ ! DEQ ! EMPTY'
+# A4
+| ! & DEQ ! ENQ ! FULL'
+# A4
+| ! | & ! ENQ ! DEQ & ENQ DEQ & | & ! FULL ! FULL' & FULL FULL' | & ! EMPTY ! EMPTY' & EMPTY EMPTY'
+# A4
+
+[ENV_INIT]
+! StoB_REQ0
+! StoB_REQ1
+! StoB_REQ2
+! StoB_REQ3
+! StoB_REQ4
+! RtoB_ACK0
+! RtoB_ACK1
+! FULL
+EMPTY
+
+[SYS_TRANS]
+| ! & ! StoB_REQ0 StoB_REQ0' ! BtoS_ACK0'
+# G2
+| ! & ! BtoS_ACK0 ! StoB_REQ0 ! BtoS_ACK0'
+# G2
+| ! & BtoS_ACK0 StoB_REQ0 BtoS_ACK0'
+# G4
+| ! BtoS_ACK0 ! BtoS_ACK1
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK2
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK3
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK4
+# G5
+| ! & ! StoB_REQ1 StoB_REQ1' ! BtoS_ACK1'
+# G2
+| ! & ! BtoS_ACK1 ! StoB_REQ1 ! BtoS_ACK1'
+# G2
+| ! & BtoS_ACK1 StoB_REQ1 BtoS_ACK1'
+# G4
+| ! BtoS_ACK1 ! BtoS_ACK2
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK3
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK4
+# G5
+| ! & ! StoB_REQ2 StoB_REQ2' ! BtoS_ACK2'
+# G2
+| ! & ! BtoS_ACK2 ! StoB_REQ2 ! BtoS_ACK2'
+# G2
+| ! & BtoS_ACK2 StoB_REQ2 BtoS_ACK2'
+# G4
+| ! BtoS_ACK2 ! BtoS_ACK3
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK4
+# G5
+| ! & ! StoB_REQ3 StoB_REQ3' ! BtoS_ACK3'
+# G2
+| ! & ! BtoS_ACK3 ! StoB_REQ3 ! BtoS_ACK3'
+# G2
+| ! & BtoS_ACK3 StoB_REQ3 BtoS_ACK3'
+# G4
+| ! BtoS_ACK3 ! BtoS_ACK4
+# G5
+| ! & ! StoB_REQ4 StoB_REQ4' ! BtoS_ACK4'
+# G2
+| ! & ! BtoS_ACK4 ! StoB_REQ4 ! BtoS_ACK4'
+# G2
+| ! & BtoS_ACK4 StoB_REQ4 BtoS_ACK4'
+# G4
+| ! & BtoR_REQ0 ! RtoB_ACK0 BtoR_REQ0'
+# G6
+| ! BtoR_REQ0 ! BtoR_REQ1
+# G7
+| ! RtoB_ACK0 ! BtoR_REQ0'
+# G8
+| ! & BtoR_REQ1 ! RtoB_ACK1 BtoR_REQ1'
+# G6
+| ! RtoB_ACK1 ! BtoR_REQ1'
+# G8
+| ! & BtoR_REQ0 BtoR_REQ1 0
+# G7
+| ! & & ! stateG7_1 ! BtoR_REQ0 BtoR_REQ1 & stateG7_1' ! stateG7_0'
+# G7
+| ! & & stateG7_1 BtoR_REQ0 ! BtoR_REQ1 & ! stateG7_1' ! stateG7_0'
+# G7
+| ! & & ! stateG7_1 ! BtoR_REQ0 ! BtoR_REQ1 & ! stateG7_1' stateG7_0'
+# G7
+| ! & & stateG7_1 ! BtoR_REQ0 ! BtoR_REQ1 & stateG7_1' stateG7_0'
+# G7
+| ! & & & ! stateG7_1 ! stateG7_0 BtoR_REQ0 ! BtoR_REQ1 & ! stateG7_1' ! stateG7_0'
+# G7
+| ! & & & stateG7_1 ! stateG7_0 ! BtoR_REQ0 BtoR_REQ1 & stateG7_1' ! stateG7_0'
+# G7
+| ! & & ! stateG7_1 stateG7_0 BtoR_REQ0 0
+# G7
+| ! & & stateG7_1 stateG7_0 BtoR_REQ1 0
+# G7
+| ! & ! BtoS_ACK0 BtoS_ACK0' ENQ'
+# G9
+| ! & ! BtoS_ACK0 BtoS_ACK0' & & ! SLC0' ! SLC1' ! SLC2'
+# G9
+| ! & ! BtoS_ACK1 BtoS_ACK1' ENQ'
+# G9
+| & ! & ! BtoS_ACK1 BtoS_ACK1' ! & & SLC0' ! SLC1' ! SLC2' & & ! BtoS_ACK1 BtoS_ACK1' & & SLC0' ! SLC1' ! SLC2'
+# G9
+| ! & ! BtoS_ACK2 BtoS_ACK2' ENQ'
+# G9
+| & ! & ! BtoS_ACK2 BtoS_ACK2' ! & & ! SLC0' SLC1' ! SLC2' & & ! BtoS_ACK2 BtoS_ACK2' & & ! SLC0' SLC1' ! SLC2'
+# G9
+| ! & ! BtoS_ACK3 BtoS_ACK3' ENQ'
+# G9
+| & ! & ! BtoS_ACK3 BtoS_ACK3' ! & & SLC0' SLC1' ! SLC2' & & ! BtoS_ACK3 BtoS_ACK3' & & SLC0' SLC1' ! SLC2'
+# G9
+| ! & ! BtoS_ACK4 BtoS_ACK4' ENQ'
+# G9
+| & ! & ! BtoS_ACK4 BtoS_ACK4' ! & & ! SLC0' ! SLC1' SLC2' & & ! BtoS_ACK4 BtoS_ACK4' & & ! SLC0' ! SLC1' SLC2'
+# G9
+| ! & & & & | BtoS_ACK0 ! BtoS_ACK0' | BtoS_ACK1 ! BtoS_ACK1' | BtoS_ACK2 ! BtoS_ACK2' | BtoS_ACK3 ! BtoS_ACK3' | BtoS_ACK4 ! BtoS_ACK4' ! ENQ'
+# G9
+| ! & RtoB_ACK0 ! RtoB_ACK0' DEQ'
+# G10
+| ! & RtoB_ACK1 ! RtoB_ACK1' DEQ'
+# G10
+| ! & | ! RtoB_ACK0 RtoB_ACK0' | ! RtoB_ACK1 RtoB_ACK1' ! DEQ'
+# G10
+| ! & FULL ! DEQ ! ENQ
+# G11
+| ! EMPTY ! DEQ
+# G11
+| ! & ! stateG12 EMPTY ! stateG12'
+# G12
+| ! & ! stateG12 DEQ ! stateG12'
+# G12
+| ! & & ! stateG12 ! EMPTY ! DEQ stateG12'
+# G12
+| ! & stateG12 ! DEQ stateG12'
+# G12
+| ! & stateG12 DEQ ! stateG12'
+# G12
+
+[SYS_INIT]
+! BtoS_ACK0
+! BtoS_ACK1
+! BtoS_ACK2
+! BtoS_ACK3
+! BtoS_ACK4
+! BtoR_REQ0
+! BtoR_REQ1
+! stateG7_0
+stateG7_1
+! ENQ
+! DEQ
+! stateG12
+! SLC0
+! SLC1
+! SLC2
+
+[ENV_LIVENESS]
+| & ! BtoR_REQ0 ! RtoB_ACK0 & BtoR_REQ0 RtoB_ACK0
+# A2
+| & ! BtoR_REQ1 ! RtoB_ACK1 & BtoR_REQ1 RtoB_ACK1
+# A2
+###############################################
+# System specification
+###############################################
+
+[SYS_LIVENESS]
+| & ! StoB_REQ0 ! BtoS_ACK0 & StoB_REQ0 BtoS_ACK0
+# G1 + G2
+| & ! StoB_REQ1 ! BtoS_ACK1 & StoB_REQ1 BtoS_ACK1
+# G1 + G2
+| & ! StoB_REQ2 ! BtoS_ACK2 & StoB_REQ2 BtoS_ACK2
+# G1 + G2
+| & ! StoB_REQ3 ! BtoS_ACK3 & StoB_REQ3 BtoS_ACK3
+# G1 + G2
+| & ! StoB_REQ4 ! BtoS_ACK4 & StoB_REQ4 BtoS_ACK4
+# G1 + G2
+! stateG12
+# G12
+

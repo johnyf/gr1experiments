@@ -1,0 +1,1035 @@
+[INPUT]
+StoB_REQ0
+StoB_REQ1
+StoB_REQ2
+StoB_REQ3
+StoB_REQ4
+StoB_REQ5
+StoB_REQ6
+StoB_REQ7
+StoB_REQ8
+StoB_REQ9
+StoB_REQ10
+StoB_REQ11
+StoB_REQ12
+StoB_REQ13
+StoB_REQ14
+StoB_REQ15
+StoB_REQ16
+StoB_REQ17
+StoB_REQ18
+StoB_REQ19
+StoB_REQ20
+StoB_REQ21
+RtoB_ACK0
+RtoB_ACK1
+FULL
+EMPTY
+###############################################
+###############################################
+# Output variable definition
+# Output variable definition
+###############################################
+###############################################
+
+[OUTPUT]
+BtoS_ACK0
+BtoS_ACK1
+BtoS_ACK2
+BtoS_ACK3
+BtoS_ACK4
+BtoS_ACK5
+BtoS_ACK6
+BtoS_ACK7
+BtoS_ACK8
+BtoS_ACK9
+BtoS_ACK10
+BtoS_ACK11
+BtoS_ACK12
+BtoS_ACK13
+BtoS_ACK14
+BtoS_ACK15
+BtoS_ACK16
+BtoS_ACK17
+BtoS_ACK18
+BtoS_ACK19
+BtoS_ACK20
+BtoS_ACK21
+BtoR_REQ0
+BtoR_REQ1
+stateG7_0
+stateG7_1
+ENQ
+DEQ
+stateG12
+SLC0
+SLC1
+SLC2
+SLC3
+SLC4
+###############################################
+###############################################
+# Environment specification
+# Environment specification
+###############################################
+###############################################
+
+[ENV_TRANS]
+| ! & StoB_REQ0 ! BtoS_ACK0 StoB_REQ0'
+# A1
+| ! BtoS_ACK0 ! StoB_REQ0'
+# A1
+| ! & StoB_REQ1 ! BtoS_ACK1 StoB_REQ1'
+# A1
+| ! BtoS_ACK1 ! StoB_REQ1'
+# A1
+| ! & StoB_REQ2 ! BtoS_ACK2 StoB_REQ2'
+# A1
+| ! BtoS_ACK2 ! StoB_REQ2'
+# A1
+| ! & StoB_REQ3 ! BtoS_ACK3 StoB_REQ3'
+# A1
+| ! BtoS_ACK3 ! StoB_REQ3'
+# A1
+| ! & StoB_REQ4 ! BtoS_ACK4 StoB_REQ4'
+# A1
+| ! BtoS_ACK4 ! StoB_REQ4'
+# A1
+| ! & StoB_REQ5 ! BtoS_ACK5 StoB_REQ5'
+# A1
+| ! BtoS_ACK5 ! StoB_REQ5'
+# A1
+| ! & StoB_REQ6 ! BtoS_ACK6 StoB_REQ6'
+# A1
+| ! BtoS_ACK6 ! StoB_REQ6'
+# A1
+| ! & StoB_REQ7 ! BtoS_ACK7 StoB_REQ7'
+# A1
+| ! BtoS_ACK7 ! StoB_REQ7'
+# A1
+| ! & StoB_REQ8 ! BtoS_ACK8 StoB_REQ8'
+# A1
+| ! BtoS_ACK8 ! StoB_REQ8'
+# A1
+| ! & StoB_REQ9 ! BtoS_ACK9 StoB_REQ9'
+# A1
+| ! BtoS_ACK9 ! StoB_REQ9'
+# A1
+| ! & StoB_REQ10 ! BtoS_ACK10 StoB_REQ10'
+# A1
+| ! BtoS_ACK10 ! StoB_REQ10'
+# A1
+| ! & StoB_REQ11 ! BtoS_ACK11 StoB_REQ11'
+# A1
+| ! BtoS_ACK11 ! StoB_REQ11'
+# A1
+| ! & StoB_REQ12 ! BtoS_ACK12 StoB_REQ12'
+# A1
+| ! BtoS_ACK12 ! StoB_REQ12'
+# A1
+| ! & StoB_REQ13 ! BtoS_ACK13 StoB_REQ13'
+# A1
+| ! BtoS_ACK13 ! StoB_REQ13'
+# A1
+| ! & StoB_REQ14 ! BtoS_ACK14 StoB_REQ14'
+# A1
+| ! BtoS_ACK14 ! StoB_REQ14'
+# A1
+| ! & StoB_REQ15 ! BtoS_ACK15 StoB_REQ15'
+# A1
+| ! BtoS_ACK15 ! StoB_REQ15'
+# A1
+| ! & StoB_REQ16 ! BtoS_ACK16 StoB_REQ16'
+# A1
+| ! BtoS_ACK16 ! StoB_REQ16'
+# A1
+| ! & StoB_REQ17 ! BtoS_ACK17 StoB_REQ17'
+# A1
+| ! BtoS_ACK17 ! StoB_REQ17'
+# A1
+| ! & StoB_REQ18 ! BtoS_ACK18 StoB_REQ18'
+# A1
+| ! BtoS_ACK18 ! StoB_REQ18'
+# A1
+| ! & StoB_REQ19 ! BtoS_ACK19 StoB_REQ19'
+# A1
+| ! BtoS_ACK19 ! StoB_REQ19'
+# A1
+| ! & StoB_REQ20 ! BtoS_ACK20 StoB_REQ20'
+# A1
+| ! BtoS_ACK20 ! StoB_REQ20'
+# A1
+| ! & StoB_REQ21 ! BtoS_ACK21 StoB_REQ21'
+# A1
+| ! BtoS_ACK21 ! StoB_REQ21'
+# A1
+| ! ! BtoR_REQ0 ! RtoB_ACK0'
+# A3
+| ! & BtoR_REQ0 RtoB_ACK0 RtoB_ACK0'
+# A4
+| ! ! BtoR_REQ1 ! RtoB_ACK1'
+# A3
+| ! & BtoR_REQ1 RtoB_ACK1 RtoB_ACK1'
+# A4
+| ! & ENQ ! DEQ ! EMPTY'
+# A4
+| ! & DEQ ! ENQ ! FULL'
+# A4
+| ! | & ! ENQ ! DEQ & ENQ DEQ & | & ! FULL ! FULL' & FULL FULL' | & ! EMPTY ! EMPTY' & EMPTY EMPTY'
+# A4
+
+[ENV_INIT]
+! StoB_REQ0
+! StoB_REQ1
+! StoB_REQ2
+! StoB_REQ3
+! StoB_REQ4
+! StoB_REQ5
+! StoB_REQ6
+! StoB_REQ7
+! StoB_REQ8
+! StoB_REQ9
+! StoB_REQ10
+! StoB_REQ11
+! StoB_REQ12
+! StoB_REQ13
+! StoB_REQ14
+! StoB_REQ15
+! StoB_REQ16
+! StoB_REQ17
+! StoB_REQ18
+! StoB_REQ19
+! StoB_REQ20
+! StoB_REQ21
+! RtoB_ACK0
+! RtoB_ACK1
+! FULL
+EMPTY
+
+[SYS_TRANS]
+| ! & ! StoB_REQ0 StoB_REQ0' ! BtoS_ACK0'
+# G2
+| ! & ! BtoS_ACK0 ! StoB_REQ0 ! BtoS_ACK0'
+# G2
+| ! & BtoS_ACK0 StoB_REQ0 BtoS_ACK0'
+# G4
+| ! BtoS_ACK0 ! BtoS_ACK1
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK2
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK3
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK4
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK5
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK6
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK0 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ1 StoB_REQ1' ! BtoS_ACK1'
+# G2
+| ! & ! BtoS_ACK1 ! StoB_REQ1 ! BtoS_ACK1'
+# G2
+| ! & BtoS_ACK1 StoB_REQ1 BtoS_ACK1'
+# G4
+| ! BtoS_ACK1 ! BtoS_ACK2
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK3
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK4
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK5
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK6
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK1 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ2 StoB_REQ2' ! BtoS_ACK2'
+# G2
+| ! & ! BtoS_ACK2 ! StoB_REQ2 ! BtoS_ACK2'
+# G2
+| ! & BtoS_ACK2 StoB_REQ2 BtoS_ACK2'
+# G4
+| ! BtoS_ACK2 ! BtoS_ACK3
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK4
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK5
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK6
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK2 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ3 StoB_REQ3' ! BtoS_ACK3'
+# G2
+| ! & ! BtoS_ACK3 ! StoB_REQ3 ! BtoS_ACK3'
+# G2
+| ! & BtoS_ACK3 StoB_REQ3 BtoS_ACK3'
+# G4
+| ! BtoS_ACK3 ! BtoS_ACK4
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK5
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK6
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK3 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ4 StoB_REQ4' ! BtoS_ACK4'
+# G2
+| ! & ! BtoS_ACK4 ! StoB_REQ4 ! BtoS_ACK4'
+# G2
+| ! & BtoS_ACK4 StoB_REQ4 BtoS_ACK4'
+# G4
+| ! BtoS_ACK4 ! BtoS_ACK5
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK6
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK4 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ5 StoB_REQ5' ! BtoS_ACK5'
+# G2
+| ! & ! BtoS_ACK5 ! StoB_REQ5 ! BtoS_ACK5'
+# G2
+| ! & BtoS_ACK5 StoB_REQ5 BtoS_ACK5'
+# G4
+| ! BtoS_ACK5 ! BtoS_ACK6
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK5 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ6 StoB_REQ6' ! BtoS_ACK6'
+# G2
+| ! & ! BtoS_ACK6 ! StoB_REQ6 ! BtoS_ACK6'
+# G2
+| ! & BtoS_ACK6 StoB_REQ6 BtoS_ACK6'
+# G4
+| ! BtoS_ACK6 ! BtoS_ACK7
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK6 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ7 StoB_REQ7' ! BtoS_ACK7'
+# G2
+| ! & ! BtoS_ACK7 ! StoB_REQ7 ! BtoS_ACK7'
+# G2
+| ! & BtoS_ACK7 StoB_REQ7 BtoS_ACK7'
+# G4
+| ! BtoS_ACK7 ! BtoS_ACK8
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK7 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ8 StoB_REQ8' ! BtoS_ACK8'
+# G2
+| ! & ! BtoS_ACK8 ! StoB_REQ8 ! BtoS_ACK8'
+# G2
+| ! & BtoS_ACK8 StoB_REQ8 BtoS_ACK8'
+# G4
+| ! BtoS_ACK8 ! BtoS_ACK9
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK8 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ9 StoB_REQ9' ! BtoS_ACK9'
+# G2
+| ! & ! BtoS_ACK9 ! StoB_REQ9 ! BtoS_ACK9'
+# G2
+| ! & BtoS_ACK9 StoB_REQ9 BtoS_ACK9'
+# G4
+| ! BtoS_ACK9 ! BtoS_ACK10
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK9 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ10 StoB_REQ10' ! BtoS_ACK10'
+# G2
+| ! & ! BtoS_ACK10 ! StoB_REQ10 ! BtoS_ACK10'
+# G2
+| ! & BtoS_ACK10 StoB_REQ10 BtoS_ACK10'
+# G4
+| ! BtoS_ACK10 ! BtoS_ACK11
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK10 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ11 StoB_REQ11' ! BtoS_ACK11'
+# G2
+| ! & ! BtoS_ACK11 ! StoB_REQ11 ! BtoS_ACK11'
+# G2
+| ! & BtoS_ACK11 StoB_REQ11 BtoS_ACK11'
+# G4
+| ! BtoS_ACK11 ! BtoS_ACK12
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK11 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ12 StoB_REQ12' ! BtoS_ACK12'
+# G2
+| ! & ! BtoS_ACK12 ! StoB_REQ12 ! BtoS_ACK12'
+# G2
+| ! & BtoS_ACK12 StoB_REQ12 BtoS_ACK12'
+# G4
+| ! BtoS_ACK12 ! BtoS_ACK13
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK12 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ13 StoB_REQ13' ! BtoS_ACK13'
+# G2
+| ! & ! BtoS_ACK13 ! StoB_REQ13 ! BtoS_ACK13'
+# G2
+| ! & BtoS_ACK13 StoB_REQ13 BtoS_ACK13'
+# G4
+| ! BtoS_ACK13 ! BtoS_ACK14
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK13 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ14 StoB_REQ14' ! BtoS_ACK14'
+# G2
+| ! & ! BtoS_ACK14 ! StoB_REQ14 ! BtoS_ACK14'
+# G2
+| ! & BtoS_ACK14 StoB_REQ14 BtoS_ACK14'
+# G4
+| ! BtoS_ACK14 ! BtoS_ACK15
+# G5
+| ! BtoS_ACK14 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK14 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK14 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK14 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK14 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK14 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ15 StoB_REQ15' ! BtoS_ACK15'
+# G2
+| ! & ! BtoS_ACK15 ! StoB_REQ15 ! BtoS_ACK15'
+# G2
+| ! & BtoS_ACK15 StoB_REQ15 BtoS_ACK15'
+# G4
+| ! BtoS_ACK15 ! BtoS_ACK16
+# G5
+| ! BtoS_ACK15 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK15 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK15 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK15 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK15 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ16 StoB_REQ16' ! BtoS_ACK16'
+# G2
+| ! & ! BtoS_ACK16 ! StoB_REQ16 ! BtoS_ACK16'
+# G2
+| ! & BtoS_ACK16 StoB_REQ16 BtoS_ACK16'
+# G4
+| ! BtoS_ACK16 ! BtoS_ACK17
+# G5
+| ! BtoS_ACK16 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK16 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK16 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK16 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ17 StoB_REQ17' ! BtoS_ACK17'
+# G2
+| ! & ! BtoS_ACK17 ! StoB_REQ17 ! BtoS_ACK17'
+# G2
+| ! & BtoS_ACK17 StoB_REQ17 BtoS_ACK17'
+# G4
+| ! BtoS_ACK17 ! BtoS_ACK18
+# G5
+| ! BtoS_ACK17 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK17 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK17 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ18 StoB_REQ18' ! BtoS_ACK18'
+# G2
+| ! & ! BtoS_ACK18 ! StoB_REQ18 ! BtoS_ACK18'
+# G2
+| ! & BtoS_ACK18 StoB_REQ18 BtoS_ACK18'
+# G4
+| ! BtoS_ACK18 ! BtoS_ACK19
+# G5
+| ! BtoS_ACK18 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK18 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ19 StoB_REQ19' ! BtoS_ACK19'
+# G2
+| ! & ! BtoS_ACK19 ! StoB_REQ19 ! BtoS_ACK19'
+# G2
+| ! & BtoS_ACK19 StoB_REQ19 BtoS_ACK19'
+# G4
+| ! BtoS_ACK19 ! BtoS_ACK20
+# G5
+| ! BtoS_ACK19 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ20 StoB_REQ20' ! BtoS_ACK20'
+# G2
+| ! & ! BtoS_ACK20 ! StoB_REQ20 ! BtoS_ACK20'
+# G2
+| ! & BtoS_ACK20 StoB_REQ20 BtoS_ACK20'
+# G4
+| ! BtoS_ACK20 ! BtoS_ACK21
+# G5
+| ! & ! StoB_REQ21 StoB_REQ21' ! BtoS_ACK21'
+# G2
+| ! & ! BtoS_ACK21 ! StoB_REQ21 ! BtoS_ACK21'
+# G2
+| ! & BtoS_ACK21 StoB_REQ21 BtoS_ACK21'
+# G4
+| ! & BtoR_REQ0 ! RtoB_ACK0 BtoR_REQ0'
+# G6
+| ! BtoR_REQ0 ! BtoR_REQ1
+# G7
+| ! RtoB_ACK0 ! BtoR_REQ0'
+# G8
+| ! & BtoR_REQ1 ! RtoB_ACK1 BtoR_REQ1'
+# G6
+| ! RtoB_ACK1 ! BtoR_REQ1'
+# G8
+| ! & BtoR_REQ0 BtoR_REQ1 0
+# G7
+| ! & & ! stateG7_1 ! BtoR_REQ0 BtoR_REQ1 & stateG7_1' ! stateG7_0'
+# G7
+| ! & & stateG7_1 BtoR_REQ0 ! BtoR_REQ1 & ! stateG7_1' ! stateG7_0'
+# G7
+| ! & & ! stateG7_1 ! BtoR_REQ0 ! BtoR_REQ1 & ! stateG7_1' stateG7_0'
+# G7
+| ! & & stateG7_1 ! BtoR_REQ0 ! BtoR_REQ1 & stateG7_1' stateG7_0'
+# G7
+| ! & & & ! stateG7_1 ! stateG7_0 BtoR_REQ0 ! BtoR_REQ1 & ! stateG7_1' ! stateG7_0'
+# G7
+| ! & & & stateG7_1 ! stateG7_0 ! BtoR_REQ0 BtoR_REQ1 & stateG7_1' ! stateG7_0'
+# G7
+| ! & & ! stateG7_1 stateG7_0 BtoR_REQ0 0
+# G7
+| ! & & stateG7_1 stateG7_0 BtoR_REQ1 0
+# G7
+| ! & ! BtoS_ACK0 BtoS_ACK0' ENQ'
+# G9
+| ! & ! BtoS_ACK0 BtoS_ACK0' & & & & ! SLC0' ! SLC1' ! SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK1 BtoS_ACK1' ENQ'
+# G9
+| & ! & ! BtoS_ACK1 BtoS_ACK1' ! & & & & SLC0' ! SLC1' ! SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK1 BtoS_ACK1' & & & & SLC0' ! SLC1' ! SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK2 BtoS_ACK2' ENQ'
+# G9
+| & ! & ! BtoS_ACK2 BtoS_ACK2' ! & & & & ! SLC0' SLC1' ! SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK2 BtoS_ACK2' & & & & ! SLC0' SLC1' ! SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK3 BtoS_ACK3' ENQ'
+# G9
+| & ! & ! BtoS_ACK3 BtoS_ACK3' ! & & & & SLC0' SLC1' ! SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK3 BtoS_ACK3' & & & & SLC0' SLC1' ! SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK4 BtoS_ACK4' ENQ'
+# G9
+| & ! & ! BtoS_ACK4 BtoS_ACK4' ! & & & & ! SLC0' ! SLC1' SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK4 BtoS_ACK4' & & & & ! SLC0' ! SLC1' SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK5 BtoS_ACK5' ENQ'
+# G9
+| & ! & ! BtoS_ACK5 BtoS_ACK5' ! & & & & SLC0' ! SLC1' SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK5 BtoS_ACK5' & & & & SLC0' ! SLC1' SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK6 BtoS_ACK6' ENQ'
+# G9
+| & ! & ! BtoS_ACK6 BtoS_ACK6' ! & & & & ! SLC0' SLC1' SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK6 BtoS_ACK6' & & & & ! SLC0' SLC1' SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK7 BtoS_ACK7' ENQ'
+# G9
+| & ! & ! BtoS_ACK7 BtoS_ACK7' ! & & & & SLC0' SLC1' SLC2' ! SLC3' ! SLC4' & & ! BtoS_ACK7 BtoS_ACK7' & & & & SLC0' SLC1' SLC2' ! SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK8 BtoS_ACK8' ENQ'
+# G9
+| & ! & ! BtoS_ACK8 BtoS_ACK8' ! & & & & ! SLC0' ! SLC1' ! SLC2' SLC3' ! SLC4' & & ! BtoS_ACK8 BtoS_ACK8' & & & & ! SLC0' ! SLC1' ! SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK9 BtoS_ACK9' ENQ'
+# G9
+| & ! & ! BtoS_ACK9 BtoS_ACK9' ! & & & & SLC0' ! SLC1' ! SLC2' SLC3' ! SLC4' & & ! BtoS_ACK9 BtoS_ACK9' & & & & SLC0' ! SLC1' ! SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK10 BtoS_ACK10' ENQ'
+# G9
+| & ! & ! BtoS_ACK10 BtoS_ACK10' ! & & & & ! SLC0' SLC1' ! SLC2' SLC3' ! SLC4' & & ! BtoS_ACK10 BtoS_ACK10' & & & & ! SLC0' SLC1' ! SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK11 BtoS_ACK11' ENQ'
+# G9
+| & ! & ! BtoS_ACK11 BtoS_ACK11' ! & & & & SLC0' SLC1' ! SLC2' SLC3' ! SLC4' & & ! BtoS_ACK11 BtoS_ACK11' & & & & SLC0' SLC1' ! SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK12 BtoS_ACK12' ENQ'
+# G9
+| & ! & ! BtoS_ACK12 BtoS_ACK12' ! & & & & ! SLC0' ! SLC1' SLC2' SLC3' ! SLC4' & & ! BtoS_ACK12 BtoS_ACK12' & & & & ! SLC0' ! SLC1' SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK13 BtoS_ACK13' ENQ'
+# G9
+| & ! & ! BtoS_ACK13 BtoS_ACK13' ! & & & & SLC0' ! SLC1' SLC2' SLC3' ! SLC4' & & ! BtoS_ACK13 BtoS_ACK13' & & & & SLC0' ! SLC1' SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK14 BtoS_ACK14' ENQ'
+# G9
+| & ! & ! BtoS_ACK14 BtoS_ACK14' ! & & & & ! SLC0' SLC1' SLC2' SLC3' ! SLC4' & & ! BtoS_ACK14 BtoS_ACK14' & & & & ! SLC0' SLC1' SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK15 BtoS_ACK15' ENQ'
+# G9
+| & ! & ! BtoS_ACK15 BtoS_ACK15' ! & & & & SLC0' SLC1' SLC2' SLC3' ! SLC4' & & ! BtoS_ACK15 BtoS_ACK15' & & & & SLC0' SLC1' SLC2' SLC3' ! SLC4'
+# G9
+| ! & ! BtoS_ACK16 BtoS_ACK16' ENQ'
+# G9
+| & ! & ! BtoS_ACK16 BtoS_ACK16' ! & & & & ! SLC0' ! SLC1' ! SLC2' ! SLC3' SLC4' & & ! BtoS_ACK16 BtoS_ACK16' & & & & ! SLC0' ! SLC1' ! SLC2' ! SLC3' SLC4'
+# G9
+| ! & ! BtoS_ACK17 BtoS_ACK17' ENQ'
+# G9
+| & ! & ! BtoS_ACK17 BtoS_ACK17' ! & & & & SLC0' ! SLC1' ! SLC2' ! SLC3' SLC4' & & ! BtoS_ACK17 BtoS_ACK17' & & & & SLC0' ! SLC1' ! SLC2' ! SLC3' SLC4'
+# G9
+| ! & ! BtoS_ACK18 BtoS_ACK18' ENQ'
+# G9
+| & ! & ! BtoS_ACK18 BtoS_ACK18' ! & & & & ! SLC0' SLC1' ! SLC2' ! SLC3' SLC4' & & ! BtoS_ACK18 BtoS_ACK18' & & & & ! SLC0' SLC1' ! SLC2' ! SLC3' SLC4'
+# G9
+| ! & ! BtoS_ACK19 BtoS_ACK19' ENQ'
+# G9
+| & ! & ! BtoS_ACK19 BtoS_ACK19' ! & & & & SLC0' SLC1' ! SLC2' ! SLC3' SLC4' & & ! BtoS_ACK19 BtoS_ACK19' & & & & SLC0' SLC1' ! SLC2' ! SLC3' SLC4'
+# G9
+| ! & ! BtoS_ACK20 BtoS_ACK20' ENQ'
+# G9
+| & ! & ! BtoS_ACK20 BtoS_ACK20' ! & & & & ! SLC0' ! SLC1' SLC2' ! SLC3' SLC4' & & ! BtoS_ACK20 BtoS_ACK20' & & & & ! SLC0' ! SLC1' SLC2' ! SLC3' SLC4'
+# G9
+| ! & ! BtoS_ACK21 BtoS_ACK21' ENQ'
+# G9
+| & ! & ! BtoS_ACK21 BtoS_ACK21' ! & & & & SLC0' ! SLC1' SLC2' ! SLC3' SLC4' & & ! BtoS_ACK21 BtoS_ACK21' & & & & SLC0' ! SLC1' SLC2' ! SLC3' SLC4'
+# G9
+| ! & & & & & & & & & & & & & & & & & & & & & | BtoS_ACK0 ! BtoS_ACK0' | BtoS_ACK1 ! BtoS_ACK1' | BtoS_ACK2 ! BtoS_ACK2' | BtoS_ACK3 ! BtoS_ACK3' | BtoS_ACK4 ! BtoS_ACK4' | BtoS_ACK5 ! BtoS_ACK5' | BtoS_ACK6 ! BtoS_ACK6' | BtoS_ACK7 ! BtoS_ACK7' | BtoS_ACK8 ! BtoS_ACK8' | BtoS_ACK9 ! BtoS_ACK9' | BtoS_ACK10 ! BtoS_ACK10' | BtoS_ACK11 ! BtoS_ACK11' | BtoS_ACK12 ! BtoS_ACK12' | BtoS_ACK13 ! BtoS_ACK13' | BtoS_ACK14 ! BtoS_ACK14' | BtoS_ACK15 ! BtoS_ACK15' | BtoS_ACK16 ! BtoS_ACK16' | BtoS_ACK17 ! BtoS_ACK17' | BtoS_ACK18 ! BtoS_ACK18' | BtoS_ACK19 ! BtoS_ACK19' | BtoS_ACK20 ! BtoS_ACK20' | BtoS_ACK21 ! BtoS_ACK21' ! ENQ'
+# G9
+| ! & RtoB_ACK0 ! RtoB_ACK0' DEQ'
+# G10
+| ! & RtoB_ACK1 ! RtoB_ACK1' DEQ'
+# G10
+| ! & | ! RtoB_ACK0 RtoB_ACK0' | ! RtoB_ACK1 RtoB_ACK1' ! DEQ'
+# G10
+| ! & FULL ! DEQ ! ENQ
+# G11
+| ! EMPTY ! DEQ
+# G11
+| ! & ! stateG12 EMPTY ! stateG12'
+# G12
+| ! & ! stateG12 DEQ ! stateG12'
+# G12
+| ! & & ! stateG12 ! EMPTY ! DEQ stateG12'
+# G12
+| ! & stateG12 ! DEQ stateG12'
+# G12
+| ! & stateG12 DEQ ! stateG12'
+# G12
+
+[SYS_INIT]
+! BtoS_ACK0
+! BtoS_ACK1
+! BtoS_ACK2
+! BtoS_ACK3
+! BtoS_ACK4
+! BtoS_ACK5
+! BtoS_ACK6
+! BtoS_ACK7
+! BtoS_ACK8
+! BtoS_ACK9
+! BtoS_ACK10
+! BtoS_ACK11
+! BtoS_ACK12
+! BtoS_ACK13
+! BtoS_ACK14
+! BtoS_ACK15
+! BtoS_ACK16
+! BtoS_ACK17
+! BtoS_ACK18
+! BtoS_ACK19
+! BtoS_ACK20
+! BtoS_ACK21
+! BtoR_REQ0
+! BtoR_REQ1
+! stateG7_0
+stateG7_1
+! ENQ
+! DEQ
+! stateG12
+! SLC0
+! SLC1
+! SLC2
+! SLC3
+! SLC4
+
+[ENV_LIVENESS]
+| & ! BtoR_REQ0 ! RtoB_ACK0 & BtoR_REQ0 RtoB_ACK0
+# A2
+| & ! BtoR_REQ1 ! RtoB_ACK1 & BtoR_REQ1 RtoB_ACK1
+# A2
+###############################################
+# System specification
+###############################################
+
+[SYS_LIVENESS]
+| & ! StoB_REQ0 ! BtoS_ACK0 & StoB_REQ0 BtoS_ACK0
+# G1 + G2
+| & ! StoB_REQ1 ! BtoS_ACK1 & StoB_REQ1 BtoS_ACK1
+# G1 + G2
+| & ! StoB_REQ2 ! BtoS_ACK2 & StoB_REQ2 BtoS_ACK2
+# G1 + G2
+| & ! StoB_REQ3 ! BtoS_ACK3 & StoB_REQ3 BtoS_ACK3
+# G1 + G2
+| & ! StoB_REQ4 ! BtoS_ACK4 & StoB_REQ4 BtoS_ACK4
+# G1 + G2
+| & ! StoB_REQ5 ! BtoS_ACK5 & StoB_REQ5 BtoS_ACK5
+# G1 + G2
+| & ! StoB_REQ6 ! BtoS_ACK6 & StoB_REQ6 BtoS_ACK6
+# G1 + G2
+| & ! StoB_REQ7 ! BtoS_ACK7 & StoB_REQ7 BtoS_ACK7
+# G1 + G2
+| & ! StoB_REQ8 ! BtoS_ACK8 & StoB_REQ8 BtoS_ACK8
+# G1 + G2
+| & ! StoB_REQ9 ! BtoS_ACK9 & StoB_REQ9 BtoS_ACK9
+# G1 + G2
+| & ! StoB_REQ10 ! BtoS_ACK10 & StoB_REQ10 BtoS_ACK10
+# G1 + G2
+| & ! StoB_REQ11 ! BtoS_ACK11 & StoB_REQ11 BtoS_ACK11
+# G1 + G2
+| & ! StoB_REQ12 ! BtoS_ACK12 & StoB_REQ12 BtoS_ACK12
+# G1 + G2
+| & ! StoB_REQ13 ! BtoS_ACK13 & StoB_REQ13 BtoS_ACK13
+# G1 + G2
+| & ! StoB_REQ14 ! BtoS_ACK14 & StoB_REQ14 BtoS_ACK14
+# G1 + G2
+| & ! StoB_REQ15 ! BtoS_ACK15 & StoB_REQ15 BtoS_ACK15
+# G1 + G2
+| & ! StoB_REQ16 ! BtoS_ACK16 & StoB_REQ16 BtoS_ACK16
+# G1 + G2
+| & ! StoB_REQ17 ! BtoS_ACK17 & StoB_REQ17 BtoS_ACK17
+# G1 + G2
+| & ! StoB_REQ18 ! BtoS_ACK18 & StoB_REQ18 BtoS_ACK18
+# G1 + G2
+| & ! StoB_REQ19 ! BtoS_ACK19 & StoB_REQ19 BtoS_ACK19
+# G1 + G2
+| & ! StoB_REQ20 ! BtoS_ACK20 & StoB_REQ20 BtoS_ACK20
+# G1 + G2
+| & ! StoB_REQ21 ! BtoS_ACK21 & StoB_REQ21 BtoS_ACK21
+# G1 + G2
+! stateG12
+# G12
+
